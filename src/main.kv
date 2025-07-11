@@ -1,0 +1,28 @@
+MDScreen:
+    md_bg_color: self.theme_cls.backgroundColor
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+
+                MDActionTopAppBarButton:
+                    id: theme_mode
+                    icon: "weather-sunny"
+                    on_release: app.change_theme()
+
+            MDTopAppBarTitle:
+                text: "FormulaX"
+                pos_hint: {"center_x": .5}
+
+            MDTopAppBarTrailingButtonContainer:
+
+                MDActionTopAppBarButton:
+                    icon: "plus-circle"
+                    on_release: app.write_note_menu.open()
+
+        Widget:
