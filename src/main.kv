@@ -22,7 +22,10 @@ MDScreen:
             MDTopAppBarTrailingButtonContainer:
 
                 MDActionTopAppBarButton:
+                    id: add_button
                     icon: "plus-circle"
-                    on_release: app.write_note_menu.open()
+                    on_release: app.add_menu_open()
 
-        Widget:
+        ScrollView:
+            MDList:
+                id: category_list
