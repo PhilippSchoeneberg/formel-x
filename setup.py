@@ -55,6 +55,8 @@ CREATE TABLE questions (
     correct_answer  TEXT NOT NULL,
     wrong_answer1   TEXT NOT NULL,
     wrong_answer2   TEXT NOT NULL,
+    wrong_answer3   TEXT NOT NULL,
+    wrong_answer4   TEXT NOT NULL,
     date            TEXT NOT NULL
 )
 """)

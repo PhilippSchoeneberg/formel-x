@@ -20,6 +20,12 @@
             MDTopAppBarTrailingButtonContainer:
 
                 MDActionTopAppBarButton:
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("mainMenu")
+
+
+                MDActionTopAppBarButton:
                     id: add_button
                     icon: "plus-circle"
                     on_release: app.add_menu_open()

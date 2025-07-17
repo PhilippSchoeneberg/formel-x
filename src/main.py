@@ -1,9 +1,11 @@
 from popups.createCompoundPopUpMenu import CreateFormulaPopUpMenu
 from popups.createCategoryPopUpMenu import CreateCategoryPopUpMenu
+from popups.createQuestionPopUpMenu import CreateQuestionPopUpMenu
 from popups.loginAccountPopUpMenu import LoginAccountPopUpMenu
 from screens.mainMenu import MainMenuScreen
-from screens.questionMenu import QuestionMenuScreen
+from screens.questionLearning import QuestionLearningScreen
 from screens.compoundMenu import CompoundMenuScreen
+from screens.compoundLearning import CompoundLearningScreen
 from screens.elementMenu import ElementMenuScreen
 
 from kivymd.uix.menu import MDDropdownMenu
@@ -21,17 +23,26 @@ class MainApp(MDApp):
         kv_files = [
             "src/main.kv",
             "src/screens/mainMenu.kv",
-            "src/screens/questionMenu.kv",
+            "src/screens/questionLearning.kv",
             "src/screens/compoundMenu.kv",
+            "src/screens/compoundLearning.kv",
             "src/screens/elementMenu.kv",
         ]
         for file in kv_files:
             Builder.load_file(file)
+
+        self.mainMenuScreen = MainMenuScreen(name="mainMenu")
+        self.elementMenuScreen = ElementMenuScreen(name="elementMenu")
+        self.compoundMenuScreen = CompoundMenuScreen(name="compoundMenu")
+        self.compoundLearningScreen = CompoundLearningScreen(name="compoundLearning")
+        self.questionLearningScreen = QuestionLearningScreen(name="questionLearning")
+
         sm = ScreenManager()
-        sm.add_widget(MainMenuScreen(name="mainMenu"))
-        sm.add_widget(ElementMenuScreen(name="elementMenu"))
-        sm.add_widget(CompoundMenuScreen(name="compoundMenu"))
-        sm.add_widget(QuestionMenuScreen(name="questionMenu"))
+        sm.add_widget(self.mainMenuScreen)
+        sm.add_widget(self.elementMenuScreen)
+        sm.add_widget(self.compoundMenuScreen)
+        sm.add_widget(self.compoundLearningScreen)
+        sm.add_widget(self.questionLearningScreen)
         self.root = sm
         return sm
 
@@ -51,6 +62,9 @@ class MainApp(MDApp):
 
         # Instantiate createCategoryPopUpMenu
         self.create_category_popup_menu = CreateCategoryPopUpMenu()
+
+        # Instantiate createCategoryPopUpMenu
+        self.create_question_popup_menu = CreateQuestionPopUpMenu()
 
         self.fill_modes_list()
         self.fill_category_list()
@@ -72,7 +86,7 @@ class MainApp(MDApp):
         self.root.get_screen("mainMenu").ids.mode_list.add_widget(
             MDListItem(
                 MDListItemHeadlineText(text="Questions"),
-                on_release=lambda _: self.change_screen("questionMenu")
+                on_release=lambda _: self.questionLearningScreen.start_learning()
             )
         )
 
@@ -80,22 +94,68 @@ class MainApp(MDApp):
         self.root.current = name
 
     def get_all_categories(self):
-        self.cursor.execute("SELECT name FROM categories")
-        return [row[0] for row in self.cursor.fetchall()]
+        self.cursor.execute("SELECT id, name, date FROM categories")
+        rows = self.cursor.fetchall()
+
+        category_dict = {
+            row[0]: {
+                "name": row[1],
+                "date": row[2],
+            }
+            for row in rows
+        }
+
+        return category_dict
+
+    def get_all_compounds(self):
+        self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category, date FROM compounds")
+        rows = self.cursor.fetchall()
+
+        compound_dict = {
+            row[0]: {
+                "correct_name": row[1],
+                "wrong_name1": row[2],
+                "wrong_name2": row[3],
+                "correct_formula": row[4],
+                "wrong_formula1": row[5],
+                "wrong_formula2": row[6],
+                "category": row[7],
+                "date": row[8],
+            }
+            for row in rows
+        }
+
+        return compound_dict
+
+    def get_all_questions(self):
+        self.cursor.execute("SELECT id, question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, date FROM questions")
+        rows = self.cursor.fetchall()
+
+        compound_dict = {
+            row[0]: {
+                "question": row[1],
+                "correct_answer": row[2],
+                "wrong_answer1": row[3],
+                "wrong_answer2": row[4],
+                "wrong_answer3": row[5],
+                "wrong_answer4": row[6],
+                "date": row[7],
+            }
+            for row in rows
+        }
+
+        return compound_dict
 
     def fill_category_list(self):
         self.root.get_screen("compoundMenu").ids.category_list.clear_widgets()
         categories = self.get_all_categories()
 
-        for category in categories:
+        for category_id, category in categories.items():
             item = MDListItem(
-                MDListItemHeadlineText(text=category),
-                on_release=lambda x=category: self.on_category_selected(x)
+                MDListItemHeadlineText(text=category["name"]),
+                on_release=lambda _, cat_id=category_id: self.compoundLearningScreen.start_learning(cat_id)
             )
             self.root.get_screen("compoundMenu").ids.category_list.add_widget(item)
-
-    def on_category_selected(self, category):
-        print(f"Selected category: {category}")
 
     def add_menu_open(self):
         add_menu_items = [
