@@ -99,7 +99,7 @@ class CreateFormulaPopUpMenu(MDDialog):
             MDDialogButtonContainer(
                 Widget(),
                 MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_note),
+                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_compound),
                 spacing="8dp",
             ),
         )
@@ -134,7 +134,7 @@ class CreateFormulaPopUpMenu(MDDialog):
         self.categories_button_text.text = category
         self.categories_dropdown_menu.dismiss()
 
-    def add_note(self, *args, **kwargs):
+    def add_compound(self, *args, **kwargs):
         app = App.get_running_app()
         correct_name = self.correct_name_field.text.strip()
         wrong_name1 = self.wrong_name_field1.text.strip()
