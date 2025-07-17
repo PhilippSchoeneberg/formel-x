@@ -1,0 +1,34 @@
+<CompoundLearningScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+
+                MDActionTopAppBarButton:
+                    id: theme_mode
+                    icon: "weather-sunny"
+                    on_release: app.change_theme()
+
+            MDTopAppBarTitle:
+                text: "FormulaX"
+                pos_hint: {"center_x": .5}
+
+            MDTopAppBarTrailingButtonContainer:
+
+                MDActionTopAppBarButton:
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("compoundMenu")
+
+                MDActionTopAppBarButton:
+                    id: back_button
+                    icon: "plus-circle"
+                    on_release: app.change_screen("compoundMenu")
+
+        ScrollView:
+            MDList:
+                id: compound_learning_list
