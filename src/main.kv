@@ -1,31 +1,11 @@
-MDScreen:
-    md_bg_color: self.theme_cls.backgroundColor
+ScreenManager:
+    id: screen_manager
 
-    BoxLayout:
-        orientation: 'vertical'
-
-        MDTopAppBar:
-            type: "small"
-            size_hint_x: 1
-
-            MDTopAppBarLeadingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    id: theme_mode
-                    icon: "weather-sunny"
-                    on_release: app.change_theme()
-
-            MDTopAppBarTitle:
-                text: "FormulaX"
-                pos_hint: {"center_x": .5}
-
-            MDTopAppBarTrailingButtonContainer:
-
-                MDActionTopAppBarButton:
-                    id: add_button
-                    icon: "plus-circle"
-                    on_release: app.add_menu_open()
-
-        ScrollView:
-            MDList:
-                id: category_list
+    MainMenuScreen:
+        name: "mainMenu"
+    QuestionMenuScreen:
+        name: "questionMenu"
+    CompoundMenuScreen
+        name: "compoundMenu"
+    ElementMenuScreen:
+        name: "elementMenu"

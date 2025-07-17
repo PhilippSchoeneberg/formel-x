@@ -1,6 +1,7 @@
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.uix.scrollview import ScrollView
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -12,16 +13,50 @@ class CreateFormulaPopUpMenu(MDDialog):
     def __init__(self):
         self.selected_category = None
 
-        self.name_field = MDTextField(
-            MDTextFieldHintText(text="Formula name"),
+        self.correct_name_field = MDTextField(
+            MDTextFieldHintText(text="Correct Formula Name"),
             MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
 
-        self.formula_field = MDTextField(
-            MDTextFieldHintText(text="Formula"),
+        self.wrong_name_field1 = MDTextField(
+            MDTextFieldHintText(text="First wrong Formula Name"),
+            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            mode="outlined",
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.wrong_name_field2 = MDTextField(
+            MDTextFieldHintText(text="Second wrong Formula Name"),
+            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            mode="outlined",
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.correct_formula_field = MDTextField(
+            MDTextFieldHintText(text="Correct Formula"),
+            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            mode="outlined",
+            multiline=True,
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.wrong_formula_field1 = MDTextField(
+            MDTextFieldHintText(text="First wrong Formula"),
+            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            mode="outlined",
+            multiline=True,
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.wrong_formula_field2 = MDTextField(
+            MDTextFieldHintText(text="Second wrong Formula"),
             MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
             mode="outlined",
             multiline=True,
@@ -38,8 +73,12 @@ class CreateFormulaPopUpMenu(MDDialog):
         )
 
         content_box = MDBoxLayout(
-            self.name_field,
-            self.formula_field,
+            self.correct_name_field,
+            self.wrong_name_field1,
+            self.wrong_name_field2,
+            self.correct_formula_field,
+            self.wrong_formula_field1,
+            self.wrong_formula_field2,
             self.categories_button,
             orientation="vertical",
             spacing="30dp",
@@ -47,9 +86,16 @@ class CreateFormulaPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
+        scroll_view = ScrollView(
+            size_hint=(1, None),
+            height="400dp",  # You can adjust this height as needed
+            do_scroll_x=False,
+        )
+        scroll_view.add_widget(content_box)
+
         super().__init__(
             MDDialogHeadlineText(text="Create Formula", halign="center"),
-            MDDialogContentContainer(content_box),
+            MDDialogContentContainer(scroll_view),
             MDDialogButtonContainer(
                 Widget(),
                 MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
@@ -90,17 +136,21 @@ class CreateFormulaPopUpMenu(MDDialog):
 
     def add_note(self, *args, **kwargs):
         app = App.get_running_app()
-        name = self.name_field.text.strip()
-        formula = self.formula_field.text.strip()
+        correct_name = self.correct_name_field.text.strip()
+        wrong_name1 = self.wrong_name_field1.text.strip()
+        wrong_name2 = self.wrong_name_field2.text.strip()
+        correct_formula = self.correct_formula_field.text.strip()
+        wrong_formula1 = self.wrong_formula_field1.text.strip()
+        wrong_formula2 = self.wrong_formula_field2.text.strip()
         category = self.selected_category
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
-        if not name:
-            self.name_field.error = True
+        if not correct_name:
+            self.correct_name_field.error = True
             valid = False
-        if not formula:
-            self.formula_field.error = True
+        if not correct_formula:
+            self.correct_formula_field.error = True
             valid = False
         if not category:
             self.categories_button_text.text = "Please select a category"
@@ -112,17 +162,17 @@ class CreateFormulaPopUpMenu(MDDialog):
             if result:
                 category_id = result[0]
             app.cursor.execute(
-                "INSERT INTO formulas (name, formula, category, date) VALUES (?, ?, ?, ?)",
-                (name, formula, category_id, date)
+                "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date)
             )
             app.connection.commit()
             self.dismiss()
 
     def dismiss(self, *args, **kwargs):
-        self.name_field.text = ""
-        self.formula_field.text = ""
-        self.name_field.error = False
-        self.formula_field.error = False
+        self.correct_name_field.text = ""
+        self.correct_formula_field.text = ""
+        self.correct_name_field.error = False
+        self.correct_formula_field.error = False
         self.categories_button_text.text = "Select Category"
         self.selected_category = None
         super().dismiss()

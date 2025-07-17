@@ -57,6 +57,7 @@ class CreateCategoryPopUpMenu(MDDialog):
                 (name, date)
             )
             app.connection.commit()
+            app.fill_category_list()
             self.dismiss()
 
     def dismiss(self, *args, **kwargs):
