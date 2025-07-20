@@ -149,12 +149,18 @@ class CreateFormulaPopUpMenu(MDDialog):
         if not correct_name:
             self.correct_name_field.error = True
             valid = False
+        else:
+            self.correct_name_field.error = False
         if not correct_formula:
             self.correct_formula_field.error = True
             valid = False
+        else:
+            self.correct_formula_field.error = False
         if not category:
             self.categories_button_text.text = "Please select a category"
             valid = False
+        else:
+            self.categories_button_text.error = False
 
         if valid:
             app.cursor.execute("SELECT id FROM categories WHERE name = ?", (category,))

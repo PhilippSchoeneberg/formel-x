@@ -7,10 +7,33 @@ cursor = connection.cursor()
 cursor.execute("PRAGMA foreign_keys = ON")
 
 # Drop tables if they exist (for re-creation)
+cursor.execute("DROP TABLE IF EXISTS accounts")
+cursor.execute("DROP TABLE IF EXISTS groups")
 cursor.execute("DROP TABLE IF EXISTS elements")
 cursor.execute("DROP TABLE IF EXISTS compounds")
 cursor.execute("DROP TABLE IF EXISTS categories")
 cursor.execute("DROP TABLE IF EXISTS questions")
+
+# Create table "accounts"
+cursor.execute("""
+CREATE TABLE accounts (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    email       TEXT NOT NULL UNIQUE,
+    password    TEXT NOT NULL,
+    date        TEXT NOT NULL
+)
+""")
+
+# Create table "groups" with foreign key reference to accounts(id)
+cursor.execute("""
+CREATE TABLE groups (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL UNIQUE,
+    owner_id    TEXT NOT NULL,
+    date        TEXT NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES accounts(id)
+)
+""")
 
 # Create table "elements" with foreign key reference to categories(id)
 cursor.execute("""
@@ -41,9 +64,9 @@ CREATE TABLE compounds (
     correct_formula TEXT NOT NULL,
     wrong_formula1  TEXT NOT NULL,
     wrong_formula2  TEXT NOT NULL,
-    category        INTEGER NOT NULL,
+    category_id        INTEGER NOT NULL,
     date            TEXT NOT NULL,
-    FOREIGN KEY (category) REFERENCES categories(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id)
 )
 """)
 

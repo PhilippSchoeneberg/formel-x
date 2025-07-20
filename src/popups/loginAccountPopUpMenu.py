@@ -1,46 +1,65 @@
+import datetime
+import bcrypt
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
-from kivy.uix.widget import Widget
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.menu import MDDropdownMenu
-import datetime
 
 
 class LoginAccountPopUpMenu(MDDialog):
     def __init__(self):
+        self.register_mode = False
         self.selected_category = None
 
-        self.name_field = MDTextField(
-            MDTextFieldHintText(text="Login name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+        self.email_helper_text = MDTextFieldHelperText(text="E-Mail Address can't be empty", mode="on_error")
+
+        self.email_field = MDTextField(
+            MDTextFieldHintText(text="E-Mail Address"),
+            self.email_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
 
-        self.formula_field = MDTextField(
-            MDTextFieldHintText(text="Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+        self.password_helper_text = MDTextFieldHelperText(text="Password can't be empty", mode="on_error")
+
+        self.password_field = MDTextField(
+            MDTextFieldHintText(text="Password"),
+            self.password_helper_text,
             mode="outlined",
-            multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
+            password=True,
         )
 
-        self.categories_button_text = MDButtonText(text="Select Category")
+        self.password_repetition_helper_text = MDTextFieldHelperText(text="Password repetition can't be empty", mode="on_error")
 
-        self.categories_button = MDButton(
-            self.categories_button_text,
-            style="outlined",
-            on_release=self.open_categories_dropdown,
+        self.password_repetition_field = MDTextField(
+            MDTextFieldHintText(text="Password repetition"),
+            self.password_repetition_helper_text,
+            mode="outlined",
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+            password=True,
         )
 
-        content_box = MDBoxLayout(
-            self.name_field,
-            self.formula_field,
-            self.categories_button,
+        self.toggle_button = MDButton(
+            MDButtonText(text="Go to Registration"),
+            style="text",
+            on_release=self.toggle_mode,
+        )
+
+        self.submit_button = MDButton(MDButtonText(text="Login"),
+            style="text",
+            on_release=self.login,
+        )
+
+        self.headline = MDDialogHeadlineText(text="Login", halign="center")
+
+        self.content_box = MDBoxLayout(
+            self.email_field,
+            self.password_field,
             orientation="vertical",
             spacing="30dp",
             adaptive_height=True,
@@ -48,81 +67,103 @@ class LoginAccountPopUpMenu(MDDialog):
         )
 
         super().__init__(
-            MDDialogHeadlineText(text="Login", halign="center"),
-            MDDialogContentContainer(content_box),
+            self.headline,
+            MDDialogContentContainer(self.content_box),
             MDDialogButtonContainer(
-                Widget(),
                 MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_note),
+                self.submit_button,
+                self.toggle_button,
                 spacing="8dp",
             ),
         )
 
-        self.categories_dropdown_menu = MDDropdownMenu(
-            caller=self.categories_button,
-            items=[],
-            width_mult=4,
-        )
 
-    def open(self):
-        self.categories_dropdown_menu.items = self.get_category_items()
-        super().open()
+    def toggle_mode(self, *args):
+        if self.password_repetition_field.parent is None:
+            self.register_mode = True
+            self.content_box.add_widget(self.password_repetition_field)
+            self.headline.text = "Register"
+            self.submit_button.children[0].text = "Register"
+            self.toggle_button.children[0].text = "Go to Login"
+        else:
+            self.register_mode = False
+            self.content_box.remove_widget(self.password_repetition_field)
+            self.headline.text = "Login"
+            self.submit_button.children[0].text = "Login"
+            self.toggle_button.children[0].text = "Go to Registration"
 
-    def open_categories_dropdown(self, *args):
-        self.categories_dropdown_menu.open()
 
-    def get_category_items(self):
+    def login(self, *args, **kwargs):
         app = App.get_running_app()
-        app.cursor.execute("SELECT name FROM categories")
-        categories = [row[0] for row in app.cursor.fetchall()]
-        return [
-            {
-                "text": cat,
-                "on_release": lambda x=cat: self.set_category(x),
-            }
-            for cat in categories
-        ]
-
-    def set_category(self, category):
-        self.selected_category = category
-        self.categories_button_text.text = category
-        self.categories_dropdown_menu.dismiss()
-
-    def add_note(self, *args, **kwargs):
-        app = App.get_running_app()
-        name = self.name_field.text.strip()
-        formula = self.formula_field.text.strip()
-        category = self.selected_category
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        email = self.email_field.text.strip()
+        password = self.password_field.text.strip()
 
         valid = True
-        if not name:
-            self.name_field.error = True
+        if not email:
+            self.email_helper_text.text = "E-Mail Address can't be empty"
+            self.email_field.error = False
+            self.email_field.error = True
             valid = False
-        if not formula:
-            self.formula_field.error = True
+        else:
+            self.email_field.error = False
+        if not password:
+            self.password_helper_text.text = "Password can't be empty"
+            self.password_field.error = False
+            self.password_field.error = True
             valid = False
-        if not category:
-            self.categories_button_text.text = "Please select a category"
-            valid = False
+        else:
+            self.password_field.error = False
 
-        if valid:
-            app.cursor.execute("SELECT id FROM categories WHERE name = ?", (category,))
-            result = app.cursor.fetchone()
-            if result:
-                category_id = result[0]
-            app.cursor.execute(
-                "INSERT INTO formulas (name, formula, category, date) VALUES (?, ?, ?, ?)",
-                (name, formula, category_id, date)
-            )
-            app.connection.commit()
-            self.dismiss()
+        if not self.register_mode:
+            if valid:
+                app.cursor.execute("SELECT id, password FROM accounts WHERE email = ?", (email,))
+                result = app.cursor.fetchone()
+                if result and bcrypt.checkpw(password.encode("utf-8"), result[1].encode("utf-8")):
+                    app.loggedInUserId = result[0]
+                    app.connection.commit()
+                    self.dismiss()
+                else:
+                    self.email_helper_text.text = "E-Mail Address or password is incorrect"
+                    self.email_field.error = False
+                    self.email_field.error = True
+                    self.password_helper_text.text = "E-Mail Address or password is incorrect"
+                    self.password_field.error = False
+                    self.password_field.error = True
+        else:
+            password_repetition = self.password_repetition_field.text.strip()
+            date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            if not password_repetition:
+                self.password_repetition_helper_text.text = "Password repetition can't be empty"
+                self.password_repetition_field.error = False
+                self.password_repetition_field.error = True
+                valid = False
+            elif password != password_repetition:
+                self.password_helper_text.text = "Passwords do not match"
+                self.password_field.error = False
+                self.password_field.error = True
+                self.password_repetition_helper_text.text = "Passwords do not match"
+                self.password_repetition_helper_text.error = False
+                self.password_repetition_helper_text.error = True
+                valid = False
+            else:
+                self.password_repetition_field.error = False
+            if valid:
+                hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+                app.cursor.execute(
+                    "INSERT INTO accounts (email, password, date) VALUES (?, ?, ?)",
+                    (email, hashed_password, date)
+                )
+                app.connection.commit()
+                self.dismiss()
+
 
     def dismiss(self, *args, **kwargs):
-        self.name_field.text = ""
-        self.formula_field.text = ""
-        self.name_field.error = False
-        self.formula_field.error = False
-        self.categories_button_text.text = "Select Category"
-        self.selected_category = None
+        if self.register_mode:
+            self.toggle_mode()
+        self.email_field.text = ""
+        self.password_field.text = ""
+        self.password_repetition_field.text = ""
+        self.email_field.error = False
+        self.password_field.error = False
+        self.password_repetition_field.error = False
         super().dismiss()

@@ -18,6 +18,7 @@ import sqlite3
 class MainApp(MDApp):
     connection = None
     cursor = None
+    loggedInUserId = None
 
     def build(self):
         kv_files = [
@@ -108,7 +109,7 @@ class MainApp(MDApp):
         return category_dict
 
     def get_all_compounds(self):
-        self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category, date FROM compounds")
+        self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date FROM compounds")
         rows = self.cursor.fetchall()
 
         compound_dict = {
