@@ -1,0 +1,30 @@
+{
+    "loggedInUserId": null,
+    "loggedInGroup": {
+        "id": 1,
+        "name": "a"
+    },
+    "groups": [
+        {
+            "id": 1,
+            "name": "a"
+        },
+        {
+            "id": 2,
+            "name": "b"
+        },
+        {
+            "id": 3,
+            "name": "v"
+        },
+        {
+            "id": 3,
+            "name": "v"
+        },
+        {
+            "id": 4,
+            "name": "m"
+        }
+    ],
+    "darkMode": true
+}

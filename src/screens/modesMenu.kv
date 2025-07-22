@@ -1,0 +1,53 @@
+<ModesMenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: theme_mode
+                    icon: "weather-sunny"
+                    on_release: app.change_theme()
+
+            MDTopAppBarTitle:
+                text: "FormulaX"
+                pos_hint: {"center_x": .5}
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: account_button
+                    icon: "account"
+
+        ScrollView:
+            MDList:
+                id: mode_list
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: choose_group_button
+                    icon: "autorenew"
+                    on_release: app.modesMenuScreen.group_menu_open()
+
+            MDTopAppBarTitle:
+                id: group_name
+                text: "Choose Group"
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: create_group_button
+                    opacity: 0
+                    disabled: True
+                    icon: "plus-circle"
+                    on_release: app.create_group_popup_menu.open()
+
+                MDActionTopAppBarButton:
+                    id: add_group_button
+                    icon: "plus"
+                    on_release: app.add_group_popup_menu.open()

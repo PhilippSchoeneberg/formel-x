@@ -20,14 +20,14 @@
             MDTopAppBarTrailingButtonContainer:
 
                 MDActionTopAppBarButton:
-                    id: back_button
-                    icon: "arrow-left"
-                    on_release: app.change_screen("mainMenu")
-
-                MDActionTopAppBarButton:
-                    id: add_button
+                    id: create_question_button
                     icon: "plus-circle"
                     on_release: app.create_question_popup_menu.open()
+
+                MDActionTopAppBarButton:
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("modesMenu")
 
         ScrollView:
             MDList:

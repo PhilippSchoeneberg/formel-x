@@ -9,7 +9,7 @@ from kivymd.uix.menu import MDDropdownMenu
 import datetime
 
 
-class CreateFormulaPopUpMenu(MDDialog):
+class CreateCompoundPopUpMenu(MDDialog):
     def __init__(self):
         self.selected_category = None
 
@@ -110,17 +110,20 @@ class CreateFormulaPopUpMenu(MDDialog):
             width_mult=4,
         )
 
+
     def open(self):
         self.categories_dropdown_menu.items = self.get_category_items()
         super().open()
 
-    def open_categories_dropdown(self, *args):
+
+    def open_categories_dropdown(self, *args, **kwargs):
         self.categories_dropdown_menu.open()
+
 
     def get_category_items(self):
         app = App.get_running_app()
-        app.cursor.execute("SELECT name FROM categories")
-        categories = [row[0] for row in app.cursor.fetchall()]
+        app.db.cursor.execute("SELECT name FROM categories")
+        categories = [row[0] for row in app.db.cursor.fetchall()]
         return [
             {
                 "text": cat,
@@ -129,10 +132,12 @@ class CreateFormulaPopUpMenu(MDDialog):
             for cat in categories
         ]
 
+
     def set_category(self, category):
         self.selected_category = category
         self.categories_button_text.text = category
         self.categories_dropdown_menu.dismiss()
+
 
     def add_compound(self, *args, **kwargs):
         app = App.get_running_app()
@@ -163,16 +168,17 @@ class CreateFormulaPopUpMenu(MDDialog):
             self.categories_button_text.error = False
 
         if valid:
-            app.cursor.execute("SELECT id FROM categories WHERE name = ?", (category,))
-            result = app.cursor.fetchone()
+            app.db.cursor.execute("SELECT id FROM categories WHERE name = ?", (category,))
+            result = app.db.cursor.fetchone()
             if result:
                 category_id = result[0]
-            app.cursor.execute(
-                "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date)
-            )
-            app.connection.commit()
-            self.dismiss()
+                app.db.cursor.execute(
+                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date)
+                )
+                app.db.connection.commit()
+                self.dismiss()
+
 
     def dismiss(self, *args, **kwargs):
         self.correct_name_field.text = ""

@@ -9,11 +9,11 @@ import datetime
 
 class CreateCategoryPopUpMenu(MDDialog):
     def __init__(self):
-        self.selected_category = None
+        self.name_helper_text = MDTextFieldHelperText(text="Category name can't be empty", mode="on_error")
 
         self.name_field = MDTextField(
             MDTextFieldHintText(text="Category name"),
-            MDTextFieldHelperText(text="Category name can't be empty", mode="on_error"),
+            self.name_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
@@ -38,8 +38,6 @@ class CreateCategoryPopUpMenu(MDDialog):
             ),
         )
 
-    def open(self):
-        super().open()
 
     def add_category(self, *args, **kwargs):
         app = App.get_running_app()
@@ -52,13 +50,22 @@ class CreateCategoryPopUpMenu(MDDialog):
             valid = False
 
         if valid:
-            app.cursor.execute(
-                "INSERT INTO categories (name, date) VALUES (?, ?)",
-                (name, date)
-            )
-            app.connection.commit()
-            app.fill_category_list()
-            self.dismiss()
+            app.db.cursor.execute("SELECT * FROM categories WHERE name = ?", (name,))
+            result = app.db.cursor.fetchone()
+            if result:
+                self.name_helper_text.text = "Group name already exists"
+                self.name_field.error = False
+                self.name_field.error = True
+            else:
+                app.db.cursor.execute(
+                    "INSERT INTO categories (name, date) VALUES (?, ?)",
+                    (name, date)
+                )
+                app.db.connection.commit()
+                app.compoundMenuScreen.fill_category_list()
+                self.dismiss()
+
+
 
     def dismiss(self, *args, **kwargs):
         self.name_field.text = ""

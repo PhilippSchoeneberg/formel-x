@@ -10,7 +10,6 @@ from kivymd.uix.boxlayout import MDBoxLayout
 class LoginAccountPopUpMenu(MDDialog):
     def __init__(self):
         self.register_mode = False
-        self.selected_category = None
 
         self.email_helper_text = MDTextFieldHelperText(text="E-Mail Address can't be empty", mode="on_error")
 
@@ -78,7 +77,7 @@ class LoginAccountPopUpMenu(MDDialog):
         )
 
 
-    def toggle_mode(self, *args):
+    def toggle_mode(self, *args, **kwargs):
         if self.password_repetition_field.parent is None:
             self.register_mode = True
             self.content_box.add_widget(self.password_repetition_field)
@@ -116,11 +115,11 @@ class LoginAccountPopUpMenu(MDDialog):
 
         if not self.register_mode:
             if valid:
-                app.cursor.execute("SELECT id, password FROM accounts WHERE email = ?", (email,))
-                result = app.cursor.fetchone()
+                app.db.cursor.execute("SELECT id, password FROM accounts WHERE email = ?", (email,))
+                result = app.db.cursor.fetchone()
                 if result and bcrypt.checkpw(password.encode("utf-8"), result[1].encode("utf-8")):
-                    app.loggedInUserId = result[0]
-                    app.connection.commit()
+                    app.db.connection.commit()
+                    app.login(result[0])
                     self.dismiss()
                 else:
                     self.email_helper_text.text = "E-Mail Address or password is incorrect"
@@ -148,13 +147,19 @@ class LoginAccountPopUpMenu(MDDialog):
             else:
                 self.password_repetition_field.error = False
             if valid:
-                hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                app.cursor.execute(
-                    "INSERT INTO accounts (email, password, date) VALUES (?, ?, ?)",
-                    (email, hashed_password, date)
-                )
-                app.connection.commit()
-                self.dismiss()
+                app.db.cursor.execute("SELECT * FROM accounts WHERE email = ?", (email,))
+                result = app.db.cursor.fetchone()
+                if result:
+                    self.email_helper_text.text = "Account with this email already exists"
+                    self.email_field.error = False
+                    self.email_field.error = True
+                else:
+                    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+                    app.db.cursor.execute(
+                        "INSERT INTO accounts (email, password, date) VALUES (?, ?, ?)",
+                        (email, hashed_password, date)
+                    )
+                    self.toggle_mode()
 
 
     def dismiss(self, *args, **kwargs):

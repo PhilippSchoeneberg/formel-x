@@ -5,7 +5,6 @@ from kivy.uix.scrollview import ScrollView
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.menu import MDDropdownMenu
 import datetime
 
 
@@ -95,6 +94,7 @@ class CreateQuestionPopUpMenu(MDDialog):
             ),
         )
 
+
     def add_question(self, *args, **kwargs):
         app = App.get_running_app()
         question = self.question_field.text.strip()
@@ -123,12 +123,13 @@ class CreateQuestionPopUpMenu(MDDialog):
             valid = False
 
         if valid:
-            app.cursor.execute(
+            app.db.cursor.execute(
                 "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, date)
             )
-            app.connection.commit()
+            app.db.connection.commit()
             self.dismiss()
+
 
     def dismiss(self, *args, **kwargs):
         self.question_field.text = ""

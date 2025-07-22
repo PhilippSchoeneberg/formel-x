@@ -29,6 +29,11 @@
                     icon: "plus-circle"
                     on_release: app.change_screen("compoundMenu")
 
+                MDActionTopAppBarButton:
+                    id: choose_group_button
+                    icon: "border-color"
+                    on_release: app.group_menu_open(*args)
+
         ScrollView:
             MDList:
                 id: compound_learning_list

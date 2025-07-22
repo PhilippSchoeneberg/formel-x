@@ -29,7 +29,7 @@ cursor.execute("""
 CREATE TABLE groups (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        TEXT NOT NULL UNIQUE,
-    owner_id    TEXT NOT NULL,
+    owner_id    INTEGER NOT NULL,
     date        TEXT NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES accounts(id)
 )
