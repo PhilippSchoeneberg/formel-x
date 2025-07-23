@@ -20,12 +20,19 @@ class CompoundMenuScreen(Screen):
         self.app.root.get_screen("compoundMenu").ids.category_list.clear_widgets()
         categories = self.app.db.get_all_categories_by_group(self.app.loggedInGroup)
 
+        title_item = MDListItem(
+            MDListItemHeadlineText(text="Select Category"))
+        title_item.ripple_effect = False
+        title_item.focus_behavior = False
+        self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(title_item)
+
         for category_id, category in categories.items():
-            item = MDListItem(
-                MDListItemHeadlineText(text=category["name"]),
-                on_release=lambda _, cat_id=category_id: self.app.compoundLearningScreen.start_learning(cat_id)
+            self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(
+                MDListItem(
+                    MDListItemHeadlineText(text=category["name"]),
+                    on_release=lambda _, cat_id=category_id: self.app.compoundLearningScreen.start_learning(cat_id)
+                )
             )
-            self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(item)
 
 
     def create_compound_menu_open(self):

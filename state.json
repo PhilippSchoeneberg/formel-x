@@ -1,10 +1,10 @@
 {
     "loggedInUserId": 1,
     "loggedInGroup": {
-        "id": 2,
-        "name": "b",
+        "id": 1,
+        "name": "a",
         "owner_id": 1,
-        "date": "2025-07-23 23:28:06"
+        "date": "2025-07-23 23:27:42"
     },
     "groups": [],
     "darkMode": true

@@ -16,6 +16,13 @@ class ModesMenuScreen(Screen):
     def fill_modes_list(self):
         self.app = App.get_running_app()
         self.app.root.get_screen("modesMenu").ids.mode_list.clear_widgets()
+
+        title_item = MDListItem(
+            MDListItemHeadlineText(text="Select Mode"))
+        title_item.ripple_effect = False
+        title_item.focus_behavior = False
+        self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(title_item)
+
         if self.app.loggedInGroup:
             self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
                 MDListItem(
@@ -85,6 +92,6 @@ class ModesMenuScreen(Screen):
                     self.remove_group(group)
         if self.app.loggedInGroup not in self.app.groups:
             self.app.loggedInGroup = None
-            self.app.root.get_screen("modesMenu").ids.group_name.text = "Choose Group"
+            self.app.root.get_screen("modesMenu").ids.group_name.text = "Select Group"
         self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
         self.fill_modes_list()
