@@ -1,3 +1,5 @@
+from src.popups.confirmDeletePopUpMenu import ConfirmDeletePopUpMenu
+
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -10,6 +12,7 @@ class CompoundLearningScreen(Screen):
         self.app = None
         self.compounds_to_learn = None
         self.current_index = None
+        self.current_compound = None
 
 
     def start_learning(self, category):
@@ -33,7 +36,7 @@ class CompoundLearningScreen(Screen):
             self.app.change_screen("compoundMenu")
             return
 
-        current_compound = self.compounds_to_learn[self.current_index]
+        self.current_compound = self.compounds_to_learn[self.current_index]
 
         def on_clicked(item, correct):
             if correct:
@@ -52,16 +55,21 @@ class CompoundLearningScreen(Screen):
             self.app.root.get_screen("compoundLearning").ids.compound_learning_list.add_widget(list_item)
 
         title_item = MDListItem(
-            MDListItemHeadlineText(text=f"Which is the correct formula for {current_compound['correct_name']}"))
+            MDListItemHeadlineText(text=f"Which is the correct formula for {self.current_compound['correct_name']}"))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
         self.app.root.get_screen("compoundLearning").ids.compound_learning_list.add_widget(title_item)
 
-        add_option(current_compound["correct_formula"], True)
-        add_option(current_compound["wrong_formula1"], False)
-        add_option(current_compound["wrong_formula2"], False)
+        add_option(self.current_compound["correct_formula"], True)
+        add_option(self.current_compound["wrong_formula1"], False)
+        add_option(self.current_compound["wrong_formula2"], False)
 
 
     def next_compound(self):
         self.current_index += 1
         self.show_next_compound()
+
+
+    def delete_compound(self):
+        confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Compound", self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)
+        confirmDeletePopupMenu.open()

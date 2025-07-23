@@ -1,4 +1,5 @@
 from src.utils.json_parser import save_state
+from src.popups.confirmDeletePopUpMenu import ConfirmDeletePopUpMenu
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -17,13 +18,12 @@ class ModesMenuScreen(Screen):
         self.app = App.get_running_app()
         self.app.root.get_screen("modesMenu").ids.mode_list.clear_widgets()
 
-        title_item = MDListItem(
-            MDListItemHeadlineText(text="Select Mode"))
-        title_item.ripple_effect = False
-        title_item.focus_behavior = False
-        self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(title_item)
-
         if self.app.loggedInGroup:
+            title_item = MDListItem(
+                MDListItemHeadlineText(text="Select Mode"))
+            title_item.ripple_effect = False
+            title_item.focus_behavior = False
+            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(title_item)
             self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text="Elements"),
@@ -76,8 +76,8 @@ class ModesMenuScreen(Screen):
 
     def delete_group(self):
         if self.app.loggedInGroup:
-            self.app.db.delete_group(self.app.loggedInGroup)
-            self.refresh_groups()
+            confirm_delete_popup = ConfirmDeletePopUpMenu("Group", self.app.loggedInGroup["name"], lambda: self.app.db.delete_group(self.app.loggedInGroup), self.refresh_groups)
+            confirm_delete_popup.open()
 
 
     def refresh_groups(self):

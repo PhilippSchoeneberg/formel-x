@@ -20,9 +20,14 @@
             MDTopAppBarTrailingButtonContainer:
 
                 MDActionTopAppBarButton:
-                    id: create_compound_button
+                    id: create_category_or_compound_button
                     icon: "plus-circle"
                     on_release: app.compoundMenuScreen.create_compound_menu_open()
+
+                MDActionTopAppBarButton:
+                    id: delete_category_button
+                    icon: "delete"
+                    on_release: app.delete_category_popup_menu.open()
 
                 MDActionTopAppBarButton:
                     id: back_button

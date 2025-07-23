@@ -5,6 +5,7 @@ class Database:
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
 
+
     def get_all_categories_by_group(self, group):
         if group:
             self.cursor.execute("SELECT id, name, date FROM categories WHERE group_id = ?", (group["id"],))
@@ -12,6 +13,7 @@ class Database:
 
             category_dict = {
                 row[0]: {
+                    "id": row[0],
                     "name": row[1],
                     "date": row[2],
                 }
@@ -23,6 +25,10 @@ class Database:
             return {}
 
 
+    def delete_category(self, category):
+        self.cursor.execute("DELETE FROM categories WHERE id = ?", (category["id"],))
+        self.connection.commit()
+
 
     def get_all_compounds_by_group(self, group):
         if group:
@@ -31,6 +37,7 @@ class Database:
 
             compound_dict = {
                 row[0]: {
+                    "id": row[0],
                     "correct_name": row[1],
                     "wrong_name1": row[2],
                     "wrong_name2": row[3],
@@ -49,6 +56,11 @@ class Database:
             return {}
 
 
+    def delete_compound(self, compound):
+        self.cursor.execute("DELETE FROM compounds WHERE id = ?", (compound["id"],))
+        self.connection.commit()
+
+
     def get_all_questions_by_group(self, group):
         if group:
             self.cursor.execute("SELECT id, question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date FROM questions WHERE group_id = ?", (group["id"],))
@@ -56,6 +68,7 @@ class Database:
 
             question_dict = {
                 row[0]: {
+                    "id": row[0],
                     "question": row[1],
                     "correct_answer": row[2],
                     "wrong_answer1": row[3],
@@ -71,6 +84,11 @@ class Database:
             return question_dict
         else:
             return {}
+
+
+    def delete_question(self, question):
+        self.cursor.execute("DELETE FROM questions WHERE id = ?", (question["id"],))
+        self.connection.commit()
 
 
     def get_all_groups_by_owner_id(self, owner_id):

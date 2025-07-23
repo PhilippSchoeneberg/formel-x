@@ -1,5 +1,6 @@
 from popups.createCompoundPopUpMenu import CreateCompoundPopUpMenu
 from popups.createCategoryPopUpMenu import CreateCategoryPopUpMenu
+from popups.deleteCategoryPopUpMenu import DeleteCategoryPopUpMenu
 from popups.createQuestionPopUpMenu import CreateQuestionPopUpMenu
 from popups.loginAccountPopUpMenu import LoginAccountPopUpMenu
 from popups.createGroupPopupMenu import CreateGroupPopUpMenu
@@ -46,6 +47,7 @@ class MainApp(MDApp):
         self.add_group_popup_menu = AddGroupPopUpMenu()
         self.create_compound_popup_menu = CreateCompoundPopUpMenu()
         self.create_category_popup_menu = CreateCategoryPopUpMenu()
+        self.delete_category_popup_menu = DeleteCategoryPopUpMenu()
         self.create_question_popup_menu = CreateQuestionPopUpMenu()
 
 
@@ -62,11 +64,11 @@ class MainApp(MDApp):
             Builder.load_file(file)
 
         sm = ScreenManager()
-        sm.add_widget(ModesMenuScreen(name="modesMenu"))#self.modesMenuScreen)
-        sm.add_widget(ElementMenuScreen(name="elementMenu"))#self.elementMenuScreen)
-        sm.add_widget(CompoundLearningScreen(name="compoundLearning"))#self.compoundMenuScreen)
-        sm.add_widget(CompoundMenuScreen(name="compoundMenu"))#self.compoundLearningScreen)
-        sm.add_widget(QuestionLearningScreen(name="questionLearning") )#self.questionLearningScreen)
+        sm.add_widget(ModesMenuScreen(name="modesMenu"))
+        sm.add_widget(ElementMenuScreen(name="elementMenu"))
+        sm.add_widget(CompoundLearningScreen(name="compoundLearning"))
+        sm.add_widget(CompoundMenuScreen(name="compoundMenu"))
+        sm.add_widget(QuestionLearningScreen(name="questionLearning"))
         self.root = sm
         return sm
 
@@ -101,12 +103,24 @@ class MainApp(MDApp):
         self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.on_release = self.modesMenuScreen.delete_group
         self.root.get_screen("modesMenu").ids.create_or_add_group_button.icon = "plus-circle"
         self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.create_group_popup_menu.open
-        self.root.get_screen("compoundMenu").ids.create_compound_button.opacity = 1
-        self.root.get_screen("compoundMenu").ids.create_compound_button.disabled = False
+        self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.opacity = 1
+        self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.disabled = False
+        self.root.get_screen("compoundMenu").ids.delete_category_button.opacity = 1
+        self.root.get_screen("compoundMenu").ids.delete_category_button.disabled = False
+        self.root.get_screen("compoundLearning").ids.create_compound_button.opacity = 1
+        self.root.get_screen("compoundLearning").ids.create_compound_button.disabled = False
+        self.root.get_screen("compoundLearning").ids.edit_compound_button.opacity = 1
+        self.root.get_screen("compoundLearning").ids.edit_compound_button.disabled = False
+        self.root.get_screen("compoundLearning").ids.delete_compound_button.opacity = 1
+        self.root.get_screen("compoundLearning").ids.delete_compound_button.disabled = False
         self.root.get_screen("elementMenu").ids.create_element_button.opacity = 1
         self.root.get_screen("elementMenu").ids.create_element_button.disabled = False
         self.root.get_screen("questionLearning").ids.create_question_button.opacity = 1
         self.root.get_screen("questionLearning").ids.create_question_button.disabled = False
+        self.root.get_screen("questionLearning").ids.edit_question_button.opacity = 1
+        self.root.get_screen("questionLearning").ids.edit_question_button.disabled = False
+        self.root.get_screen("questionLearning").ids.delete_question_button.opacity = 1
+        self.root.get_screen("questionLearning").ids.delete_question_button.disabled = False
 
 
     def logout(self):
@@ -121,12 +135,24 @@ class MainApp(MDApp):
         self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.on_release = lambda: self.modesMenuScreen.remove_group(self.loggedInGroup)
         self.root.get_screen("modesMenu").ids.create_or_add_group_button.icon = "plus"
         self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.add_group_popup_menu.open
-        self.root.get_screen("compoundMenu").ids.create_compound_button.opacity = 0
-        self.root.get_screen("compoundMenu").ids.create_compound_button.disabled = True
+        self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.opacity = 0
+        self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.disabled = True
+        self.root.get_screen("compoundMenu").ids.delete_category_button.opacity = 0
+        self.root.get_screen("compoundMenu").ids.delete_category_button.disabled = True
+        self.root.get_screen("compoundLearning").ids.create_compound_button.opacity = 0
+        self.root.get_screen("compoundLearning").ids.create_compound_button.disabled = True
+        self.root.get_screen("compoundLearning").ids.edit_compound_button.opacity = 0
+        self.root.get_screen("compoundLearning").ids.edit_compound_button.disabled = True
+        self.root.get_screen("compoundLearning").ids.delete_compound_button.opacity = 0
+        self.root.get_screen("compoundLearning").ids.delete_compound_button.disabled = True
         self.root.get_screen("elementMenu").ids.create_element_button.opacity = 0
         self.root.get_screen("elementMenu").ids.create_element_button.disabled = True
         self.root.get_screen("questionLearning").ids.create_question_button.opacity = 0
         self.root.get_screen("questionLearning").ids.create_question_button.disabled = True
+        self.root.get_screen("questionLearning").ids.edit_question_button.opacity = 0
+        self.root.get_screen("questionLearning").ids.edit_question_button.disabled = True
+        self.root.get_screen("questionLearning").ids.delete_question_button.opacity = 0
+        self.root.get_screen("questionLearning").ids.delete_question_button.disabled = True
 
 
     def change_screen(self, name):

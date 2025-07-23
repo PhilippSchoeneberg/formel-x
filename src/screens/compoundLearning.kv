@@ -18,21 +18,25 @@
                 pos_hint: {"center_x": .5}
 
             MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: create_compound_button
+                    icon: "plus-circle"
+                    on_release: app.create_compound_popup_menu.open()
+
+                MDActionTopAppBarButton:
+                    id: edit_compound_button
+                    icon: "border-color"
+                    on_release: app.group_menu_open(*args)
+
+                MDActionTopAppBarButton:
+                    id: delete_compound_button
+                    icon: "delete"
+                    on_release: app.compoundLearningScreen.delete_compound()
 
                 MDActionTopAppBarButton:
                     id: back_button
                     icon: "arrow-left"
                     on_release: app.change_screen("compoundMenu")
-
-                MDActionTopAppBarButton:
-                    id: back_button
-                    icon: "plus-circle"
-                    on_release: app.change_screen("compoundMenu")
-
-                MDActionTopAppBarButton:
-                    id: choose_group_button
-                    icon: "border-color"
-                    on_release: app.group_menu_open(*args)
 
         ScrollView:
             MDList:

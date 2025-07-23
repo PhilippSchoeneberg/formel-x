@@ -6,6 +6,11 @@
         "owner_id": 1,
         "date": "2025-07-23 23:27:42"
     },
-    "groups": [],
+    "groups": [
+        {
+            "id": 1,
+            "name": "a"
+        }
+    ],
     "darkMode": true
 }

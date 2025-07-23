@@ -18,11 +18,20 @@
                 pos_hint: {"center_x": .5}
 
             MDTopAppBarTrailingButtonContainer:
-
                 MDActionTopAppBarButton:
                     id: create_question_button
                     icon: "plus-circle"
                     on_release: app.create_question_popup_menu.open()
+
+                MDActionTopAppBarButton:
+                    id: edit_question_button
+                    icon: "border-color"
+                    on_release: app.group_menu_open(*args)
+
+                MDActionTopAppBarButton:
+                    id: delete_question_button
+                    icon: "delete"
+                    on_release: app.questionLearningScreen.delete_question()
 
                 MDActionTopAppBarButton:
                     id: back_button

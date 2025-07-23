@@ -48,6 +48,6 @@ class CompoundMenuScreen(Screen):
             }
         ]
         MDDropdownMenu(
-            caller=self.app.root.get_screen(self.app.root.current).ids.create_compound_button,
+            caller=self.app.root.get_screen(self.app.root.current).ids.create_category_or_compound_button,
             items=add_menu_items
         ).open()

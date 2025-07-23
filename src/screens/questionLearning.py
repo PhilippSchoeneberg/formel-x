@@ -1,3 +1,5 @@
+from src.popups.confirmDeletePopUpMenu import ConfirmDeletePopUpMenu
+
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -10,6 +12,7 @@ class QuestionLearningScreen(Screen):
         self.app = None
         self.questions_to_learn = None
         self.current_index = None
+        self.current_question = None
 
 
     def start_learning(self):
@@ -32,13 +35,13 @@ class QuestionLearningScreen(Screen):
             self.app.change_screen("modesMenu")
             return
 
-        current_question = self.questions_to_learn[self.current_index]
+        self.current_question = self.questions_to_learn[self.current_index]
 
         def on_clicked(item, correct):
             if correct:
                 item.theme_bg_color = "Custom"
                 item.md_bg_color = [0, 1, 0, 0.3]
-                Clock.schedule_once(lambda dt: self.next_compound(), 1)
+                Clock.schedule_once(lambda dt: self.next_question(), 1)
             else:
                 item.theme_bg_color = "Custom"
                 item.md_bg_color = [1, 0, 0, 0.3]
@@ -51,18 +54,23 @@ class QuestionLearningScreen(Screen):
             )
             self.app.root.get_screen("questionLearning").ids.question_learning_list.add_widget(list_item)
 
-        title_item = MDListItem(MDListItemHeadlineText(text=current_question["question"]))
+        title_item = MDListItem(MDListItemHeadlineText(text=self.current_question["question"]))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
         self.app.root.get_screen("questionLearning").ids.question_learning_list.add_widget(title_item)
 
-        add_option(current_question["correct_answer"], True)
-        add_option(current_question["wrong_answer1"], False)
-        add_option(current_question["wrong_answer2"], False)
-        add_option(current_question["wrong_answer3"], False)
-        add_option(current_question["wrong_answer4"], False)
+        add_option(self.current_question["correct_answer"], True)
+        add_option(self.current_question["wrong_answer1"], False)
+        add_option(self.current_question["wrong_answer2"], False)
+        add_option(self.current_question["wrong_answer3"], False)
+        add_option(self.current_question["wrong_answer4"], False)
 
 
-    def next_compound(self):
+    def next_question(self):
         self.current_index += 1
         self.show_next_question()
+
+
+    def delete_question(self):
+        confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Question", self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
+        confirmDeletePopupMenu.open()
