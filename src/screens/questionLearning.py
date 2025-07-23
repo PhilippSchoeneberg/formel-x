@@ -17,7 +17,7 @@ class QuestionLearningScreen(Screen):
         self.app.change_screen("questionLearning")
 
         self.questions_to_learn = [
-            question for question in self.app.db.get_all_questions().values()
+            question for question in self.app.db.get_all_questions_by_group(self.app.loggedInGroup).values()
         ]
 
         self.current_index = 0

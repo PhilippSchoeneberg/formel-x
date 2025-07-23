@@ -11,10 +11,14 @@ class CompoundMenuScreen(Screen):
         self.group_dropdown_menu = None
 
 
+    def on_pre_enter(self):
+        self.fill_category_list()
+
+
     def fill_category_list(self):
         self.app = App.get_running_app()
         self.app.root.get_screen("compoundMenu").ids.category_list.clear_widgets()
-        categories = self.app.db.get_all_categories()
+        categories = self.app.db.get_all_categories_by_group(self.app.loggedInGroup)
 
         for category_id, category in categories.items():
             item = MDListItem(
@@ -25,6 +29,7 @@ class CompoundMenuScreen(Screen):
 
 
     def create_compound_menu_open(self):
+        self.app = App.get_running_app()
         add_menu_items = [
             {
                 "text": "Add Formula",

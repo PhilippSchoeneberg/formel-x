@@ -43,27 +43,30 @@ class CreateCategoryPopUpMenu(MDDialog):
         app = App.get_running_app()
         name = self.name_field.text.strip()
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         valid = True
+
         if not name:
+            self.name_helper_text.text = "Category name can't be empty"
+            self.name_field.error = False
             self.name_field.error = True
             valid = False
 
-        if valid:
-            app.db.cursor.execute("SELECT * FROM categories WHERE name = ?", (name,))
-            result = app.db.cursor.fetchone()
-            if result:
+        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
+        for category in categories.values():
+            if category["name"] == name:
                 self.name_helper_text.text = "Group name already exists"
                 self.name_field.error = False
                 self.name_field.error = True
-            else:
-                app.db.cursor.execute(
-                    "INSERT INTO categories (name, date) VALUES (?, ?)",
-                    (name, date)
-                )
-                app.db.connection.commit()
-                app.compoundMenuScreen.fill_category_list()
-                self.dismiss()
+                valid= False
+
+        if valid:
+            app.db.cursor.execute(
+                "INSERT INTO categories (name, group_id, date) VALUES (?, ?, ?)",
+                (name, app.loggedInGroup["id"], date)
+            )
+            app.db.connection.commit()
+            app.compoundMenuScreen.fill_category_list()
+            self.dismiss()
 
 
 

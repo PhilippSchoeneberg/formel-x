@@ -1,30 +1,11 @@
 {
-    "loggedInUserId": null,
+    "loggedInUserId": 1,
     "loggedInGroup": {
-        "id": 1,
-        "name": "a"
+        "id": 2,
+        "name": "b",
+        "owner_id": 1,
+        "date": "2025-07-23 23:28:06"
     },
-    "groups": [
-        {
-            "id": 1,
-            "name": "a"
-        },
-        {
-            "id": 2,
-            "name": "b"
-        },
-        {
-            "id": 3,
-            "name": "v"
-        },
-        {
-            "id": 3,
-            "name": "v"
-        },
-        {
-            "id": 4,
-            "name": "m"
-        }
-    ],
+    "groups": [],
     "darkMode": true
 }

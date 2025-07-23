@@ -124,8 +124,8 @@ class CreateQuestionPopUpMenu(MDDialog):
 
         if valid:
             app.db.cursor.execute(
-                "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, date) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, date)
+                "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date)
             )
             app.db.connection.commit()
             self.dismiss()

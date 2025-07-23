@@ -16,24 +16,25 @@ class ModesMenuScreen(Screen):
     def fill_modes_list(self):
         self.app = App.get_running_app()
         self.app.root.get_screen("modesMenu").ids.mode_list.clear_widgets()
-        self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
-            MDListItem(
-                MDListItemHeadlineText(text="Elements"),
-                on_release=lambda _: self.app.change_screen("elementMenu")
+        if self.app.loggedInGroup:
+            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+                MDListItem(
+                    MDListItemHeadlineText(text="Elements"),
+                    on_release=lambda _: self.app.change_screen("elementMenu")
+                )
             )
-        )
-        self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
-            MDListItem(
-                MDListItemHeadlineText(text="Compounds"),
-                on_release=lambda _: self.app.change_screen("compoundMenu")
+            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+                MDListItem(
+                    MDListItemHeadlineText(text="Compounds"),
+                    on_release=lambda _: self.app.change_screen("compoundMenu")
+                )
             )
-        )
-        self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
-            MDListItem(
-                MDListItemHeadlineText(text="Questions"),
-                on_release=lambda _: self.app.questionLearningScreen.start_learning()
+            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+                MDListItem(
+                    MDListItemHeadlineText(text="Questions"),
+                    on_release=lambda _: self.app.questionLearningScreen.start_learning()
+                )
             )
-        )
 
 
     def group_menu_open(self):
@@ -55,3 +56,35 @@ class ModesMenuScreen(Screen):
         self.app.root.get_screen("modesMenu").ids.group_name.text = group["name"]
         if self.group_dropdown_menu:
             self.group_dropdown_menu.dismiss()
+        self.refresh_groups()
+
+
+    def remove_group(self, group):
+        if group:
+            self.app.groups.remove(group)
+            self.app.state["groups"] = self.app.groups
+            save_state(self.app.state)
+            self.refresh_groups()
+
+
+    def delete_group(self):
+        if self.app.loggedInGroup:
+            self.app.db.delete_group(self.app.loggedInGroup)
+            self.refresh_groups()
+
+
+    def refresh_groups(self):
+        if self.app.loggedInUserId:
+            self.app.groups = self.app.db.get_all_groups_by_owner_id(self.app.loggedInUserId)
+        else:
+            self.app.groups = self.app.state["groups"]
+            for group in self.app.groups:
+                self.app.db.cursor.execute("SELECT * FROM groups WHERE id = ?", (group["id"],))
+                result = self.app.db.cursor.fetchone()
+                if not result:
+                    self.remove_group(group)
+        if self.app.loggedInGroup not in self.app.groups:
+            self.app.loggedInGroup = None
+            self.app.root.get_screen("modesMenu").ids.group_name.text = "Choose Group"
+        self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
+        self.fill_modes_list()

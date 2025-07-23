@@ -5,6 +5,8 @@ from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
 
+from src.utils.json_parser import save_state
+
 
 class AddGroupPopUpMenu(MDDialog):
     def __init__(self):
@@ -32,13 +34,13 @@ class AddGroupPopUpMenu(MDDialog):
             MDDialogButtonContainer(
                 Widget(),
                 MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Add"), style="text", on_release=self.add_category),
+                MDButton(MDButtonText(text="Add"), style="text", on_release=self.add_group),
                 spacing="8dp",
             ),
         )
 
 
-    def add_category(self, *args, **kwargs):
+    def add_group(self, *args, **kwargs):
         app = App.get_running_app()
         name = self.name_field.text.strip()
 
@@ -58,6 +60,9 @@ class AddGroupPopUpMenu(MDDialog):
                 if result[0] not in app.groups:
                     group = {"id": result[0], "name": result[1]}
                     app.groups.append(group)
+                    app.state["groups"] = app.groups
+                    save_state(self.state)
+                app.modesMenuScreen.refresh_groups()
                 app.db.connection.commit()
                 self.dismiss()
             else:

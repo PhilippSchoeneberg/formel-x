@@ -65,6 +65,7 @@ class CreateGroupPopUpMenu(MDDialog):
                     "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
                     (name, app.loggedInUserId, date)
                 )
+                app.modesMenuScreen.refresh_groups()
                 app.db.connection.commit()
                 self.dismiss()
 

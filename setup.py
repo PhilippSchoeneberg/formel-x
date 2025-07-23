@@ -7,12 +7,12 @@ cursor = connection.cursor()
 cursor.execute("PRAGMA foreign_keys = ON")
 
 # Drop tables if they exist (for re-creation)
-cursor.execute("DROP TABLE IF EXISTS accounts")
-cursor.execute("DROP TABLE IF EXISTS groups")
-cursor.execute("DROP TABLE IF EXISTS elements")
 cursor.execute("DROP TABLE IF EXISTS compounds")
+cursor.execute("DROP TABLE IF EXISTS elements")
 cursor.execute("DROP TABLE IF EXISTS categories")
 cursor.execute("DROP TABLE IF EXISTS questions")
+cursor.execute("DROP TABLE IF EXISTS groups")
+cursor.execute("DROP TABLE IF EXISTS accounts")
 
 # Create table "accounts"
 cursor.execute("""
@@ -41,16 +41,20 @@ CREATE TABLE elements (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     name     TEXT NOT NULL,
     formula  TEXT NOT NULL,
-    date     TEXT NOT NULL
+    group_id INTEGER NOT NULL,
+    date     TEXT NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)
 
 # Create table "categories"
 cursor.execute("""
 CREATE TABLE categories (
-    id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    date TEXT NOT NULL
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name        TEXT NOT NULL,
+    group_id    INTEGER NOT NULL,
+    date        TEXT NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)
 
@@ -64,9 +68,11 @@ CREATE TABLE compounds (
     correct_formula TEXT NOT NULL,
     wrong_formula1  TEXT NOT NULL,
     wrong_formula2  TEXT NOT NULL,
-    category_id        INTEGER NOT NULL,
+    category_id     INTEGER NOT NULL,
+    group_id        INTEGER NOT NULL,
     date            TEXT NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES categories(id)
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)
 
@@ -80,7 +86,9 @@ CREATE TABLE questions (
     wrong_answer2   TEXT NOT NULL,
     wrong_answer3   TEXT NOT NULL,
     wrong_answer4   TEXT NOT NULL,
-    date            TEXT NOT NULL
+    group_id        INTEGER NOT NULL,
+    date            TEXT NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)
 

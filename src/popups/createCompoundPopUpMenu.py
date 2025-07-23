@@ -122,14 +122,13 @@ class CreateCompoundPopUpMenu(MDDialog):
 
     def get_category_items(self):
         app = App.get_running_app()
-        app.db.cursor.execute("SELECT name FROM categories")
-        categories = [row[0] for row in app.db.cursor.fetchall()]
+        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
         return [
             {
-                "text": cat,
-                "on_release": lambda x=cat: self.set_category(x),
+                "text": category["name"],
+                "on_release": lambda x=category["name"]: self.set_category(x),
             }
-            for cat in categories
+            for category in categories.values()
         ]
 
 
@@ -173,8 +172,8 @@ class CreateCompoundPopUpMenu(MDDialog):
             if result:
                 category_id = result[0]
                 app.db.cursor.execute(
-                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, date)
+                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, app.loggedInGroup["id"], date)
                 )
                 app.db.connection.commit()
                 self.dismiss()
@@ -182,9 +181,18 @@ class CreateCompoundPopUpMenu(MDDialog):
 
     def dismiss(self, *args, **kwargs):
         self.correct_name_field.text = ""
+        self.wrong_name_field1.text = ""
+        self.wrong_name_field2.text = ""
         self.correct_formula_field.text = ""
+        self.wrong_formula_field1.text = ""
+        self.wrong_formula_field2.text = ""
         self.correct_name_field.error = False
+        self.wrong_name_field1.error = False
+        self.wrong_name_field2.error = False
         self.correct_formula_field.error = False
+        self.wrong_formula_field1.error = False
+        self.wrong_formula_field2.error = False
+        self.wrong_formula_field2.error = False
         self.categories_button_text.text = "Select Category"
         self.selected_category = None
         super().dismiss()

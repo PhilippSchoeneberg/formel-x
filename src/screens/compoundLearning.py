@@ -17,7 +17,7 @@ class CompoundLearningScreen(Screen):
         self.app.change_screen("compoundLearning")
 
         self.compounds_to_learn = [
-            compound for compound in self.app.db.get_all_compounds().values()
+            compound for compound in self.app.db.get_all_compounds_by_group(self.app.loggedInGroup).values()
             if compound["category"] == category
         ]
 

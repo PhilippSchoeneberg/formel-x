@@ -41,13 +41,9 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: create_group_button
-                    opacity: 0
-                    disabled: True
-                    icon: "plus-circle"
-                    on_release: app.create_group_popup_menu.open()
+                    id: delete_or_remove_group_button
+                    icon: "exit-to-app"
 
                 MDActionTopAppBarButton:
-                    id: add_group_button
+                    id: create_or_add_group_button
                     icon: "plus"
-                    on_release: app.add_group_popup_menu.open()

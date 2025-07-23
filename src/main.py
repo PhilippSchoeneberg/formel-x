@@ -76,7 +76,7 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = 'Darkblue'
 
         self.modesMenuScreen.fill_modes_list()
-        self.compoundMenuScreen.fill_category_list()
+
 
         self.state = load_state()
         if self.state.get("loggedInUserId"):
@@ -85,7 +85,6 @@ class MainApp(MDApp):
             self.logout()
         if self.state.get("loggedInGroup"):
             self.modesMenuScreen.set_group(self.state["loggedInGroup"])
-        self.groups = self.state["groups"]
         self.darkMode = self.state["darkMode"]
         self.set_theme()
 
@@ -94,11 +93,14 @@ class MainApp(MDApp):
         self.loggedInUserId = loggedInUserId
         self.state["loggedInUserId"] = self.loggedInUserId
         save_state(self.state)
+        self.modesMenuScreen.refresh_groups()
+
         self.root.get_screen("modesMenu").ids.account_button.icon = "logout"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.logout
-
-        self.root.get_screen("modesMenu").ids.create_group_button.opacity = 1
-        self.root.get_screen("modesMenu").ids.create_group_button.disabled = False
+        self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.icon = "delete"
+        self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.on_release = self.modesMenuScreen.delete_group
+        self.root.get_screen("modesMenu").ids.create_or_add_group_button.icon = "plus-circle"
+        self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.create_group_popup_menu.open
         self.root.get_screen("compoundMenu").ids.create_compound_button.opacity = 1
         self.root.get_screen("compoundMenu").ids.create_compound_button.disabled = False
         self.root.get_screen("elementMenu").ids.create_element_button.opacity = 1
@@ -111,11 +113,14 @@ class MainApp(MDApp):
         self.loggedInUserId = None
         self.state["loggedInUserId"] = self.loggedInUserId
         save_state(self.state)
+        self.modesMenuScreen.refresh_groups()
+
         self.root.get_screen("modesMenu").ids.account_button.icon = "account"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.login_account_popup_menu.open
-
-        self.root.get_screen("modesMenu").ids.create_group_button.opacity = 0
-        self.root.get_screen("modesMenu").ids.create_group_button.disabled = True
+        self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.icon = "exit-to-app"
+        self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.on_release = lambda: self.modesMenuScreen.remove_group(self.loggedInGroup)
+        self.root.get_screen("modesMenu").ids.create_or_add_group_button.icon = "plus"
+        self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.add_group_popup_menu.open
         self.root.get_screen("compoundMenu").ids.create_compound_button.opacity = 0
         self.root.get_screen("compoundMenu").ids.create_compound_button.disabled = True
         self.root.get_screen("elementMenu").ids.create_element_button.opacity = 0
