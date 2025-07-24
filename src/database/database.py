@@ -6,6 +6,18 @@ class Database:
         self.cursor = self.connection.cursor()
 
 
+    def get_category_by_id(self, category_id):
+        self.cursor.execute("SELECT * FROM categories WHERE id = ?", (category_id,))
+        row = self.cursor.fetchone()
+
+        category_dict = {
+            "id": row[0],
+            "name": row[1],
+            "date": row[2],
+        }
+        return category_dict
+
+
     def get_all_categories_by_group(self, group):
         if group:
             self.cursor.execute("SELECT id, name, date FROM categories WHERE group_id = ?", (group["id"],))

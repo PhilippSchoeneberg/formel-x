@@ -71,6 +71,10 @@ class QuestionLearningScreen(Screen):
         self.show_next_question()
 
 
+    def edit_question(self):
+        self.app.create_or_edit_question_popup_menu.open(self.current_question, self.next_question)
+
+
     def delete_question(self):
         confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Question", self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
         confirmDeletePopupMenu.open()

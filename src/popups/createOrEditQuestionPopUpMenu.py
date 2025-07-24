@@ -8,9 +8,10 @@ from kivymd.uix.boxlayout import MDBoxLayout
 import datetime
 
 
-class CreateQuestionPopUpMenu(MDDialog):
+class CreateOrEditQuestionPopUpMenu(MDDialog):
     def __init__(self):
-        self.selected_category = None
+        self.question = None
+        self.action_function = None
 
         self.question_field = MDTextField(
             MDTextFieldHintText(text="Question"),
@@ -83,8 +84,10 @@ class CreateQuestionPopUpMenu(MDDialog):
         )
         scroll_view.add_widget(content_box)
 
+        self.headline = MDDialogHeadlineText(text="Create Question", halign="center")
+
         super().__init__(
-            MDDialogHeadlineText(text="Create Formula", halign="center"),
+            self.headline,
             MDDialogContentContainer(scroll_view),
             MDDialogButtonContainer(
                 Widget(),
@@ -93,6 +96,20 @@ class CreateQuestionPopUpMenu(MDDialog):
                 spacing="8dp",
             ),
         )
+
+
+    def open(self, question = None, action_function = None):
+        self.question = question
+        self.action_function = action_function
+        if self.question:
+            self.headline = "Edit Question"
+            self.question_field.text = self.question["question"]
+            self.correct_answer_field.text = self.question["correct_answer"]
+            self.wrong_answer_field1.text = self.question["wrong_answer1"]
+            self.wrong_answer_field2.text = self.question["wrong_answer2"]
+            self.wrong_answer_field3.text = self.question["wrong_answer3"]
+            self.wrong_answer_field4.text = self.question["wrong_answer4"]
+        super().open()
 
 
     def add_question(self, *args, **kwargs):
@@ -123,15 +140,23 @@ class CreateQuestionPopUpMenu(MDDialog):
             valid = False
 
         if valid:
-            app.db.cursor.execute(
-                "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date)
-            )
+            if not self.question:
+                app.db.cursor.execute(
+                    "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date)
+                )
+            else:
+                app.db.cursor.execute(
+                    "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, group_id = ?, date = ? WHERE id = ?",
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date, self.question["id"])
+                )
+                self.action_function()
             app.db.connection.commit()
             self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
+        self.headline = "Create Question"
         self.question_field.text = ""
         self.correct_answer_field.text = ""
         self.wrong_answer_field1.text = ""

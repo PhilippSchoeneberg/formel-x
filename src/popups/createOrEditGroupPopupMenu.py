@@ -7,8 +7,9 @@ from kivymd.uix.boxlayout import MDBoxLayout
 import datetime
 
 
-class CreateGroupPopUpMenu(MDDialog):
+class CreateOrEditGroupPopUpMenu(MDDialog):
     def __init__(self):
+        self.group = None
         self.name_helper_text = MDTextFieldHelperText(text="Group name can't be empty", mode="on_error")
 
         self.name_field = MDTextField(
@@ -27,8 +28,10 @@ class CreateGroupPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
+        self.headline = MDDialogHeadlineText(text="Create Group", halign="center")
+
         super().__init__(
-            MDDialogHeadlineText(text="Create Group", halign="center"),
+            self.headline,
             MDDialogContentContainer(content_box),
             MDDialogButtonContainer(
                 Widget(),
@@ -37,6 +40,14 @@ class CreateGroupPopUpMenu(MDDialog):
                 spacing="8dp",
             ),
         )
+
+
+    def open(self, group = None):
+        self.group = group
+        if self.group:
+            self.headline = "Edit Group"
+            self.name_field.text = self.group["name"]
+        super().open()
 
 
     def create_group(self, *args, **kwargs):
@@ -61,16 +72,23 @@ class CreateGroupPopUpMenu(MDDialog):
                 self.name_field.error = False
                 self.name_field.error = True
             else:
-                app.db.cursor.execute(
-                    "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
-                    (name, app.loggedInUserId, date)
-                )
+                if not self.group:
+                    app.db.cursor.execute(
+                        "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
+                        (name, app.loggedInUserId, date)
+                    )
+                else:
+                    app.db.cursor.execute(
+                        "UPDATE groups SET name = ?, owner_id = ?, date = ? WHERE id = ?",
+                        (name, app.loggedInUserId, date, self.group["id"])
+                    )
                 app.modesMenuScreen.refresh_groups()
                 app.db.connection.commit()
                 self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
+        self.headline = "Create Group"
         self.name_field.text = ""
         self.name_field.error = False
         super().dismiss()

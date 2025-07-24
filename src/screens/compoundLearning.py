@@ -70,6 +70,10 @@ class CompoundLearningScreen(Screen):
         self.show_next_compound()
 
 
+    def edit_compound(self):
+        self.app.create_or_edit_compound_popup_menu.open(self.current_compound, self.next_compound)
+
+
     def delete_compound(self):
         confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Compound", self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)
         confirmDeletePopupMenu.open()

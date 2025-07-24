@@ -74,6 +74,11 @@ class ModesMenuScreen(Screen):
             self.refresh_groups()
 
 
+    def edit_group(self):
+        if self.app.loggedInGroup:
+            self.app.create_or_edit_group_popup_menu.open(self.app.loggedInGroup)
+
+
     def delete_group(self):
         if self.app.loggedInGroup:
             confirm_delete_popup = ConfirmDeletePopUpMenu("Group", self.app.loggedInGroup["name"], lambda: self.app.db.delete_group(self.app.loggedInGroup), self.refresh_groups)

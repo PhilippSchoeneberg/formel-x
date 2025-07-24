@@ -1,9 +1,9 @@
-from popups.createCompoundPopUpMenu import CreateCompoundPopUpMenu
-from popups.createCategoryPopUpMenu import CreateCategoryPopUpMenu
+from popups.createOrEditCompoundPopUpMenu import CreateOrEditCompoundPopUpMenu
+from popups.createOrEditCategoryPopUpMenu import CreateOrEditCategoryPopUpMenu
 from popups.deleteCategoryPopUpMenu import DeleteCategoryPopUpMenu
-from popups.createQuestionPopUpMenu import CreateQuestionPopUpMenu
+from popups.createOrEditQuestionPopUpMenu import CreateOrEditQuestionPopUpMenu
 from popups.loginAccountPopUpMenu import LoginAccountPopUpMenu
-from popups.createGroupPopupMenu import CreateGroupPopUpMenu
+from popups.createOrEditGroupPopupMenu import CreateOrEditGroupPopUpMenu
 from popups.addGroupPopupMenu import AddGroupPopUpMenu
 from screens.modesMenu import ModesMenuScreen
 from screens.questionLearning import QuestionLearningScreen
@@ -43,12 +43,12 @@ class MainApp(MDApp):
 
         # Instantiate popup menus
         self.login_account_popup_menu = LoginAccountPopUpMenu()
-        self.create_group_popup_menu = CreateGroupPopUpMenu()
+        self.create_or_edit_group_popup_menu = CreateOrEditGroupPopUpMenu()
         self.add_group_popup_menu = AddGroupPopUpMenu()
-        self.create_compound_popup_menu = CreateCompoundPopUpMenu()
-        self.create_category_popup_menu = CreateCategoryPopUpMenu()
+        self.create_or_edit_compound_popup_menu = CreateOrEditCompoundPopUpMenu()
+        self.create_or_edit_category_popup_menu = CreateOrEditCategoryPopUpMenu()
         self.delete_category_popup_menu = DeleteCategoryPopUpMenu()
-        self.create_question_popup_menu = CreateQuestionPopUpMenu()
+        self.create_or_edit_question_popup_menu = CreateOrEditQuestionPopUpMenu()
 
 
     def build(self):
@@ -102,7 +102,7 @@ class MainApp(MDApp):
         self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.icon = "delete"
         self.root.get_screen("modesMenu").ids.delete_or_remove_group_button.on_release = self.modesMenuScreen.delete_group
         self.root.get_screen("modesMenu").ids.create_or_add_group_button.icon = "plus-circle"
-        self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.create_group_popup_menu.open
+        self.root.get_screen("modesMenu").ids.create_or_add_group_button.on_release = self.create_or_edit_group_popup_menu.open
         self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.opacity = 1
         self.root.get_screen("compoundMenu").ids.create_category_or_compound_button.disabled = False
         self.root.get_screen("compoundMenu").ids.delete_category_button.opacity = 1

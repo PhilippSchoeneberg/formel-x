@@ -35,19 +35,24 @@ class CompoundMenuScreen(Screen):
             )
 
 
-    def create_compound_menu_open(self):
+    def create_or_edit_category_or_compound_menu_open(self):
         self.app = App.get_running_app()
         add_menu_items = [
             {
                 "text": "Add Formula",
-                "on_release": lambda: self.app.create_compound_popup_menu.open(),
+                "on_release": lambda: self.app.create_or_edit_compound_popup_menu.open(),
             },
             {
                 "text": "Add Category",
-                "on_release": lambda: self.app.create_category_popup_menu.open(),
+                "on_release": lambda: self.app.create_or_edit_category_popup_menu.open(),
             }
         ]
         MDDropdownMenu(
             caller=self.app.root.get_screen(self.app.root.current).ids.create_category_or_compound_button,
             items=add_menu_items
         ).open()
+
+
+    def edit_category(self):
+        self.app = App.get_running_app()
+        self.app.create_or_edit_category_popup_menu.open(True)

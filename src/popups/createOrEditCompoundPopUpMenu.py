@@ -9,8 +9,10 @@ from kivymd.uix.menu import MDDropdownMenu
 import datetime
 
 
-class CreateCompoundPopUpMenu(MDDialog):
+class CreateOrEditCompoundPopUpMenu(MDDialog):
     def __init__(self):
+        self.compound = None
+        self.action_function = None
         self.selected_category = None
 
         self.correct_name_field = MDTextField(
@@ -93,8 +95,10 @@ class CreateCompoundPopUpMenu(MDDialog):
         )
         scroll_view.add_widget(content_box)
 
+        self.headline = MDDialogHeadlineText(text="Create Compound", halign="center")
+
         super().__init__(
-            MDDialogHeadlineText(text="Create Formula", halign="center"),
+            self.headline,
             MDDialogContentContainer(scroll_view),
             MDDialogButtonContainer(
                 Widget(),
@@ -111,7 +115,20 @@ class CreateCompoundPopUpMenu(MDDialog):
         )
 
 
-    def open(self):
+    def open(self, compound = None, action_function = None):
+        app = App.get_running_app()
+        self.compound = compound
+        self.action_function = action_function
+        if self.compound:
+            self.headline = "Edit Compound"
+            self.correct_name_field.text = self.compound["correct_name"]
+            self.wrong_name_field1.text = self.compound["wrong_name1"]
+            self.wrong_name_field2.text = self.compound["wrong_name2"]
+            self.correct_formula_field.text = self.compound["correct_formula"]
+            self.wrong_formula_field1.text = self.compound["wrong_formula1"]
+            self.wrong_formula_field2.text = self.compound["wrong_formula2"]
+            self.selected_category = app.db.get_category_by_id(self.compound["category"])
+            self.categories_button_text.text = self.selected_category["name"]
         self.categories_dropdown_menu.items = self.get_category_items()
         super().open()
 
@@ -126,7 +143,7 @@ class CreateCompoundPopUpMenu(MDDialog):
         return [
             {
                 "text": category["name"],
-                "on_release": lambda x=category["name"]: self.set_category(x),
+                "on_release": lambda x=category: self.set_category(x),
             }
             for category in categories.values()
         ]
@@ -134,7 +151,7 @@ class CreateCompoundPopUpMenu(MDDialog):
 
     def set_category(self, category):
         self.selected_category = category
-        self.categories_button_text.text = category
+        self.categories_button_text.text = category["name"]
         self.categories_dropdown_menu.dismiss()
 
 
@@ -163,23 +180,24 @@ class CreateCompoundPopUpMenu(MDDialog):
         if not category:
             self.categories_button_text.text = "Please select a category"
             valid = False
-        else:
-            self.categories_button_text.error = False
 
         if valid:
-            app.db.cursor.execute("SELECT id FROM categories WHERE name = ?", (category,))
-            result = app.db.cursor.fetchone()
-            if result:
-                category_id = result[0]
+            if not self.compound:
                 app.db.cursor.execute(
                     "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, app.loggedInGroup["id"], date)
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.loggedInGroup["id"], date)
                 )
-                app.db.connection.commit()
-                self.dismiss()
+            else:
+                app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.loggedInGroup["id"], date, self.compound["id"])
+                )
+                self.action_function()
+            app.db.connection.commit()
+            self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
+        self.headline = "Create Compound"
         self.correct_name_field.text = ""
         self.wrong_name_field1.text = ""
         self.wrong_name_field2.text = ""

@@ -18,11 +18,15 @@
                 pos_hint: {"center_x": .5}
 
             MDTopAppBarTrailingButtonContainer:
-
                 MDActionTopAppBarButton:
                     id: create_category_or_compound_button
                     icon: "plus-circle"
-                    on_release: app.compoundMenuScreen.create_compound_menu_open()
+                    on_release: app.compoundMenuScreen.create_or_edit_category_or_compound_menu_open()
+
+                MDActionTopAppBarButton:
+                    id: edit_category_button
+                    icon: "border-color"
+                    on_release: app.compoundMenuScreen.edit_category()
 
                 MDActionTopAppBarButton:
                     id: delete_category_button

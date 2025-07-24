@@ -21,12 +21,12 @@
                 MDActionTopAppBarButton:
                     id: create_compound_button
                     icon: "plus-circle"
-                    on_release: app.create_compound_popup_menu.open()
+                    on_release: app.create_or_edit_compound_popup_menu.open()
 
                 MDActionTopAppBarButton:
                     id: edit_compound_button
                     icon: "border-color"
-                    on_release: app.group_menu_open(*args)
+                    on_release: app.compoundLearningScreen.edit_compound()
 
                 MDActionTopAppBarButton:
                     id: delete_compound_button
