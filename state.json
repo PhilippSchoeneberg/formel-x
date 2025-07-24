@@ -1,13 +1,17 @@
 {
     "logged_in_user_id": null,
     "logged_in_group": {
-        "id": 1,
-        "name": "Lehrlinge 1"
+        "id": 5,
+        "name": "a"
     },
     "groups": [
         {
             "id": 1,
             "name": "Lehrlinge 1"
+        },
+        {
+            "id": 5,
+            "name": "a"
         }
     ],
     "dark_mode": true

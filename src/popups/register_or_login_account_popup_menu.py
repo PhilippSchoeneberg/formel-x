@@ -159,7 +159,8 @@ class RegisterOrLoginAccountPopUpMenu(MDDialog):
                         "INSERT INTO accounts (email, password, date) VALUES (?, ?, ?)",
                         (email, hashed_password, date)
                     )
-                    self.toggle_mode()
+                    app.login(app.db.cursor.lastrowid)
+                    self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
