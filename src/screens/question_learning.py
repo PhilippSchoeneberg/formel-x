@@ -1,7 +1,5 @@
-from src.popups.confirmDeletePopUpMenu import ConfirmDeletePopUpMenu
-
-from kivy.clock import Clock
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
@@ -20,7 +18,7 @@ class QuestionLearningScreen(Screen):
         self.app.change_screen("questionLearning")
 
         self.questions_to_learn = [
-            question for question in self.app.db.get_all_questions_by_group(self.app.loggedInGroup).values()
+            question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
         ]
 
         self.current_index = 0
@@ -76,5 +74,4 @@ class QuestionLearningScreen(Screen):
 
 
     def delete_question(self):
-        confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Question", self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
-        confirmDeletePopupMenu.open()
+        self.app.confirm_delete_popup_menu.open("Question", self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)

@@ -33,7 +33,7 @@
                 MDActionTopAppBarButton:
                     id: choose_group_button
                     icon: "autorenew"
-                    on_release: app.modesMenuScreen.group_menu_open()
+                    on_release: app.modes_menu_screen.group_menu_open()
 
             MDTopAppBarTitle:
                 id: group_name
@@ -41,13 +41,13 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: create_or_add_group_button
-                    icon: "plus"
-
-                MDActionTopAppBarButton:
                     id: edit_group_button
                     icon: "border-color"
-                    on_release: app.modesMenuScreen.edit_group()
+                    on_release: app.modes_menu_screen.edit_group()
+
+                MDActionTopAppBarButton:
+                    id: create_or_add_group_button
+                    icon: "plus"
 
                 MDActionTopAppBarButton:
                     id: delete_or_remove_group_button

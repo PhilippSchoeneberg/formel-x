@@ -7,7 +7,6 @@
             size_hint_x: 1
 
             MDTopAppBarLeadingButtonContainer:
-
                 MDActionTopAppBarButton:
                     id: theme_mode
                     icon: "weather-sunny"
@@ -19,19 +18,19 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
+                    id: edit_compound_button
+                    icon: "border-color"
+                    on_release: app.compound_learning_screen.edit_compound()
+
+                MDActionTopAppBarButton:
                     id: create_compound_button
                     icon: "plus-circle"
                     on_release: app.create_or_edit_compound_popup_menu.open()
 
                 MDActionTopAppBarButton:
-                    id: edit_compound_button
-                    icon: "border-color"
-                    on_release: app.compoundLearningScreen.edit_compound()
-
-                MDActionTopAppBarButton:
                     id: delete_compound_button
                     icon: "delete"
-                    on_release: app.compoundLearningScreen.delete_compound()
+                    on_release: app.compound_learning_screen.delete_compound()
 
                 MDActionTopAppBarButton:
                     id: back_button

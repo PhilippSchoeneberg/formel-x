@@ -1,4 +1,4 @@
-<ElementMenuScreen>:
+<QuestionLearningScreen>:
     BoxLayout:
         orientation: 'vertical'
 
@@ -7,7 +7,6 @@
             size_hint_x: 1
 
             MDTopAppBarLeadingButtonContainer:
-
                 MDActionTopAppBarButton:
                     id: theme_mode
                     icon: "weather-sunny"
@@ -18,11 +17,20 @@
                 pos_hint: {"center_x": .5}
 
             MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: edit_question_button
+                    icon: "border-color"
+                    on_release: app.question_learning_screen.edit_question()
 
                 MDActionTopAppBarButton:
-                    id: create_element_button
+                    id: create_question_button
                     icon: "plus-circle"
-                    on_release: app.add_menu_open()
+                    on_release: app.create_or_edit_question_popup_menu.open()
+
+                MDActionTopAppBarButton:
+                    id: delete_question_button
+                    icon: "delete"
+                    on_release: app.question_learning_screen.delete_question()
 
                 MDActionTopAppBarButton:
                     id: back_button
@@ -31,4 +39,4 @@
 
         ScrollView:
             MDList:
-                id: category_list
+                id: question_learning_list

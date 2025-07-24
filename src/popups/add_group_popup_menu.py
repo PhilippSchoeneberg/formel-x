@@ -4,12 +4,12 @@ from kivy.uix.widget import Widget
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
-import datetime
+
+from src.utils.json_parser import save_state
 
 
-class CreateOrEditGroupPopUpMenu(MDDialog):
+class AddGroupPopUpMenu(MDDialog):
     def __init__(self):
-        self.group = None
         self.name_helper_text = MDTextFieldHelperText(text="Group name can't be empty", mode="on_error")
 
         self.name_field = MDTextField(
@@ -28,32 +28,21 @@ class CreateOrEditGroupPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
-        self.headline = MDDialogHeadlineText(text="Create Group", halign="center")
-
         super().__init__(
-            self.headline,
+            MDDialogHeadlineText(text="Add Group", halign="center"),
             MDDialogContentContainer(content_box),
             MDDialogButtonContainer(
                 Widget(),
                 MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.create_group),
+                MDButton(MDButtonText(text="Add"), style="text", on_release=self.add_group),
                 spacing="8dp",
             ),
         )
 
 
-    def open(self, group = None):
-        self.group = group
-        if self.group:
-            self.headline = "Edit Group"
-            self.name_field.text = self.group["name"]
-        super().open()
-
-
-    def create_group(self, *args, **kwargs):
+    def add_group(self, *args, **kwargs):
         app = App.get_running_app()
         name = self.name_field.text.strip()
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not name:
@@ -68,27 +57,21 @@ class CreateOrEditGroupPopUpMenu(MDDialog):
             app.db.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
             result = app.db.cursor.fetchone()
             if result:
-                self.name_helper_text.text = "Group name already exists"
-                self.name_field.error = False
-                self.name_field.error = True
-            else:
-                if not self.group:
-                    app.db.cursor.execute(
-                        "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
-                        (name, app.loggedInUserId, date)
-                    )
-                else:
-                    app.db.cursor.execute(
-                        "UPDATE groups SET name = ?, owner_id = ?, date = ? WHERE id = ?",
-                        (name, app.loggedInUserId, date, self.group["id"])
-                    )
-                app.modesMenuScreen.refresh_groups()
+                if result[0] not in app.groups:
+                    group = {"id": result[0], "name": result[1]}
+                    app.groups.append(group)
+                    app.state["groups"] = app.groups
+                    save_state(self.state)
+                app.modes_menu_screen.refresh_groups()
                 app.db.connection.commit()
                 self.dismiss()
+            else:
+                self.name_helper_text.text = "Group does not exist"
+                self.name_field.error = False
+                self.name_field.error = True
 
 
     def dismiss(self, *args, **kwargs):
-        self.headline = "Create Group"
         self.name_field.text = ""
         self.name_field.error = False
         super().dismiss()

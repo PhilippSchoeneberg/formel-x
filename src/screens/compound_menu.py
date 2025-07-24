@@ -18,7 +18,7 @@ class CompoundMenuScreen(Screen):
     def fill_category_list(self):
         self.app = App.get_running_app()
         self.app.root.get_screen("compoundMenu").ids.category_list.clear_widgets()
-        categories = self.app.db.get_all_categories_by_group(self.app.loggedInGroup)
+        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
 
         title_item = MDListItem(
             MDListItemHeadlineText(text="Select Category"))
@@ -30,7 +30,7 @@ class CompoundMenuScreen(Screen):
             self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text=category["name"]),
-                    on_release=lambda _, cat_id=category_id: self.app.compoundLearningScreen.start_learning(cat_id)
+                    on_release=lambda _, cat_id=category_id: self.app.compound_learning_screen.start_learning(cat_id)
                 )
             )
 

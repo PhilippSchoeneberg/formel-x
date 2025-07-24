@@ -1,16 +1,14 @@
 {
-    "loggedInUserId": 1,
-    "loggedInGroup": {
+    "logged_in_user_id": null,
+    "logged_in_group": {
         "id": 1,
-        "name": "b",
-        "owner_id": 1,
-        "date": "2025-07-24 14:01:25"
+        "name": "Lehrlinge 1"
     },
     "groups": [
         {
             "id": 1,
-            "name": "a"
+            "name": "Lehrlinge 1"
         }
     ],
-    "darkMode": true
+    "dark_mode": true
 }

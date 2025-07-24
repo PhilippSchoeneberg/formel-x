@@ -55,7 +55,7 @@ class DeleteCategoryPopUpMenu(MDDialog):
 
     def get_category_items(self):
         app = App.get_running_app()
-        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
+        categories = app.db.get_all_categories_by_group(app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -84,7 +84,7 @@ class DeleteCategoryPopUpMenu(MDDialog):
 
         if valid:
             app.db.delete_category(category)
-            app.compoundMenuScreen.fill_category_list()
+            app.compound_menu_screen.fill_category_list()
             self.dismiss()
 
 

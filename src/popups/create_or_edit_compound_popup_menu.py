@@ -139,7 +139,7 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
     def get_category_items(self):
         app = App.get_running_app()
-        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
+        categories = app.db.get_all_categories_by_group(app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -185,11 +185,11 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             if not self.compound:
                 app.db.cursor.execute(
                     "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.loggedInGroup["id"], date)
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.logged_in_group["id"], date)
                 )
             else:
                 app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.loggedInGroup["id"], date, self.compound["id"])
+                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.logged_in_group["id"], date, self.compound["id"])
                 )
                 self.action_function()
             app.db.connection.commit()

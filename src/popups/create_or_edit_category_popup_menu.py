@@ -73,7 +73,7 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
     def get_category_items(self):
         app = App.get_running_app()
-        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
+        categories = app.db.get_all_categories_by_group(app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -103,7 +103,7 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
             self.name_field.error = True
             valid = False
 
-        categories = app.db.get_all_categories_by_group(app.loggedInGroup)
+        categories = app.db.get_all_categories_by_group(app.logged_in_group)
         for cat in categories.values():
             if cat["name"] == name:
                 self.name_helper_text.text = "Group name already exists"
@@ -111,25 +111,27 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
                 self.name_field.error = True
                 valid = False
 
-        if not category:
-            self.categories_button_text.text = "Please select a category"
-            valid = False
-
-        if valid:
-            if not self.edit:
+        if not self.edit:
+            if valid:
                 app.db.cursor.execute(
                     "INSERT INTO categories (name, group_id, date) VALUES (?, ?, ?)",
-                    (name, app.loggedInGroup["id"], date)
+                    (name, app.logged_in_group["id"], date)
                 )
-            else:
+                app.db.connection.commit()
+                app.compound_menu_screen.fill_category_list()
+                self.dismiss()
+        else:
+            if not category:
+                self.categories_button_text.text = "Please select a category"
+                valid = False
+            if valid:
                 app.db.cursor.execute(
                     "UPDATE categories SET name = ?, group_id = ?, date = ? WHERE id = ?",
-                    (name, app.loggedInGroup["id"], date, category["id"])
+                    (name, app.logged_in_group["id"], date, category["id"])
                 )
-            app.db.connection.commit()
-            app.compoundMenuScreen.fill_category_list()
-            self.dismiss()
-
+                app.db.connection.commit()
+                app.compound_menu_screen.fill_category_list()
+                self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):

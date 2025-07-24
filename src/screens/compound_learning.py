@@ -1,7 +1,5 @@
-from src.popups.confirmDeletePopUpMenu import ConfirmDeletePopUpMenu
-
-from kivy.clock import Clock
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
@@ -20,7 +18,7 @@ class CompoundLearningScreen(Screen):
         self.app.change_screen("compoundLearning")
 
         self.compounds_to_learn = [
-            compound for compound in self.app.db.get_all_compounds_by_group(self.app.loggedInGroup).values()
+            compound for compound in self.app.db.get_all_compounds_by_group(self.app.logged_in_group).values()
             if compound["category"] == category
         ]
 
@@ -75,5 +73,4 @@ class CompoundLearningScreen(Screen):
 
 
     def delete_compound(self):
-        confirmDeletePopupMenu = ConfirmDeletePopUpMenu("Compound", self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)
-        confirmDeletePopupMenu.open()
+        self.app.confirm_delete_popup_menu.open("Compound", self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)

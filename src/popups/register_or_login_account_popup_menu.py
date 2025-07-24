@@ -1,5 +1,5 @@
-import datetime
 import bcrypt
+import datetime
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
 from kivymd.uix.button import MDButton, MDButtonText
@@ -7,7 +7,7 @@ from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHe
 from kivymd.uix.boxlayout import MDBoxLayout
 
 
-class LoginAccountPopUpMenu(MDDialog):
+class RegisterOrLoginAccountPopUpMenu(MDDialog):
     def __init__(self):
         self.register_mode = False
 

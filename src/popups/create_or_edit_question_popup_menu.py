@@ -1,3 +1,4 @@
+import datetime
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -5,7 +6,6 @@ from kivy.uix.scrollview import ScrollView
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
-import datetime
 
 
 class CreateOrEditQuestionPopUpMenu(MDDialog):
@@ -143,12 +143,12 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
             if not self.question:
                 app.db.cursor.execute(
                     "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date)
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.logged_in_group["id"], date)
                 )
             else:
                 app.db.cursor.execute(
                     "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, group_id = ?, date = ? WHERE id = ?",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.loggedInGroup["id"], date, self.question["id"])
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.logged_in_group["id"], date, self.question["id"])
                 )
                 self.action_function()
             app.db.connection.commit()
