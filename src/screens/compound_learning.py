@@ -28,7 +28,7 @@ class CompoundLearningScreen(Screen):
 
 
     def show_next_compound(self):
-        self.app.root.get_screen("compoundLearning").ids.compound_learning_list.clear_widgets()
+        self.ids.compound_learning_list.clear_widgets()
 
         if self.current_index >= len(self.compounds_to_learn):
             self.app.change_screen("compoundMenu")
@@ -50,17 +50,29 @@ class CompoundLearningScreen(Screen):
                 MDListItemHeadlineText(text=text),
                 on_release=lambda item: on_clicked(list_item, correct)
             )
-            self.app.root.get_screen("compoundLearning").ids.compound_learning_list.add_widget(list_item)
+            self.ids.compound_learning_list.add_widget(list_item)
 
-        title_item = MDListItem(
-            MDListItemHeadlineText(text=f"Which is the correct formula for {self.current_compound['correct_name']}"))
-        title_item.ripple_effect = False
-        title_item.focus_behavior = False
-        self.app.root.get_screen("compoundLearning").ids.compound_learning_list.add_widget(title_item)
+        if self.app.formula_to_name_query_mode:
+            title_item = MDListItem(
+                MDListItemHeadlineText(text=f"Which is the correct formula for {self.current_compound['correct_name']}"))
+            title_item.ripple_effect = False
+            title_item.focus_behavior = False
+            self.ids.compound_learning_list.add_widget(title_item)
 
-        add_option(self.current_compound["correct_formula"], True)
-        add_option(self.current_compound["wrong_formula1"], False)
-        add_option(self.current_compound["wrong_formula2"], False)
+            add_option(self.current_compound["correct_formula"], True)
+            add_option(self.current_compound["wrong_formula1"], False)
+            add_option(self.current_compound["wrong_formula2"], False)
+        else:
+            title_item = MDListItem(
+                MDListItemHeadlineText(
+                    text=f"Which is the correct name for {self.current_compound['correct_formula']}"))
+            title_item.ripple_effect = False
+            title_item.focus_behavior = False
+            self.ids.compound_learning_list.add_widget(title_item)
+
+            add_option(self.current_compound["correct_name"], True)
+            add_option(self.current_compound["wrong_name1"], False)
+            add_option(self.current_compound["wrong_name2"], False)
 
 
     def next_compound(self):

@@ -1,9 +1,71 @@
+import datetime
 import sqlite3
 
 class Database:
-    def __init__(self, db_path="formulaX.db"):
+    def __init__(self, db_path="src/database/formulaX.db"):
         self.connection = sqlite3.connect(db_path)
         self.cursor = self.connection.cursor()
+
+
+    def fill_elements_table(self):
+        with open("src/database/insert_elements.sql", "r", encoding="utf-8") as f:
+            sql_script = f.read()
+            self.cursor.executescript(sql_script)
+        self.connection.commit()
+
+
+    def get_all_elements(self):
+        self.cursor.execute("SELECT * FROM elements")
+        rows = self.cursor.fetchall()
+
+        element_dict = {
+            row[0]: {
+                "symbol": row[0],
+                "name": row[1],
+                "group": row[2],
+                "period": row[3],
+            }
+            for row in rows
+        }
+
+        return element_dict
+
+
+    def link_element_to_group(self, element, group):
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.cursor.execute(
+            "INSERT INTO elements_to_groups (symbol, group_id, date) VALUES (?, ?, ?)",
+            (element["symbol"], group["id"], date)
+        )
+        self.connection.commit()
+
+
+    def unlink_element_to_group(self, element, group):
+        self.cursor.execute(
+            "DELETE FROM elements_to_groups WHERE symbol = ? AND group_id = ?",
+            (element["symbol"], group["id"])
+        )
+        self.connection.commit()
+
+
+    def get_all_elements_by_group(self, group):
+        if group:
+            self.cursor.execute("SELECT elements.symbol, elements.name, elements.\"group\", elements.period FROM elements_to_groups LEFT OUTER JOIN elements ON elements_to_groups.symbol = elements.symbol WHERE elements_to_groups.group_id = ?", (group["id"],))
+            rows = self.cursor.fetchall()
+
+            category_dict = {
+                row[0]: {
+                    "symbol": row[0],
+                    "name": row[1],
+                    "group": row[2],
+                    "period": row[3],
+                }
+                for row in rows
+            }
+
+            return category_dict
+        else:
+            return {}
 
 
     def get_category_by_id(self, category_id):
@@ -120,7 +182,7 @@ class Database:
 
 
     def delete_group(self, group):
-        self.cursor.execute("DELETE FROM elements WHERE group_id = ?", (group["id"],))
+        self.cursor.execute("DELETE FROM elements_to_groups WHERE group_id = ?", (group["id"],))
         self.cursor.execute("DELETE FROM categories WHERE group_id = ?", (group["id"],))
         self.cursor.execute("DELETE FROM compounds WHERE group_id = ?", (group["id"],))
         self.cursor.execute("DELETE FROM questions WHERE group_id = ?", (group["id"],))

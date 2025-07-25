@@ -1,5 +1,4 @@
 from src.utils.json_parser import save_state
-from src.popups.confirm_delete_popup_menu import ConfirmDeletePopUpMenu
 
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
@@ -16,27 +15,27 @@ class ModesMenuScreen(Screen):
 
     def fill_modes_list(self):
         self.app = App.get_running_app()
-        self.app.root.get_screen("modesMenu").ids.mode_list.clear_widgets()
+        self.ids.mode_list.clear_widgets()
 
         if self.app.logged_in_group:
             title_item = MDListItem(
                 MDListItemHeadlineText(text="Select Mode"))
             title_item.ripple_effect = False
             title_item.focus_behavior = False
-            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(title_item)
-            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+            self.ids.mode_list.add_widget(title_item)
+            self.ids.mode_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text="Elements"),
                     on_release=lambda _: self.app.change_screen("elementMenu")
                 )
             )
-            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+            self.ids.mode_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text="Compounds"),
                     on_release=lambda _: self.app.change_screen("compoundMenu")
                 )
             )
-            self.app.root.get_screen("modesMenu").ids.mode_list.add_widget(
+            self.ids.mode_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text="Questions"),
                     on_release=lambda _: self.app.question_learning_screen.start_learning()
@@ -60,7 +59,7 @@ class ModesMenuScreen(Screen):
         self.app.logged_in_group = group
         self.app.state["logged_in_group"] = self.app.logged_in_group
         save_state(self.app.state)
-        self.app.root.get_screen("modesMenu").ids.group_name.text = group["name"]
+        self.ids.group_name.text = group["name"]
         if self.group_dropdown_menu:
             self.group_dropdown_menu.dismiss()
         self.refresh_groups()
@@ -85,6 +84,7 @@ class ModesMenuScreen(Screen):
 
 
     def refresh_groups(self):
+        self.app = App.get_running_app()
         if self.app.logged_in_user_id:
             self.app.groups = self.app.db.get_all_groups_by_owner_id(self.app.logged_in_user_id)
         else:
@@ -96,6 +96,6 @@ class ModesMenuScreen(Screen):
                     self.remove_group(group)
         if self.app.logged_in_group not in self.app.groups:
             self.app.logged_in_group = None
-            self.app.root.get_screen("modesMenu").ids.group_name.text = "Select Group"
+            self.ids.group_name.text = "Select Group"
         self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
         self.fill_modes_list()

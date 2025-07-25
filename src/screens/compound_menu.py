@@ -17,17 +17,17 @@ class CompoundMenuScreen(Screen):
 
     def fill_category_list(self):
         self.app = App.get_running_app()
-        self.app.root.get_screen("compoundMenu").ids.category_list.clear_widgets()
+        self.ids.category_list.clear_widgets()
         categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
 
         title_item = MDListItem(
             MDListItemHeadlineText(text="Select Category"))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
-        self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(title_item)
+        self.ids.category_list.add_widget(title_item)
 
         for category_id, category in categories.items():
-            self.app.root.get_screen("compoundMenu").ids.category_list.add_widget(
+            self.ids.category_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text=category["name"]),
                     on_release=lambda _, cat_id=category_id: self.app.compound_learning_screen.start_learning(cat_id)
@@ -56,3 +56,11 @@ class CompoundMenuScreen(Screen):
     def edit_category(self):
         self.app = App.get_running_app()
         self.app.create_or_edit_category_popup_menu.open(True)
+
+
+    def switch_query_mode(self):
+        self.app = App.get_running_app()
+        self.app.formula_to_name_query_mode = not self.app.formula_to_name_query_mode
+        self.ids.query_mode_title.text = (
+            "Formula to Name" if self.app.formula_to_name_query_mode else "Name to Formula"
+        )

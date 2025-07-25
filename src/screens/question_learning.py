@@ -27,7 +27,7 @@ class QuestionLearningScreen(Screen):
 
 
     def show_next_question(self):
-        self.app.root.get_screen("questionLearning").ids.question_learning_list.clear_widgets()
+        self.ids.question_learning_list.clear_widgets()
 
         if self.current_index >= len(self.questions_to_learn):
             self.app.change_screen("modesMenu")
@@ -50,12 +50,12 @@ class QuestionLearningScreen(Screen):
                 MDListItemHeadlineText(text=text),
                 on_release=lambda item: on_clicked(item, correct)
             )
-            self.app.root.get_screen("questionLearning").ids.question_learning_list.add_widget(list_item)
+            self.ids.question_learning_list.add_widget(list_item)
 
         title_item = MDListItem(MDListItemHeadlineText(text=self.current_question["question"]))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
-        self.app.root.get_screen("questionLearning").ids.question_learning_list.add_widget(title_item)
+        self.ids.question_learning_list.add_widget(title_item)
 
         add_option(self.current_question["correct_answer"], True)
         add_option(self.current_question["wrong_answer1"], False)

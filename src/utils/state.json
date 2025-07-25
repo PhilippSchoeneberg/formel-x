@@ -1,16 +1,16 @@
 {
     "logged_in_user_id": null,
     "logged_in_group": {
-        "id": 5,
+        "id": 1,
         "name": "a"
     },
     "groups": [
         {
-            "id": 1,
-            "name": "Lehrlinge 1"
+            "id": 2,
+            "name": "Athe 2025"
         },
         {
-            "id": 5,
+            "id": 1,
             "name": "a"
         }
     ],

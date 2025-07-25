@@ -40,3 +40,17 @@
         ScrollView:
             MDList:
                 id: category_list
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: switch_query_mode_button
+                    icon: "autorenew"
+                    on_release: app.compound_menu_screen.switch_query_mode()
+
+            MDTopAppBarTitle:
+                id: query_mode_title
+                text: "Formula to Name"

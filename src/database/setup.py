@@ -1,21 +1,21 @@
-import sqlite3
+from src.database.database import Database
 
-connection = sqlite3.connect("formulaX.db")
-cursor = connection.cursor()
+db = Database()
 
 # Enable foreign key support (must be done per connection in SQLite)
-cursor.execute("PRAGMA foreign_keys = ON")
+db.cursor.execute("PRAGMA foreign_keys = ON")
 
 # Drop tables if they exist (for re-creation)
-cursor.execute("DROP TABLE IF EXISTS compounds")
-cursor.execute("DROP TABLE IF EXISTS elements")
-cursor.execute("DROP TABLE IF EXISTS categories")
-cursor.execute("DROP TABLE IF EXISTS questions")
-cursor.execute("DROP TABLE IF EXISTS groups")
-cursor.execute("DROP TABLE IF EXISTS accounts")
+db.cursor.execute("DROP TABLE IF EXISTS elements_to_groups")
+db.cursor.execute("DROP TABLE IF EXISTS compounds")
+db.cursor.execute("DROP TABLE IF EXISTS elements")
+db.cursor.execute("DROP TABLE IF EXISTS categories")
+db.cursor.execute("DROP TABLE IF EXISTS questions")
+db.cursor.execute("DROP TABLE IF EXISTS groups")
+db.cursor.execute("DROP TABLE IF EXISTS accounts")
 
 # Create table "accounts"
-cursor.execute("""
+db.cursor.execute("""
 CREATE TABLE accounts (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     email       TEXT NOT NULL UNIQUE,
@@ -25,7 +25,7 @@ CREATE TABLE accounts (
 """)
 
 # Create table "groups" with foreign key reference to accounts(id)
-cursor.execute("""
+db.cursor.execute("""
 CREATE TABLE groups (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        TEXT NOT NULL UNIQUE,
@@ -35,20 +35,29 @@ CREATE TABLE groups (
 )
 """)
 
-# Create table "elements" with foreign key reference to categories(id)
-cursor.execute("""
+# Create table "elements"
+db.cursor.execute("""
 CREATE TABLE elements (
-    id       INTEGER PRIMARY KEY AUTOINCREMENT,
-    name     TEXT NOT NULL,
-    formula  TEXT NOT NULL,
-    group_id INTEGER NOT NULL,
-    date     TEXT NOT NULL,
+    symbol  TEXT PRIMARY KEY,
+    name    TEXT NOT NULL,
+    "group" INTEGER NOT NULL,
+    period  INTEGER NOT NULL
+)
+""")
+
+# Create table "elements_to_groups" with foreign key reference to elements(symbol) and groups(id)
+db.cursor.execute("""
+CREATE TABLE elements_to_groups (
+    symbol      TEXT NOT NULL,
+    group_id    INTEGER NOT NULL,
+    date        TEXT NOT NULL,
+    FOREIGN KEY (symbol) REFERENCES elements(symbol),
     FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)
 
 # Create table "categories"
-cursor.execute("""
+db.cursor.execute("""
 CREATE TABLE categories (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        TEXT NOT NULL,
@@ -58,16 +67,20 @@ CREATE TABLE categories (
 )
 """)
 
-# Create table "formulas" with foreign key reference to categories(id)
-cursor.execute("""
+# Create table "formulas" with foreign key reference to categories(id) and groups(id)
+db.cursor.execute("""
 CREATE TABLE compounds (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     correct_name    TEXT NOT NULL,
     wrong_name1     TEXT NOT NULL,
     wrong_name2     TEXT NOT NULL,
+    wrong_name3     TEXT NOT NULL,
+    wrong_name4     TEXT NOT NULL,
     correct_formula TEXT NOT NULL,
     wrong_formula1  TEXT NOT NULL,
     wrong_formula2  TEXT NOT NULL,
+    wrong_formula3  TEXT NOT NULL,
+    wrong_formula4  TEXT NOT NULL,
     category_id     INTEGER NOT NULL,
     group_id        INTEGER NOT NULL,
     date            TEXT NOT NULL,
@@ -77,7 +90,7 @@ CREATE TABLE compounds (
 """)
 
 # Create table "questions" with foreign key reference to categories(id)
-cursor.execute("""
+db.cursor.execute("""
 CREATE TABLE questions (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     question        TEXT NOT NULL,
@@ -92,5 +105,7 @@ CREATE TABLE questions (
 )
 """)
 
-connection.commit()
-connection.close()
+db.fill_elements_table()
+
+db.connection.commit()
+db.close()

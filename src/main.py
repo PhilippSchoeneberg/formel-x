@@ -30,6 +30,8 @@ class MainApp(MDApp):
         self.logged_in_user_id = None
         self.logged_in_group = None
         self.groups = {}
+        self.learning_mode = False
+        self.formula_to_name_query_mode = True
 
         # Instantiate state
         self.state = None
@@ -38,11 +40,11 @@ class MainApp(MDApp):
         self.db = Database()
 
         # Instantiate screens
-        self.question_learning_screen = QuestionLearningScreen(name="questionLearning")
-        self.compound_menu_screen = CompoundMenuScreen(name="compoundMenu")
-        self.compound_learning_screen = CompoundLearningScreen(name="compoundLearning")
-        self.element_menu_screen = ElementMenuScreen(name="elementMenu")
-        self.modes_menu_screen = ModesMenuScreen(name="modesMenu")
+        self.question_learning_screen = None
+        self.compound_menu_screen = None
+        self.compound_learning_screen = None
+        self.element_menu_screen = None
+        self.modes_menu_screen = None
 
         # Instantiate popup menus
         self.register_or_login_account_popup_menu = RegisterOrLoginAccountPopUpMenu()
@@ -67,12 +69,18 @@ class MainApp(MDApp):
         for file in kv_files:
             Builder.load_file(file)
 
+        self.question_learning_screen = QuestionLearningScreen(name="questionLearning")
+        self.compound_menu_screen = CompoundMenuScreen(name="compoundMenu")
+        self.compound_learning_screen = CompoundLearningScreen(name="compoundLearning")
+        self.element_menu_screen = ElementMenuScreen(name="elementMenu")
+        self.modes_menu_screen = ModesMenuScreen(name="modesMenu")
+
         sm = ScreenManager()
-        sm.add_widget(ModesMenuScreen(name="modesMenu"))
-        sm.add_widget(ElementMenuScreen(name="elementMenu"))
-        sm.add_widget(CompoundLearningScreen(name="compoundLearning"))
-        sm.add_widget(CompoundMenuScreen(name="compoundMenu"))
-        sm.add_widget(QuestionLearningScreen(name="questionLearning"))
+        sm.add_widget(self.modes_menu_screen)
+        sm.add_widget(self.element_menu_screen)
+        sm.add_widget(self.compound_menu_screen)
+        sm.add_widget(self.compound_learning_screen)
+        sm.add_widget(self.question_learning_screen)
         self.root = sm
         return sm
 
@@ -80,9 +88,6 @@ class MainApp(MDApp):
     def on_start(self):
         self.theme_cls.theme_style = "Dark"
         self.theme_cls.primary_palette = 'Darkblue'
-
-        self.modes_menu_screen.fill_modes_list()
-
 
         self.state = load_state()
         if self.state.get("logged_in_user_id"):
@@ -94,12 +99,16 @@ class MainApp(MDApp):
         self.dark_mode = self.state["dark_mode"]
         self.set_theme()
 
+        self.modes_menu_screen.fill_modes_list()
+        self.element_menu_screen.fill_periodic_table()
+
 
     def login(self, loggedInUserId):
         self.logged_in_user_id = loggedInUserId
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
         self.modes_menu_screen.refresh_groups()
+        self.element_menu_screen.refresh_buttons()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "logout"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.logout
@@ -121,8 +130,6 @@ class MainApp(MDApp):
         self.root.get_screen("compoundLearning").ids.edit_compound_button.disabled = False
         self.root.get_screen("compoundLearning").ids.delete_compound_button.opacity = 1
         self.root.get_screen("compoundLearning").ids.delete_compound_button.disabled = False
-        self.root.get_screen("elementMenu").ids.create_element_button.opacity = 1
-        self.root.get_screen("elementMenu").ids.create_element_button.disabled = False
         self.root.get_screen("questionLearning").ids.create_question_button.opacity = 1
         self.root.get_screen("questionLearning").ids.create_question_button.disabled = False
         self.root.get_screen("questionLearning").ids.edit_question_button.opacity = 1
@@ -136,6 +143,7 @@ class MainApp(MDApp):
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
         self.modes_menu_screen.refresh_groups()
+        self.element_menu_screen.refresh_buttons()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "account"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.register_or_login_account_popup_menu.open
@@ -157,8 +165,6 @@ class MainApp(MDApp):
         self.root.get_screen("compoundLearning").ids.edit_compound_button.disabled = True
         self.root.get_screen("compoundLearning").ids.delete_compound_button.opacity = 0
         self.root.get_screen("compoundLearning").ids.delete_compound_button.disabled = True
-        self.root.get_screen("elementMenu").ids.create_element_button.opacity = 0
-        self.root.get_screen("elementMenu").ids.create_element_button.disabled = True
         self.root.get_screen("questionLearning").ids.create_question_button.opacity = 0
         self.root.get_screen("questionLearning").ids.create_question_button.disabled = True
         self.root.get_screen("questionLearning").ids.edit_question_button.opacity = 0

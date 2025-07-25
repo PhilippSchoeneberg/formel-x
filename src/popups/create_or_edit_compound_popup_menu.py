@@ -39,6 +39,22 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             pos_hint={"center_x": 0.5},
         )
 
+        self.wrong_name_field3 = MDTextField(
+            MDTextFieldHintText(text="Third wrong Formula Name"),
+            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            mode="outlined",
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.wrong_name_field4 = MDTextField(
+            MDTextFieldHintText(text="Fourth wrong Formula Name"),
+            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            mode="outlined",
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
         self.correct_formula_field = MDTextField(
             MDTextFieldHintText(text="Correct Formula"),
             MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
@@ -66,6 +82,24 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             pos_hint={"center_x": 0.5},
         )
 
+        self.wrong_formula_field3 = MDTextField(
+            MDTextFieldHintText(text="Third wrong Formula"),
+            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            mode="outlined",
+            multiline=True,
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
+        self.wrong_formula_field4 = MDTextField(
+            MDTextFieldHintText(text="Fourth wrong Formula"),
+            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            mode="outlined",
+            multiline=True,
+            size_hint_x=1,
+            pos_hint={"center_x": 0.5},
+        )
+
         self.categories_button_text = MDButtonText(text="Select Category")
 
         self.categories_button = MDButton(
@@ -78,9 +112,13 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             self.correct_name_field,
             self.wrong_name_field1,
             self.wrong_name_field2,
+            self.wrong_name_field3,
+            self.wrong_name_field4,
             self.correct_formula_field,
             self.wrong_formula_field1,
             self.wrong_formula_field2,
+            self.wrong_formula_field3,
+            self.wrong_formula_field4,
             self.categories_button,
             orientation="vertical",
             spacing="30dp",
@@ -124,9 +162,13 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             self.correct_name_field.text = self.compound["correct_name"]
             self.wrong_name_field1.text = self.compound["wrong_name1"]
             self.wrong_name_field2.text = self.compound["wrong_name2"]
+            self.wrong_name_field3.text = self.compound["wrong_name3"]
+            self.wrong_name_field4.text = self.compound["wrong_name4"]
             self.correct_formula_field.text = self.compound["correct_formula"]
             self.wrong_formula_field1.text = self.compound["wrong_formula1"]
             self.wrong_formula_field2.text = self.compound["wrong_formula2"]
+            self.wrong_formula_field3.text = self.compound["wrong_formula3"]
+            self.wrong_formula_field4.text = self.compound["wrong_formula4"]
             self.selected_category = app.db.get_category_by_id(self.compound["category"])
             self.categories_button_text.text = self.selected_category["name"]
         self.categories_dropdown_menu.items = self.get_category_items()
@@ -160,9 +202,13 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
         correct_name = self.correct_name_field.text.strip()
         wrong_name1 = self.wrong_name_field1.text.strip()
         wrong_name2 = self.wrong_name_field2.text.strip()
+        wrong_name3 = self.wrong_name_field3.text.strip()
+        wrong_name4 = self.wrong_name_field4.text.strip()
         correct_formula = self.correct_formula_field.text.strip()
         wrong_formula1 = self.wrong_formula_field1.text.strip()
         wrong_formula2 = self.wrong_formula_field2.text.strip()
+        wrong_formula3 = self.wrong_formula_field3.text.strip()
+        wrong_formula4 = self.wrong_formula_field4.text.strip()
         category = self.selected_category
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -172,11 +218,21 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             valid = False
         else:
             self.correct_name_field.error = False
+        if not wrong_name1:
+            self.wrong_name_field1.error = True
+            valid = False
+        else:
+            self.wrong_name_field1.error = False
         if not correct_formula:
             self.correct_formula_field.error = True
             valid = False
         else:
             self.correct_formula_field.error = False
+        if not wrong_formula1:
+            self.wrong_formula_field1.error = True
+            valid = False
+        else:
+            self.wrong_formula_field1.error = False
         if not category:
             self.categories_button_text.text = "Please select a category"
             valid = False
@@ -184,12 +240,12 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
         if valid:
             if not self.compound:
                 app.db.cursor.execute(
-                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.logged_in_group["id"], date)
+                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], app.logged_in_group["id"], date)
                 )
             else:
-                app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
-                    (correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category["id"], app.logged_in_group["id"], date, self.compound["id"])
+                app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?,  wrong_name3 = ?, wrong_name4 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, wrong_formula3 = ?, wrong_formula4 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
+                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], app.logged_in_group["id"], date, self.compound["id"])
                 )
                 self.action_function()
             app.db.connection.commit()
@@ -201,16 +257,23 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
         self.correct_name_field.text = ""
         self.wrong_name_field1.text = ""
         self.wrong_name_field2.text = ""
+        self.wrong_name_field3.text = ""
+        self.wrong_name_field4.text = ""
         self.correct_formula_field.text = ""
         self.wrong_formula_field1.text = ""
         self.wrong_formula_field2.text = ""
+        self.wrong_formula_field3.text = ""
+        self.wrong_formula_field4.text = ""
         self.correct_name_field.error = False
         self.wrong_name_field1.error = False
         self.wrong_name_field2.error = False
+        self.wrong_name_field3.error = False
+        self.wrong_name_field4.error = False
         self.correct_formula_field.error = False
         self.wrong_formula_field1.error = False
         self.wrong_formula_field2.error = False
-        self.wrong_formula_field2.error = False
+        self.wrong_formula_field3.error = False
+        self.wrong_formula_field4.error = False
         self.categories_button_text.text = "Select Category"
         self.selected_category = None
         super().dismiss()
