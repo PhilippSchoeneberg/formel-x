@@ -7,11 +7,13 @@ from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 class CompoundMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = None
+        self.app = App.get_running_app()
         self.group_dropdown_menu = None
 
 
-    def on_pre_enter(self):
+    def refresh(self, *args):
+        self.app = App.get_running_app()
+        self.ids.query_mode_title.text = self.app.language_manager.translate("formula_to_name")
         self.fill_category_list()
 
 
@@ -21,7 +23,7 @@ class CompoundMenuScreen(Screen):
         categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
 
         title_item = MDListItem(
-            MDListItemHeadlineText(text="Select Category"))
+            MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category")))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
         self.ids.category_list.add_widget(title_item)
@@ -34,16 +36,24 @@ class CompoundMenuScreen(Screen):
                 )
             )
 
+        if categories:
+            self.ids.category_list.add_widget(
+                MDListItem(
+                    MDListItemHeadlineText(text=self.app.language_manager.translate("all")),
+                    on_release=lambda _, cat_id=None: self.app.compound_learning_screen.start_learning(cat_id)
+                )
+            )
+
 
     def create_or_edit_category_or_compound_menu_open(self):
         self.app = App.get_running_app()
         add_menu_items = [
             {
-                "text": "Add Formula",
+                "text": self.app.language_manager.translate("add_formula"),
                 "on_release": lambda: self.app.create_or_edit_compound_popup_menu.open(),
             },
             {
-                "text": "Add Category",
+                "text": self.app.language_manager.translate("add_category"),
                 "on_release": lambda: self.app.create_or_edit_category_popup_menu.open(),
             }
         ]
@@ -53,14 +63,21 @@ class CompoundMenuScreen(Screen):
         ).open()
 
 
-    def edit_category(self):
-        self.app = App.get_running_app()
+    def create(self):
+        self.app.create_or_edit_category_popup_menu.open(False)
+
+
+    def edit(self):
         self.app.create_or_edit_category_popup_menu.open(True)
+
+
+    def delete(self):
+        self.app.delete_category_popup_menu.open()
 
 
     def switch_query_mode(self):
         self.app = App.get_running_app()
         self.app.formula_to_name_query_mode = not self.app.formula_to_name_query_mode
         self.ids.query_mode_title.text = (
-            "Formula to Name" if self.app.formula_to_name_query_mode else "Name to Formula"
+            self.app.language_manager.translate("formula_to_name") if self.app.formula_to_name_query_mode else self.app.language_manager.translate("name_to_formula")
         )

@@ -1,0 +1,200 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
+
+msgid "all"
+msgstr "Todos"
+
+msgid "language"
+msgstr "Idioma "
+
+msgid "theme"
+msgstr "Modo ligero "
+
+msgid "select"
+msgstr "Seleccionar "
+
+msgid "create"
+msgstr "Crear "
+
+msgid "empty_error"
+msgstr " no puede estar vacío.."
+
+msgid "does_not_exist_error"
+msgstr " no existe."
+
+msgid "already_exists_error"
+msgstr " ya existe."
+
+msgid "already_added_error"
+msgstr " ya añadido."
+
+msgid "do_not_match_error"
+msgstr " no coinciden."
+
+msgid "incorrect_error"
+msgstr " es incorrecto."
+
+msgid "edit"
+msgstr "Editar "
+
+msgid "delete"
+msgstr "Eliminar "
+
+msgid "add"
+msgstr "Añadir "
+
+msgid "leave"
+msgstr "Salir "
+
+msgid "delete_text"
+msgstr "¿Estás seguro de que quieres eliminar "
+
+msgid "cancel"
+msgstr "Cancelar"
+
+msgid "submit"
+msgstr "Enviar"
+
+msgid "login"
+msgstr "Iniciar sesión"
+
+msgid "registration"
+msgstr "Inscripción"
+
+msgid "go_to_login"
+msgstr "Ir a Iniciar sesión"
+
+msgid "go_to_registration"
+msgstr "Ir a Registro"
+
+msgid "email_address"
+msgstr "Correo electrónico"
+
+msgid "password"
+msgstr "Contraseña"
+
+msgid "password_repetition"
+msgstr "Repetición de contraseña"
+
+msgid "account"
+msgstr "Cuenta"
+
+msgid "elements"
+msgstr "Elementos"
+
+msgid "compounds"
+msgstr "compuestos"
+
+msgid "questions"
+msgstr "Preguntas"
+
+msgid "group"
+msgstr "Grupo"
+
+msgid "group_name"
+msgstr "Nombre del grupo"
+
+msgid "add_group"
+msgstr "Añadir grupo"
+
+msgid "mode"
+msgstr "Modo"
+
+msgid "element_remembering_mode_list_text"
+msgstr "Aprende la tabla periódica y luego pasa al modo de aprendizaje."
+
+msgid "element_learning_mode_list_text"
+msgstr "¿Dónde está "
+
+msgid "remembering_mode"
+msgstr "Modo de recuerdo"
+
+msgid "learning_mode"
+msgstr "Modo de aprendizaje"
+
+msgid "add_category"
+msgstr "Añadir categoría"
+
+msgid "category"
+msgstr "Categoría"
+
+msgid "category_name"
+msgstr "Nombre de la categoría"
+
+msgid "add_formula"
+msgstr "Añadir fórmula"
+
+msgid "compound"
+msgstr "Compuesto"
+
+msgid "correct_formula_name"
+msgstr "Nombre correcto de la fórmula"
+
+msgid "first_wrong_formula_name"
+msgstr "Primer nombre de fórmula incorrecto"
+
+msgid "second_wrong_formula_name"
+msgstr "Segundo nombre de fórmula incorrecto"
+
+msgid "third_wrong_formula_name"
+msgstr "Tercer nombre de fórmula incorrecto"
+
+msgid "fourth_wrong_formula_name"
+msgstr "Cuarto nombre de fórmula incorrecto"
+
+msgid "correct_formula"
+msgstr "Fórmula correcta"
+
+msgid "first_wrong_formula"
+msgstr "Primera fórmula incorrecta"
+
+msgid "second_wrong_formula"
+msgstr "Segunda fórmula incorrecta"
+
+msgid "third_wrong_formula"
+msgstr "Tercera fórmula errónea"
+
+msgid "fourth_wrong_formula"
+msgstr "Cuarta fórmula errónea"
+
+msgid "formula_to_name"
+msgstr "Fórmula para nombrar"
+
+msgid "name_to_formula"
+msgstr "Nombre a fórmula"
+
+msgid "compound_learning_mode_list_formula_text"
+msgstr "¿Cuál es la fórmula correcta para "
+
+msgid "compound_learning_mode_list_name_text"
+msgstr "¿Cuál es el nombre correcto para "
+
+msgid "for"
+msgstr "para"
+
+msgid " or "
+msgstr " o "
+
+msgid " and "
+msgstr " y "
+
+msgid "question"
+msgstr "Pregunta"
+
+msgid "correct_answer"
+msgstr "Respuesta correcta"
+
+msgid "first_wrong_answer"
+msgstr "Primera respuesta incorrecta"
+
+msgid "second_wrong_answer"
+msgstr "Segunda respuesta incorrecta"
+
+msgid "third_wrong_answer"
+msgstr "Tercera respuesta incorrecta"
+
+msgid "fourth_wrong_answer"
+msgstr "Cuarta respuesta incorrecta"

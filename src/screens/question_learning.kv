@@ -8,9 +8,9 @@
 
             MDTopAppBarLeadingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: theme_mode
-                    icon: "weather-sunny"
-                    on_release: app.change_theme()
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("modesMenu")
 
             MDTopAppBarTitle:
                 text: "FormulaX"
@@ -18,24 +18,9 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: edit_question_button
-                    icon: "border-color"
-                    on_release: app.question_learning_screen.edit_question()
-
-                MDActionTopAppBarButton:
-                    id: create_question_button
-                    icon: "plus-circle"
-                    on_release: app.create_or_edit_question_popup_menu.open()
-
-                MDActionTopAppBarButton:
-                    id: delete_question_button
-                    icon: "delete"
-                    on_release: app.question_learning_screen.delete_question()
-
-                MDActionTopAppBarButton:
-                    id: back_button
-                    icon: "arrow-left"
-                    on_release: app.change_screen("modesMenu")
+                    id: general_menu_button
+                    icon: "menu"
+                    on_release: app.general_menu_open()
 
         ScrollView:
             MDList:

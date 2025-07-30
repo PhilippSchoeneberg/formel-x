@@ -1,18 +1,19 @@
 {
+    "dark_mode": true,
+    "language": "de",
     "logged_in_user_id": null,
     "logged_in_group": {
         "id": 1,
-        "name": "a"
+        "name": "a",
+        "owner_id": 1,
+        "date": "2025-07-27 03:20:22"
     },
     "groups": [
         {
-            "id": 2,
-            "name": "Athe 2025"
-        },
-        {
             "id": 1,
-            "name": "a"
+            "name": "a",
+            "owner_id": 1,
+            "date": "2025-07-27 03:20:22"
         }
-    ],
-    "dark_mode": true
+    ]
 }

@@ -1,0 +1,200 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+
+msgid "all"
+msgstr "Alle "
+
+msgid "language"
+msgstr "Taal "
+
+msgid "theme"
+msgstr "Helligkeitsmodus "
+
+msgid "select"
+msgstr "Selecteer "
+
+msgid "create"
+msgstr "Maak "
+
+msgid "empty_error"
+msgstr " kan niet leeg zijn."
+
+msgid "does_not_exist_error"
+msgstr " bestaat niet."
+
+msgid "already_exists_error"
+msgstr " bestaat al."
+
+msgid "already_added_error"
+msgstr " al toegevoegd."
+
+msgid "do_not_match_error"
+msgstr " komen niet overeen."
+
+msgid "incorrect_error"
+msgstr " is onjuist."
+
+msgid "edit"
+msgstr "Bewerken "
+
+msgid "delete"
+msgstr "Verwijderen "
+
+msgid "add"
+msgstr "Toevoegen "
+
+msgid "leave"
+msgstr "Vertrek "
+
+msgid "delete_text"
+msgstr "Weet u zeker dat u wilt verwijderen ?"
+
+msgid "cancel"
+msgstr "Annuleren"
+
+msgid "submit"
+msgstr "Verzenden"
+
+msgid "login"
+msgstr "Inloggen"
+
+msgid "registration"
+msgstr "Registratie"
+
+msgid "go_to_login"
+msgstr "Ga naar Inloggen"
+
+msgid "go_to_registration"
+msgstr "Ga naar Registratie"
+
+msgid "email_address"
+msgstr "E-mailadres"
+
+msgid "password"
+msgstr "Wachtwoord"
+
+msgid "password_repetition"
+msgstr "Wachtwoord herhalen"
+
+msgid "account"
+msgstr "Account"
+
+msgid "elements"
+msgstr "Elementen"
+
+msgid "compounds"
+msgstr "Verbindingen"
+
+msgid "questions"
+msgstr "Vragen"
+
+msgid "group"
+msgstr "Groep"
+
+msgid "group_name"
+msgstr "Groepsnaam"
+
+msgid "add_group"
+msgstr "Groep toevoegen"
+
+msgid "mode"
+msgstr "Modus"
+
+msgid "element_remembering_mode_list_text"
+msgstr "Leer het periodiek systeem en schakel vervolgens over naar de leermodus."
+
+msgid "element_learning_mode_list_text"
+msgstr "Waar is "
+
+msgid "remembering_mode"
+msgstr "Herinneringsmodus"
+
+msgid "learning_mode"
+msgstr "Leermodus"
+
+msgid "add_category"
+msgstr "Categorie toevoegen"
+
+msgid "category"
+msgstr "Categorie"
+
+msgid "category_name"
+msgstr "Categorie naam"
+
+msgid "add_formula"
+msgstr "Formule toevoegen"
+
+msgid "compound"
+msgstr "Verbinding"
+
+msgid "correct_formula_name"
+msgstr "Juiste formule naam"
+
+msgid "first_wrong_formula_name"
+msgstr "Eerste verkeerde formule naam"
+
+msgid "second_wrong_formula_name"
+msgstr "Tweede foutieve formule naam"
+
+msgid "third_wrong_formula_name"
+msgstr "Derde foutieve formule naam"
+
+msgid "fourth_wrong_formula_name"
+msgstr "Vierde foutieve formule naam"
+
+msgid "correct_formula"
+msgstr "Juiste formule"
+
+msgid "first_wrong_formula"
+msgstr "Eerste verkeerde formule"
+
+msgid "second_wrong_formula"
+msgstr "Tweede verkeerde formule"
+
+msgid "third_wrong_formula"
+msgstr "Derde verkeerde formule"
+
+msgid "fourth_wrong_formula"
+msgstr "Vierde verkeerde formule"
+
+msgid "formula_to_name"
+msgstr "Formule om te benoemen"
+
+msgid "name_to_formula"
+msgstr "Naam naar formule"
+
+msgid "compound_learning_mode_list_formula_text"
+msgstr "Wat is de juiste formule voor"
+
+msgid "compound_learning_mode_list_name_text"
+msgstr "Wat is de juiste naam voor"
+
+msgid "for"
+msgstr "voor"
+
+msgid " or "
+msgstr " of "
+
+msgid " and "
+msgstr " en "
+
+msgid "question"
+msgstr "Vraag"
+
+msgid "correct_answer"
+msgstr "Juiste antwoord"
+
+msgid "first_wrong_answer"
+msgstr "Eerste fout antwoord"
+
+msgid "second_wrong_answer"
+msgstr "Tweede fout antwoord"
+
+msgid "third_wrong_answer"
+msgstr "Derde fout antwoord"
+
+msgid "fourth_wrong_answer"
+msgstr "Vierde fout antwoord"

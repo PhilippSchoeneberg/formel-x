@@ -10,19 +10,22 @@ import datetime
 
 class CreateOrEditCategoryPopUpMenu(MDDialog):
     def __init__(self):
+        self.app = App.get_running_app()
         self.edit = False
         self.selected_category = None
-        self.name_helper_text = MDTextFieldHelperText(text="Category name can't be empty", mode="on_error")
+
+        self.name_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("category_name"))
+        self.name_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error"), mode="on_error")
 
         self.name_field = MDTextField(
-            MDTextFieldHintText(text="Category name"),
+            self.name_hint_text,
             self.name_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
 
-        self.categories_button_text = MDButtonText(text="Select Category")
+        self.categories_button_text = MDButtonText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category"))
 
         self.categories_button = MDButton(
             self.categories_button_text,
@@ -38,15 +41,17 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
-        self.headline = MDDialogHeadlineText(text="Create Category", halign="center")
+        self.headline_text = MDDialogHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("category"), halign="center")
+        self.cancel_button_text = MDButtonText(text=self.app.language_manager.translate("cancel"))
+        self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("submit"))
 
         super().__init__(
-            self.headline,
+            self.headline_text,
             MDDialogContentContainer(self.content_box),
             MDDialogButtonContainer(
                 Widget(),
-                MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_category),
+                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
+                MDButton(self.submit_button_text, style="text", on_release=self.add_category),
                 spacing="8dp",
             ),
         )
@@ -59,10 +64,18 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
 
     def open(self, edit=False):
+        self.app.general_dropdown_menu.dismiss()
         self.edit = edit
+        self.name_hint_text.text = self.app.language_manager.translate("category_name")
+        self.name_helper_text.text = self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error")
+        self.categories_button_text.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("category")
         if self.edit:
-            self.headline.text = "Edit Category"
+            self.headline_text.text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("category")
             self.content_box.add_widget(self.categories_button)
+        else:
+            self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("category")
+        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
+        self.submit_button_text.text = self.app.language_manager.translate("submit")
         self.categories_dropdown_menu.items = self.get_category_items()
         super().open()
 
@@ -72,8 +85,7 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
 
     def get_category_items(self):
-        app = App.get_running_app()
-        categories = app.db.get_all_categories_by_group(app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -91,54 +103,50 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
 
     def add_category(self, *args, **kwargs):
-        app = App.get_running_app()
         name = self.name_field.text.strip()
         category = self.selected_category
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         valid = True
 
         if not name:
-            self.name_helper_text.text = "Category name can't be empty"
+            self.name_helper_text.text = self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error")
             self.name_field.error = False
             self.name_field.error = True
             valid = False
 
-        categories = app.db.get_all_categories_by_group(app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
         for cat in categories.values():
             if cat["name"] == name:
-                self.name_helper_text.text = "Group name already exists"
+                self.name_helper_text.text = self.app.language_manager.translate("category") + self.app.language_manager.translate("already_exists_error")
                 self.name_field.error = False
                 self.name_field.error = True
                 valid = False
 
         if not self.edit:
             if valid:
-                app.db.cursor.execute(
+                self.app.db.cursor.execute(
                     "INSERT INTO categories (name, group_id, date) VALUES (?, ?, ?)",
-                    (name, app.logged_in_group["id"], date)
+                    (name, self.app.logged_in_group["id"], date)
                 )
-                app.db.connection.commit()
-                app.compound_menu_screen.fill_category_list()
+                self.app.db.connection.commit()
+                self.app.compound_menu_screen.fill_category_list()
                 self.dismiss()
         else:
             if not category:
-                self.categories_button_text.text = "Please select a category"
                 valid = False
             if valid:
-                app.db.cursor.execute(
+                self.app.db.cursor.execute(
                     "UPDATE categories SET name = ?, group_id = ?, date = ? WHERE id = ?",
-                    (name, app.logged_in_group["id"], date, category["id"])
+                    (name, self.app.logged_in_group["id"], date, category["id"])
                 )
-                app.db.connection.commit()
-                app.compound_menu_screen.fill_category_list()
+                self.app.db.connection.commit()
+                self.app.compound_menu_screen.fill_category_list()
                 self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
-        self.headline.text = "Create Category"
         self.content_box.remove_widget(self.categories_button)
         self.name_field.text = ""
         self.name_field.error = False
-        self.categories_button_text.text = "Select Category"
         self.selected_category = None
         super().dismiss()

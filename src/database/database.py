@@ -1,6 +1,7 @@
 import datetime
 import sqlite3
 
+
 class Database:
     def __init__(self, db_path="src/database/formulaX.db"):
         self.connection = sqlite3.connect(db_path)
@@ -106,7 +107,7 @@ class Database:
 
     def get_all_compounds_by_group(self, group):
         if group:
-            self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, correct_formula, wrong_formula1, wrong_formula2, category_id, group_id, date FROM compounds WHERE group_id = ?", (group["id"],))
+            self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category_id, group_id, date FROM compounds WHERE group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
             compound_dict = {
@@ -115,12 +116,16 @@ class Database:
                     "correct_name": row[1],
                     "wrong_name1": row[2],
                     "wrong_name2": row[3],
-                    "correct_formula": row[4],
-                    "wrong_formula1": row[5],
-                    "wrong_formula2": row[6],
-                    "category": row[7],
-                    "group_id": row[8],
-                    "date": row[9],
+                    "wrong_name3": row[4],
+                    "wrong_name4": row[5],
+                    "correct_formula": row[6],
+                    "wrong_formula1": row[7],
+                    "wrong_formula2": row[8],
+                    "wrong_formula3": row[9],
+                    "wrong_formula4": row[10],
+                    "category": row[11],
+                    "group_id": row[12],
+                    "date": row[13],
                 }
                 for row in rows
             }
@@ -163,6 +168,19 @@ class Database:
     def delete_question(self, question):
         self.cursor.execute("DELETE FROM questions WHERE id = ?", (question["id"],))
         self.connection.commit()
+
+
+    def get_group_by_name(self, name):
+        self.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
+        row = self.cursor.fetchone()
+
+        group_dict = {
+            "id": row[0],
+            "name": row[1],
+            "owner_id": row[2],
+            "date": row[3],
+        }
+        return group_dict
 
 
     def get_all_groups_by_owner_id(self, owner_id):

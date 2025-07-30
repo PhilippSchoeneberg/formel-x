@@ -18,7 +18,10 @@ class ElementMenuScreen(Screen):
         self.element_symbols = None
 
 
-    def on_pre_enter(self, *args):
+    def refresh(self, *args):
+        self.app = App.get_running_app()
+        self.ids.learning_mode_title.text = self.app.language_manager.translate("remembering_mode")
+        self.headline.text=self.app.language_manager.translate("element_remembering_mode_list_text")
         self.refresh_buttons()
 
 
@@ -28,7 +31,7 @@ class ElementMenuScreen(Screen):
         self.elements = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
         self.element_symbols = [element["symbol"] for element in self.elements.values()]
 
-        self.headline = MDListItemHeadlineText(text="Learn the periodic table then switch to learning mode")
+        self.headline = MDListItemHeadlineText(text=self.app.language_manager.translate("element_remembering_mode_list_text"))
         title_item = MDListItem(self.headline)
         title_item.ripple_effect = False
         title_item.focus_behavior = False
@@ -118,11 +121,11 @@ class ElementMenuScreen(Screen):
         self.app = App.get_running_app()
         self.app.learning_mode = not self.app.learning_mode
         if self.app.learning_mode:
-            self.ids.learning_mode_title.text = "Learning Mode"
+            self.ids.learning_mode_title.text = self.app.language_manager.translate("learning_mode")
             self.start_learning()
         else:
-            self.ids.learning_mode_title.text = "Remembering Mode"
-            self.headline.text = "Learn the periodic table then switch to learning mode"
+            self.ids.learning_mode_title.text = self.app.language_manager.translate("remembering_mode")
+            self.headline.text = self.app.language_manager.translate("element_remembering_mode_list_text")
         self.refresh_buttons()
 
 
@@ -134,12 +137,13 @@ class ElementMenuScreen(Screen):
 
 
     def show_next_element(self):
+        self.app = App.get_running_app()
         self.refresh_buttons()
         if self.current_index >= len(self.elements_to_learn):
             self.switch_learning_mode()
             return
         self.current_element = self.elements_to_learn[self.current_index]
-        self.headline.text = f"Where is {self.current_element['name']}"
+        self.headline.text = self.app.language_manager.translate("element_learning_mode_list_text") + self.current_element['name']
 
 
     def next_element(self):

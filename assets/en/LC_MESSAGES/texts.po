@@ -1,0 +1,200 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "all"
+msgstr "All"
+
+msgid "language"
+msgstr "Language "
+
+msgid "theme"
+msgstr "Theme "
+
+msgid "select"
+msgstr "Select "
+
+msgid "create"
+msgstr "Create "
+
+msgid "empty_error"
+msgstr " can't be empty."
+
+msgid "does_not_exist_error"
+msgstr " does not exist."
+
+msgid "already_exists_error"
+msgstr " already exists."
+
+msgid "already_added_error"
+msgstr " already added."
+
+msgid "do_not_match_error"
+msgstr " do not match."
+
+msgid "incorrect_error"
+msgstr " is incorrect."
+
+msgid "edit"
+msgstr "Edit "
+
+msgid "delete"
+msgstr "Delete "
+
+msgid "add"
+msgstr "Add "
+
+msgid "leave"
+msgstr "Leave "
+
+msgid "delete_text"
+msgstr "Are you sure you want to delete "
+
+msgid "cancel"
+msgstr "Cancel"
+
+msgid "submit"
+msgstr "Submit"
+
+msgid "login"
+msgstr "Login"
+
+msgid "registration"
+msgstr "Registration"
+
+msgid "go_to_login"
+msgstr "Go to Login"
+
+msgid "go_to_registration"
+msgstr "Go to Registration"
+
+msgid "email_address"
+msgstr "E-Mail Address"
+
+msgid "password"
+msgstr "Password"
+
+msgid "password_repetition"
+msgstr "Password Repetition"
+
+msgid "account"
+msgstr "Account"
+
+msgid "elements"
+msgstr "Elements"
+
+msgid "compounds"
+msgstr "Compounds"
+
+msgid "questions"
+msgstr "Questions"
+
+msgid "group"
+msgstr "Group"
+
+msgid "group_name"
+msgstr "Group name"
+
+msgid "add_group"
+msgstr "Add Group"
+
+msgid "mode"
+msgstr "Mode"
+
+msgid "element_remembering_mode_list_text"
+msgstr "Learn the periodic table then switch to learning mode."
+
+msgid "element_learning_mode_list_text"
+msgstr "Where is "
+
+msgid "remembering_mode"
+msgstr "Remembering Mode"
+
+msgid "learning_mode"
+msgstr "Learning Mode"
+
+msgid "add_category"
+msgstr "Add Category"
+
+msgid "category"
+msgstr "Category"
+
+msgid "category_name"
+msgstr "Category Name"
+
+msgid "add_formula"
+msgstr "Add Formula"
+
+msgid "compound"
+msgstr "Compound"
+
+msgid "correct_formula_name"
+msgstr "Correct Formula Name"
+
+msgid "first_wrong_formula_name"
+msgstr "First wrong Formula Name"
+
+msgid "second_wrong_formula_name"
+msgstr "Second wrong Formula Name"
+
+msgid "third_wrong_formula_name"
+msgstr "Third wrong Formula Name"
+
+msgid "fourth_wrong_formula_name"
+msgstr "Fourth wrong Formula Name"
+
+msgid "correct_formula"
+msgstr "Correct Formula"
+
+msgid "first_wrong_formula"
+msgstr "First wrong Formula"
+
+msgid "second_wrong_formula"
+msgstr "Second wrong Formula"
+
+msgid "third_wrong_formula"
+msgstr "Third wrong Formula"
+
+msgid "fourth_wrong_formula"
+msgstr "Fourth wrong Formula"
+
+msgid "formula_to_name"
+msgstr "Formula to Name"
+
+msgid "name_to_formula"
+msgstr "Name to Formula"
+
+msgid "compound_learning_mode_list_formula_text"
+msgstr "Which is the correct formula for "
+
+msgid "compound_learning_mode_list_name_text"
+msgstr "Which is the correct name for "
+
+msgid "for"
+msgstr "for"
+
+msgid " or "
+msgstr " or "
+
+msgid " and "
+msgstr " and "
+
+msgid "question"
+msgstr "Question"
+
+msgid "correct_answer"
+msgstr "Correct Answer"
+
+msgid "first_wrong_answer"
+msgstr "First wrong Answer"
+
+msgid "second_wrong_answer"
+msgstr "Second wrong Answer"
+
+msgid "third_wrong_answer"
+msgstr "Third wrong Answer"
+
+msgid "fourth_wrong_answer"
+msgstr "Fourth wrong Answer"

@@ -8,9 +8,9 @@
 
             MDTopAppBarLeadingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: theme_mode
-                    icon: "weather-sunny"
-                    on_release: app.change_theme()
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("modesMenu")
 
             MDTopAppBarTitle:
                 text: "FormulaX"
@@ -18,24 +18,9 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: edit_category_button
-                    icon: "border-color"
-                    on_release: app.compound_menu_screen.edit_category()
-
-                MDActionTopAppBarButton:
-                    id: create_category_or_compound_button
-                    icon: "plus-circle"
-                    on_release: app.compound_menu_screen.create_or_edit_category_or_compound_menu_open()
-
-                MDActionTopAppBarButton:
-                    id: delete_category_button
-                    icon: "delete"
-                    on_release: app.delete_category_popup_menu.open()
-
-                MDActionTopAppBarButton:
-                    id: back_button
-                    icon: "arrow-left"
-                    on_release: app.change_screen("modesMenu")
+                    id: general_menu_button
+                    icon: "menu"
+                    on_release: app.general_menu_open()
 
         ScrollView:
             MDList:
@@ -53,4 +38,3 @@
 
             MDTopAppBarTitle:
                 id: query_mode_title
-                text: "Formula to Name"

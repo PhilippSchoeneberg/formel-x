@@ -9,36 +9,39 @@ from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 class ModesMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = None
+        self.app = App.get_running_app()
         self.group_dropdown_menu = None
 
 
+    def refresh(self):
+        self.refresh_groups()
+
+
     def fill_modes_list(self):
-        self.app = App.get_running_app()
         self.ids.mode_list.clear_widgets()
 
         if self.app.logged_in_group:
             title_item = MDListItem(
-                MDListItemHeadlineText(text="Select Mode"))
+                MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("mode")))
             title_item.ripple_effect = False
             title_item.focus_behavior = False
             self.ids.mode_list.add_widget(title_item)
             self.ids.mode_list.add_widget(
                 MDListItem(
-                    MDListItemHeadlineText(text="Elements"),
+                    MDListItemHeadlineText(text=self.app.language_manager.translate("elements")),
                     on_release=lambda _: self.app.change_screen("elementMenu")
                 )
             )
             self.ids.mode_list.add_widget(
                 MDListItem(
-                    MDListItemHeadlineText(text="Compounds"),
+                    MDListItemHeadlineText(text=self.app.language_manager.translate("compounds")),
                     on_release=lambda _: self.app.change_screen("compoundMenu")
                 )
             )
             self.ids.mode_list.add_widget(
                 MDListItem(
-                    MDListItemHeadlineText(text="Questions"),
-                    on_release=lambda _: self.app.question_learning_screen.start_learning()
+                    MDListItemHeadlineText(text=self.app.language_manager.translate("questions")),
+                    on_release=lambda _: self.app.change_screen("questionLearning")
                 )
             )
 
@@ -49,7 +52,7 @@ class ModesMenuScreen(Screen):
             group_menu_items.append({"text": group["name"],
                                      "on_release": lambda x=group: self.set_group(x)})
         self.group_dropdown_menu = MDDropdownMenu(
-            caller=self.app.root.get_screen(self.app.root.current).ids.choose_group_button,
+            caller=self.ids.select_group_button,
             items=group_menu_items
         )
         self.group_dropdown_menu.open()
@@ -65,7 +68,7 @@ class ModesMenuScreen(Screen):
         self.refresh_groups()
 
 
-    def remove_group(self, group):
+    def remove(self, group):
         if group:
             self.app.groups.remove(group)
             self.app.state["groups"] = self.app.groups
@@ -73,12 +76,16 @@ class ModesMenuScreen(Screen):
             self.refresh_groups()
 
 
-    def edit_group(self):
+    def create(self):
+        self.app.create_or_edit_group_popup_menu.open()
+
+
+    def edit(self):
         if self.app.logged_in_group:
             self.app.create_or_edit_group_popup_menu.open(self.app.logged_in_group)
 
 
-    def delete_group(self):
+    def delete(self):
         if self.app.logged_in_group:
             self.app.confirm_delete_popup_menu.open("Group", self.app.logged_in_group["name"], lambda: self.app.db.delete_group(self.app.logged_in_group), self.refresh_groups)
 
@@ -96,6 +103,6 @@ class ModesMenuScreen(Screen):
                     self.remove_group(group)
         if self.app.logged_in_group not in self.app.groups:
             self.app.logged_in_group = None
-            self.ids.group_name.text = "Select Group"
+            self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")
         self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
         self.fill_modes_list()

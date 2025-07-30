@@ -9,11 +9,14 @@ from kivymd.uix.boxlayout import MDBoxLayout
 
 class CreateOrEditGroupPopUpMenu(MDDialog):
     def __init__(self):
+        self.app = App.get_running_app()
         self.group = None
-        self.name_helper_text = MDTextFieldHelperText(text="Group name can't be empty", mode="on_error")
+
+        self.name_hint_text = MDTextFieldHintText(text= self.app.language_manager.translate("group_name"))
+        self.name_helper_text = MDTextFieldHelperText(text= self.app.language_manager.translate("group_name") +  self.app.language_manager.translate("empty_error"), mode="on_error")
 
         self.name_field = MDTextField(
-            MDTextFieldHintText(text="Group name"),
+            self.name_hint_text,
             self.name_helper_text,
             mode="outlined",
             size_hint_x=1,
@@ -28,36 +31,44 @@ class CreateOrEditGroupPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
-        self.headline = MDDialogHeadlineText(text="Create Group", halign="center")
+        self.headline_text = MDDialogHeadlineText(text= self.app.language_manager.translate("create") + self.app.language_manager.translate("group"), halign="center")
+        self.cancel_button_text = MDButtonText(text=self.app.language_manager.translate("cancel"))
+        self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("submit"))
 
         super().__init__(
-            self.headline,
+            self.headline_text,
             MDDialogContentContainer(content_box),
             MDDialogButtonContainer(
                 Widget(),
-                MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.create_group),
+                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
+                MDButton(self.submit_button_text, style="text", on_release=self.create_group),
                 spacing="8dp",
             ),
         )
 
 
     def open(self, group = None):
+        self.app.general_dropdown_menu.dismiss()
         self.group = group
+        self.name_hint_text.text=self.app.language_manager.translate("group_name")
+        self.name_helper_text.text=self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
         if self.group:
-            self.headline = "Edit Group"
+            self.headline_text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("group")
             self.name_field.text = self.group["name"]
+        else:
+            self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("group")
+        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
+        self.submit_button_text.text = self.app.language_manager.translate("submit")
         super().open()
 
 
     def create_group(self, *args, **kwargs):
-        app = App.get_running_app()
         name = self.name_field.text.strip()
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not name:
-            self.name_helper_text.text = "Group name can't be empty"
+            self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
             self.name_field.error = False
             self.name_field.error = True
             valid = False
@@ -65,30 +76,29 @@ class CreateOrEditGroupPopUpMenu(MDDialog):
             self.name_field.error = False
 
         if valid:
-            app.db.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
-            result = app.db.cursor.fetchone()
+            self.app.db.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
+            result = self.app.db.cursor.fetchone()
             if result:
-                self.name_helper_text.text = "Group name already exists"
+                self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("already_exists_error")
                 self.name_field.error = False
                 self.name_field.error = True
             else:
                 if not self.group:
-                    app.db.cursor.execute(
+                    self.app.db.cursor.execute(
                         "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
-                        (name, app.logged_in_user_id, date)
+                        (name, self.app.logged_in_user_id, date)
                     )
                 else:
-                    app.db.cursor.execute(
+                    self.app.db.cursor.execute(
                         "UPDATE groups SET name = ?, owner_id = ?, date = ? WHERE id = ?",
-                        (name, app.logged_in_user_id, date, self.group["id"])
+                        (name, self.app.logged_in_user_id, date, self.group["id"])
                     )
-                app.modes_menu_screen.refresh_groups()
-                app.db.connection.commit()
+                self.app.modes_menu_screen.refresh_groups()
+                self.app.db.connection.commit()
                 self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
-        self.headline = "Create Group"
         self.name_field.text = ""
         self.name_field.error = False
         super().dismiss()

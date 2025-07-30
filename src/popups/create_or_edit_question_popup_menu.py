@@ -10,54 +10,90 @@ from kivymd.uix.boxlayout import MDBoxLayout
 
 class CreateOrEditQuestionPopUpMenu(MDDialog):
     def __init__(self):
+        self.app = App.get_running_app()
         self.question = None
         self.action_function = None
 
+        self.question_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("question"))
+        self.question_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("question") + self.app.language_manager.translate("empty_error"), mode="on_error")
+
         self.question_field = MDTextField(
-            MDTextFieldHintText(text="Question"),
-            MDTextFieldHelperText(text="Question can't be empty", mode="on_error"),
+            self.question_hint_text,
+            self.question_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.correct_answer_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("correct_answer"))
+        self.correct_answer_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("correct_answer") + self.app.language_manager.translate("empty_error"),
+            mode="on_error")
 
         self.correct_answer_field = MDTextField(
-            MDTextFieldHintText(text="Correct Answer"),
-            MDTextFieldHelperText(text="Answer can't be empty", mode="on_error"),
+            self.correct_answer_hint_text,
+            self.correct_answer_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_answer1_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("first_wrong_answer"))
+        self.wrong_answer1_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("first_wrong_answer") + self.app.language_manager.translate(
+                "empty_error"),
+            mode="on_error")
 
         self.wrong_answer_field1 = MDTextField(
-            MDTextFieldHintText(text="First wrong Answer"),
-            MDTextFieldHelperText(text="Answer can't be empty", mode="on_error"),
+            self.wrong_answer1_hint_text,
+            self.wrong_answer1_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_answer2_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("second_wrong_answer"))
+        self.wrong_answer2_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("second_wrong_answer") + self.app.language_manager.translate(
+                "empty_error"),
+            mode="on_error")
 
         self.wrong_answer_field2 = MDTextField(
-            MDTextFieldHintText(text="Second wrong Answer"),
-            MDTextFieldHelperText(text="Answer can't be empty", mode="on_error"),
+            self.wrong_answer2_hint_text,
+            self.wrong_answer2_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_answer3_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("third_wrong_answer"))
+        self.wrong_answer3_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("third_wrong_answer") + self.app.language_manager.translate(
+                "empty_error"),
+            mode="on_error")
 
         self.wrong_answer_field3 = MDTextField(
-            MDTextFieldHintText(text="Third wrong Answer"),
-            MDTextFieldHelperText(text="Answer can't be empty", mode="on_error"),
+            self.wrong_answer3_hint_text,
+            self.wrong_answer3_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
 
+        self.wrong_answer4_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("fourth_wrong_answer"))
+        self.wrong_answer4_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("fourth_wrong_answer") + self.app.language_manager.translate(
+                "empty_error"),
+            mode="on_error")
+
         self.wrong_answer_field4 = MDTextField(
-            MDTextFieldHintText(text="Fourth wrong Answer"),
-            MDTextFieldHelperText(text="Answer can't be empty", mode="on_error"),
+            self.wrong_answer4_hint_text,
+            self.wrong_answer4_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
@@ -84,36 +120,69 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
         )
         scroll_view.add_widget(content_box)
 
-        self.headline = MDDialogHeadlineText(text="Create Question", halign="center")
+        self.headline_text = MDDialogHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("question"), halign="center")
+        self.cancel_button_text = MDButtonText(text=self.app.language_manager.translate("cancel"))
+        self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("submit"))
 
         super().__init__(
-            self.headline,
+            self.headline_text,
             MDDialogContentContainer(scroll_view),
             MDDialogButtonContainer(
                 Widget(),
-                MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_question),
+                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
+                MDButton(self.submit_button_text, style="text", on_release=self.add_question),
                 spacing="8dp",
             ),
         )
 
 
     def open(self, question = None, action_function = None):
+        self.app.general_dropdown_menu.dismiss()
         self.question = question
         self.action_function = action_function
+
+        self.question_hint_text.text = self.app.language_manager.translate("question")
+        self.question_helper_text.text = self.app.language_manager.translate("question") + self.app.language_manager.translate("empty_error")
+        self.correct_answer_hint_text.text = self.app.language_manager.translate("correct_answer")
+        self.correct_answer_helper_text.text = self.app.language_manager.translate("correct_answer") + self.app.language_manager.translate("empty_error")
+        self.wrong_answer1_hint_text.text = self.app.language_manager.translate("first_wrong_answer")
+        self.wrong_answer1_helper_text.text = self.app.language_manager.translate("first_wrong_answer") + self.app.language_manager.translate("empty_error")
+        self.wrong_answer2_hint_text.text = self.app.language_manager.translate("second_wrong_answer")
+        self.wrong_answer2_helper_text.text = self.app.language_manager.translate("second_wrong_answer") + self.app.language_manager.translate("empty_error")
+        self.wrong_answer3_hint_text.text = self.app.language_manager.translate("third_wrong_answer")
+        self.wrong_answer3_helper_text.text = self.app.language_manager.translate("third_wrong_answer") + self.app.language_manager.translate("empty_error")
+        self.wrong_answer4_hint_text.text = self.app.language_manager.translate("fourth_wrong_answer")
+        self.wrong_answer4_helper_text.text = self.app.language_manager.translate("fourth_wrong_answer") + self.app.language_manager.translate("empty_error")
+
+        self.question_hint_text.canvas.ask_update()
+        self.question_helper_text.canvas.ask_update()
+        self.correct_answer_hint_text.canvas.ask_update()
+        self.correct_answer_helper_text.canvas.ask_update()
+        self.wrong_answer1_hint_text.canvas.ask_update()
+        self.wrong_answer1_helper_text.canvas.ask_update()
+        self.wrong_answer2_hint_text.canvas.ask_update()
+        self.wrong_answer2_helper_text.canvas.ask_update()
+        self.wrong_answer3_hint_text.canvas.ask_update()
+        self.wrong_answer3_helper_text.canvas.ask_update()
+        self.wrong_answer4_hint_text.canvas.ask_update()
+        self.wrong_answer4_helper_text.canvas.ask_update()
+
         if self.question:
-            self.headline = "Edit Question"
+            self.headline_text.text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("question")
             self.question_field.text = self.question["question"]
             self.correct_answer_field.text = self.question["correct_answer"]
             self.wrong_answer_field1.text = self.question["wrong_answer1"]
             self.wrong_answer_field2.text = self.question["wrong_answer2"]
             self.wrong_answer_field3.text = self.question["wrong_answer3"]
             self.wrong_answer_field4.text = self.question["wrong_answer4"]
+        else:
+            self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("question")
+        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
+        self.submit_button_text.text = self.app.language_manager.translate("submit")
         super().open()
 
 
     def add_question(self, *args, **kwargs):
-        app = App.get_running_app()
         question = self.question_field.text.strip()
         correct_answer = self.correct_answer_field.text.strip()
         wrong_answer1 = self.wrong_answer_field1.text.strip()
@@ -141,22 +210,21 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
 
         if valid:
             if not self.question:
-                app.db.cursor.execute(
+                self.app.db.cursor.execute(
                     "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.logged_in_group["id"], date)
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, self.app.logged_in_group["id"], date)
                 )
             else:
-                app.db.cursor.execute(
+                self.app.db.cursor.execute(
                     "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, group_id = ?, date = ? WHERE id = ?",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, app.logged_in_group["id"], date, self.question["id"])
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, self.app.logged_in_group["id"], date, self.question["id"])
                 )
                 self.action_function()
-            app.db.connection.commit()
+            self.app.db.connection.commit()
             self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
-        self.headline = "Create Question"
         self.question_field.text = ""
         self.correct_answer_field.text = ""
         self.wrong_answer_field1.text = ""

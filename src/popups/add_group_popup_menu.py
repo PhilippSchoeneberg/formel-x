@@ -10,10 +10,13 @@ from src.utils.json_parser import save_state
 
 class AddGroupPopUpMenu(MDDialog):
     def __init__(self):
-        self.name_helper_text = MDTextFieldHelperText(text="Group name can't be empty", mode="on_error")
+        self.app = App.get_running_app()
+
+        self.name_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error"), mode="on_error")
+        self.name_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("group_name"))
 
         self.name_field = MDTextField(
-            MDTextFieldHintText(text="Group name"),
+            self.name_hint_text,
             self.name_helper_text,
             mode="outlined",
             size_hint_x=1,
@@ -28,25 +31,37 @@ class AddGroupPopUpMenu(MDDialog):
             size_hint_y=None,
         )
 
+        self.headline_text = MDDialogHeadlineText(text=self.app.language_manager.translate("add_group"), halign="center")
+        self.cancel_button_text = MDButtonText(text=self.app.language_manager.translate("cancel"))
+        self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("submit"))
+
         super().__init__(
-            MDDialogHeadlineText(text="Add Group", halign="center"),
+            self.headline_text,
             MDDialogContentContainer(content_box),
             MDDialogButtonContainer(
                 Widget(),
-                MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Add"), style="text", on_release=self.add_group),
+                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
+                MDButton(self.submit_button_text, style="text", on_release=self.add_group),
                 spacing="8dp",
             ),
         )
 
+    def on_open(self):
+        self.app.general_dropdown_menu.dismiss()
+        self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
+        self.name_hint_text.text = self.app.language_manager.translate("group_name")
+        self.headline_text.text = self.app.language_manager.translate("add_group")
+        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
+        self.submit_button_text.text = self.app.language_manager.translate("submit")
+        super().open()
+
 
     def add_group(self, *args, **kwargs):
-        app = App.get_running_app()
         name = self.name_field.text.strip()
 
         valid = True
         if not name:
-            self.name_helper_text.text = "Group name can't be empty"
+            self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
             self.name_field.error = False
             self.name_field.error = True
             valid = False
@@ -54,19 +69,21 @@ class AddGroupPopUpMenu(MDDialog):
             self.name_field.error = False
 
         if valid:
-            app.db.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
-            result = app.db.cursor.fetchone()
-            if result:
-                if result[0] not in app.groups:
-                    group = {"id": result[0], "name": result[1]}
-                    app.groups.append(group)
-                    app.state["groups"] = app.groups
+            group = self.app.db.get_group_by_name(name)
+            if group:
+                if group not in self.app.groups:
+                    self.app.groups.append(group)
+                    self.app.state["groups"] = self.app.groups
                     save_state(self.state)
-                app.modes_menu_screen.refresh_groups()
-                app.db.connection.commit()
-                self.dismiss()
+                    self.app.modes_menu_screen.refresh_groups()
+                    self.app.db.connection.commit()
+                    self.dismiss()
+                else:
+                    self.name_helper_text.text = self.app.language_manager.translate("group") + self.app.language_manager.translate("already_added_error")
+                    self.name_field.error = False
+                    self.name_field.error = True
             else:
-                self.name_helper_text.text = "Group does not exist"
+                self.name_helper_text.text = self.app.language_manager.translate("group") + self.app.language_manager.translate("does_not_exist_error")
                 self.name_field.error = False
                 self.name_field.error = True
 

@@ -1,3 +1,5 @@
+from src.utils.transform_to_unicode import transform_to_unicode
+
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -11,96 +13,151 @@ import datetime
 
 class CreateOrEditCompoundPopUpMenu(MDDialog):
     def __init__(self):
+        self.app = App.get_running_app()
         self.compound = None
         self.action_function = None
         self.selected_category = None
 
+        self.correct_name_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("correct_formula_name"))
+        self.correct_name_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("correct_formula_name") + self.app.language_manager.translate("empty_error"), mode="on_error")
+
         self.correct_name_field = MDTextField(
-            MDTextFieldHintText(text="Correct Formula Name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            self.correct_name_hint_text,
+            self.correct_name_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_name1_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("first_wrong_formula_name"))
+        self.wrong_name1_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("first_wrong_formula_name") + self.app.language_manager.translate("empty_error"), mode="on_error")
 
         self.wrong_name_field1 = MDTextField(
-            MDTextFieldHintText(text="First wrong Formula Name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            self.wrong_name1_hint_text,
+            self.wrong_name1_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_name2_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("second_wrong_formula_name"))
+        self.wrong_name2_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("second_wrong_formula_name") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_name_field2 = MDTextField(
-            MDTextFieldHintText(text="Second wrong Formula Name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            self.wrong_name2_hint_text,
+            self.wrong_name2_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_name3_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("third_wrong_formula_name"))
+        self.wrong_name3_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("third_wrong_formula_name") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_name_field3 = MDTextField(
-            MDTextFieldHintText(text="Third wrong Formula Name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            self.wrong_name3_hint_text,
+            self.wrong_name3_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_name4_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("fourth_wrong_formula_name"))
+        self.wrong_name4_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("fourth_wrong_formula_name") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_name_field4 = MDTextField(
-            MDTextFieldHintText(text="Fourth wrong Formula Name"),
-            MDTextFieldHelperText(text="Formula name can't be empty", mode="on_error"),
+            self.wrong_name4_hint_text,
+            self.wrong_name4_helper_text,
             mode="outlined",
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.correct_formula_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("correct_formula"))
+        self.correct_formula_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("correct_formula") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.correct_formula_field = MDTextField(
-            MDTextFieldHintText(text="Correct Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            self.correct_formula_hint_text,
+            self.correct_formula_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_formula1_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("first_wrong_formula"))
+        self.wrong_formula1_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_formula_field1 = MDTextField(
-            MDTextFieldHintText(text="First wrong Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            self.wrong_formula1_hint_text,
+            self.wrong_formula1_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_formula2_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("first_wrong_formula"))
+        self.wrong_formula2_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_formula_field2 = MDTextField(
-            MDTextFieldHintText(text="Second wrong Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            self.wrong_formula2_hint_text,
+            self.wrong_formula2_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_formula3_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("first_wrong_formula"))
+        self.wrong_formula3_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_formula_field3 = MDTextField(
-            MDTextFieldHintText(text="Third wrong Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            self.wrong_formula3_hint_text,
+            self.wrong_formula3_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
+
+        self.wrong_formula4_hint_text = MDTextFieldHintText(
+            text=self.app.language_manager.translate("first_wrong_formula"))
+        self.wrong_formula4_helper_text = MDTextFieldHelperText(
+            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+                "empty_error"), mode="on_error")
 
         self.wrong_formula_field4 = MDTextField(
-            MDTextFieldHintText(text="Fourth wrong Formula"),
-            MDTextFieldHelperText(text="Formula can't be empty", mode="on_error"),
+            self.wrong_formula4_hint_text,
+            self.wrong_formula4_helper_text,
             mode="outlined",
             multiline=True,
             size_hint_x=1,
             pos_hint={"center_x": 0.5},
         )
 
-        self.categories_button_text = MDButtonText(text="Select Category")
+        self.categories_button_text = MDButtonText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category"))
 
         self.categories_button = MDButton(
             self.categories_button_text,
@@ -133,15 +190,17 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
         )
         scroll_view.add_widget(content_box)
 
-        self.headline = MDDialogHeadlineText(text="Create Compound", halign="center")
+        self.headline_text = MDDialogHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("compound"), halign="center")
+        self.cancel_button_text = MDButtonText(text=self.app.language_manager.translate("cancel"))
+        self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("submit"))
 
         super().__init__(
-            self.headline,
+            self.headline_text,
             MDDialogContentContainer(scroll_view),
             MDDialogButtonContainer(
                 Widget(),
-                MDButton(MDButtonText(text="Cancel"), style="text", on_release=self.dismiss),
-                MDButton(MDButtonText(text="Submit"), style="text", on_release=self.add_compound),
+                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
+                MDButton(self.submit_button_text, style="text", on_release=self.add_compound),
                 spacing="8dp",
             ),
         )
@@ -154,11 +213,37 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
 
     def open(self, compound = None, action_function = None):
-        app = App.get_running_app()
+        self.app.general_dropdown_menu.dismiss()
         self.compound = compound
         self.action_function = action_function
+
+        self.correct_name_hint_text.text = self.app.language_manager.translate("correct_formula_name")
+        self.correct_name_helper_text.text = self.app.language_manager.translate("correct_formula_name") + self.app.language_manager.translate("empty_error")
+        self.wrong_name1_hint_text.text = self.app.language_manager.translate("first_wrong_formula_name")
+        self.wrong_name1_helper_text.text = self.app.language_manager.translate("first_wrong_formula_name") + self.app.language_manager.translate("empty_error")
+        self.wrong_name2_hint_text.text = self.app.language_manager.translate("second_wrong_formula_name")
+        self.wrong_name2_helper_text.text = self.app.language_manager.translate("second_wrong_formula_name") + self.app.language_manager.translate("empty_error")
+        self.wrong_name3_hint_text.text = self.app.language_manager.translate("third_wrong_formula_name")
+        self.wrong_name3_helper_text.text = self.app.language_manager.translate("third_wrong_formula_name") + self.app.language_manager.translate("empty_error")
+        self.wrong_name4_hint_text.text = self.app.language_manager.translate("fourth_wrong_formula_name")
+        self.wrong_name4_helper_text.text = self.app.language_manager.translate("fourth_wrong_formula_name") + self.app.language_manager.translate("empty_error")
+        self.correct_formula_hint_text.text = self.app.language_manager.translate("correct_formula")
+        self.correct_formula_helper_text.text = self.app.language_manager.translate("correct_formula") + self.app.language_manager.translate("empty_error")
+        self.wrong_formula1_hint_text.text = self.app.language_manager.translate("first_wrong_formula")
+        self.wrong_formula1_helper_text.text = self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate("empty_error")
+        self.wrong_formula2_hint_text.text = self.app.language_manager.translate("first_wrong_formula")
+        self.wrong_formula2_helper_text.text = self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate("empty_error")
+        self.wrong_formula3_hint_text.text = self.app.language_manager.translate("first_wrong_formula")
+        self.wrong_formula3_helper_text.text = self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate("empty_error")
+        self.wrong_formula4_hint_text.text = self.app.language_manager.translate("first_wrong_formula")
+        self.wrong_formula4_helper_text.text = self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate("empty_error")
+        self.categories_button_text.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("category")
+        self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("compound")
+        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
+        self.submit_button_text.text = self.app.language_manager.translate("submit")
+
         if self.compound:
-            self.headline = "Edit Compound"
+            self.headline_text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("compound")
             self.correct_name_field.text = self.compound["correct_name"]
             self.wrong_name_field1.text = self.compound["wrong_name1"]
             self.wrong_name_field2.text = self.compound["wrong_name2"]
@@ -169,7 +254,7 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             self.wrong_formula_field2.text = self.compound["wrong_formula2"]
             self.wrong_formula_field3.text = self.compound["wrong_formula3"]
             self.wrong_formula_field4.text = self.compound["wrong_formula4"]
-            self.selected_category = app.db.get_category_by_id(self.compound["category"])
+            self.selected_category = self.app.db.get_category_by_id(self.compound["category"])
             self.categories_button_text.text = self.selected_category["name"]
         self.categories_dropdown_menu.items = self.get_category_items()
         super().open()
@@ -180,8 +265,7 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
 
     def get_category_items(self):
-        app = App.get_running_app()
-        categories = app.db.get_all_categories_by_group(app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -198,17 +282,16 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
 
     def add_compound(self, *args, **kwargs):
-        app = App.get_running_app()
         correct_name = self.correct_name_field.text.strip()
         wrong_name1 = self.wrong_name_field1.text.strip()
         wrong_name2 = self.wrong_name_field2.text.strip()
         wrong_name3 = self.wrong_name_field3.text.strip()
         wrong_name4 = self.wrong_name_field4.text.strip()
-        correct_formula = self.correct_formula_field.text.strip()
-        wrong_formula1 = self.wrong_formula_field1.text.strip()
-        wrong_formula2 = self.wrong_formula_field2.text.strip()
-        wrong_formula3 = self.wrong_formula_field3.text.strip()
-        wrong_formula4 = self.wrong_formula_field4.text.strip()
+        correct_formula = transform_to_unicode(self.correct_formula_field.text.strip())
+        wrong_formula1 = transform_to_unicode(self.wrong_formula_field1.text.strip())
+        wrong_formula2 = transform_to_unicode(self.wrong_formula_field2.text.strip())
+        wrong_formula3 = transform_to_unicode(self.wrong_formula_field3.text.strip())
+        wrong_formula4 = transform_to_unicode(self.wrong_formula_field4.text.strip())
         category = self.selected_category
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -218,42 +301,56 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
             valid = False
         else:
             self.correct_name_field.error = False
+
         if not wrong_name1:
             self.wrong_name_field1.error = True
             valid = False
         else:
             self.wrong_name_field1.error = False
+
+        if not wrong_name2:
+            self.wrong_name_field2.error = True
+            valid = False
+        else:
+            self.wrong_name_field2.error = False
+
         if not correct_formula:
             self.correct_formula_field.error = True
             valid = False
         else:
             self.correct_formula_field.error = False
+
         if not wrong_formula1:
             self.wrong_formula_field1.error = True
             valid = False
         else:
             self.wrong_formula_field1.error = False
+
+        if not wrong_formula2:
+            self.wrong_formula_field2.error = True
+            valid = False
+        else:
+            self.wrong_formula_field2.error = False
+
         if not category:
-            self.categories_button_text.text = "Please select a category"
             valid = False
 
         if valid:
             if not self.compound:
-                app.db.cursor.execute(
+                self.app.db.cursor.execute(
                     "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], app.logged_in_group["id"], date)
+                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], self.app.logged_in_group["id"], date)
                 )
             else:
-                app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?,  wrong_name3 = ?, wrong_name4 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, wrong_formula3 = ?, wrong_formula4 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
-                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], app.logged_in_group["id"], date, self.compound["id"])
+                self.app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?,  wrong_name3 = ?, wrong_name4 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, wrong_formula3 = ?, wrong_formula4 = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
+                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category["id"], self.app.logged_in_group["id"], date, self.compound["id"])
                 )
                 self.action_function()
-            app.db.connection.commit()
+            self.app.db.connection.commit()
             self.dismiss()
 
 
     def dismiss(self, *args, **kwargs):
-        self.headline = "Create Compound"
         self.correct_name_field.text = ""
         self.wrong_name_field1.text = ""
         self.wrong_name_field2.text = ""
@@ -274,6 +371,5 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
         self.wrong_formula_field2.error = False
         self.wrong_formula_field3.error = False
         self.wrong_formula_field4.error = False
-        self.categories_button_text.text = "Select Category"
         self.selected_category = None
         super().dismiss()

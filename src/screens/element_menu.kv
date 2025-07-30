@@ -8,9 +8,9 @@
 
             MDTopAppBarLeadingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: theme_mode
-                    icon: "weather-sunny"
-                    on_release: app.change_theme()
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("modesMenu")
 
             MDTopAppBarTitle:
                 text: "FormulaX"
@@ -18,9 +18,9 @@
 
             MDTopAppBarTrailingButtonContainer:
                 MDActionTopAppBarButton:
-                    id: back_button
-                    icon: "arrow-left"
-                    on_release: app.change_screen("modesMenu")
+                    id: general_menu_button
+                    icon: "menu"
+                    on_release: app.general_menu_open()
 
         MDList:
             id: element_learning_list
@@ -48,4 +48,3 @@
 
             MDTopAppBarTitle:
                 id: learning_mode_title
-                text: "Remembering Mode"

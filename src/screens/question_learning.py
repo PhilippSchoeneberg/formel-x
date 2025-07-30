@@ -7,23 +7,23 @@ from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 class QuestionLearningScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = None
-        self.questions_to_learn = None
-        self.current_index = None
+        self.app = App.get_running_app()
+        self.questions_to_learn = []
+        self.current_index = 0
         self.current_question = None
 
 
-    def start_learning(self):
-        self.app = App.get_running_app()
-        self.app.change_screen("questionLearning")
+    def refresh(self):
+        self.show_next_question()
 
+
+    def start_learning(self, category=None):
+        self.app.change_screen("compoundLearning")
+        self.current_index = 0
         self.questions_to_learn = [
             question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
         ]
-
-        self.current_index = 0
-        self.show_next_question()
-        self.app.change_screen("questionLearning")
+        self.refresh()
 
 
     def show_next_question(self):
@@ -69,9 +69,13 @@ class QuestionLearningScreen(Screen):
         self.show_next_question()
 
 
-    def edit_question(self):
+    def create(self):
+        self.app.create_or_edit_question_popup_menu.open()
+
+
+    def edit(self):
         self.app.create_or_edit_question_popup_menu.open(self.current_question, self.next_question)
 
 
-    def delete_question(self):
-        self.app.confirm_delete_popup_menu.open("Question", self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
+    def delete(self):
+        self.app.confirm_delete_popup_menu.open(self.app.language_manager.translate("question"), self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
