@@ -54,8 +54,8 @@ class ElementMenuScreen(Screen):
 
         for element in self.app.db.get_all_elements().values():
             symbol = element["symbol"]
-            group = element["group"] - 1
-            period = element["period"] - 1
+            group = element["system_group"] - 1
+            period = element["system_period"] - 1
 
             btn = MDButton(
                 style = "elevated",

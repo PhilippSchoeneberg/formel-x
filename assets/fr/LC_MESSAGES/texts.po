@@ -64,6 +64,9 @@ msgstr "Connexion"
 msgid "registration"
 msgstr "Inscription"
 
+msgid "register"
+msgstr "s'inscrire"
+
 msgid "go_to_login"
 msgstr "Aller à la connexion"
 
@@ -124,8 +127,8 @@ msgstr "Catégorie"
 msgid "category_name"
 msgstr "Nom de la catégorie"
 
-msgid "add_formula"
-msgstr "Ajouter une formule"
+msgid "add_compound"
+msgstr "Ajouter un composé"
 
 msgid "compound"
 msgstr "Composé"
@@ -180,6 +183,9 @@ msgstr " ou "
 
 msgid " and "
 msgstr " et "
+
+msgid "add_question"
+msgstr "Añadir pregunta"
 
 msgid "question"
 msgstr "Question"

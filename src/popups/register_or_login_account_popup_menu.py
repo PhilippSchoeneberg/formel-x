@@ -92,14 +92,14 @@ class RegisterOrLoginAccountPopUpMenu(MDDialog):
             self.register_mode = True
             self.content_box.add_widget(self.password_repetition_field)
             self.headline.text = self.app.language_manager.translate("register")
-            self.submit_button.children[0].text = self.app.language_manager.translate("register")
-            self.toggle_button.children[0].text = self.app.language_manager.translate("go_to_login")
+            self.submit_button_text.text = self.app.language_manager.translate("register")
+            self.toggle_button_text.text = self.app.language_manager.translate("go_to_login")
         else:
             self.register_mode = False
             self.content_box.remove_widget(self.password_repetition_field)
             self.headline.text = self.app.language_manager.translate("login")
-            self.submit_button.children[0].text = self.app.language_manager.translate("login")
-            self.toggle_button.children[0].text = self.app.language_manager.translate("go_to_registration")
+            self.submit_button_text.text = self.app.language_manager.translate("login")
+            self.toggle_button_text.text = self.app.language_manager.translate("go_to_registration")
 
 
     def login(self, *args, **kwargs):

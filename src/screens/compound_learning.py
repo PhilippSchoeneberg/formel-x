@@ -14,7 +14,8 @@ class CompoundLearningScreen(Screen):
 
 
     def refresh(self):
-        self.show_next_compound()
+        if self.app.root.current == self.name:
+            self.show_next_compound()
 
 
     def start_learning(self, category=None):

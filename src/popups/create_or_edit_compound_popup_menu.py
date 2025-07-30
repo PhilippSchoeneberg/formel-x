@@ -1,4 +1,5 @@
 from src.utils.transform_to_unicode import transform_to_unicode
+from src.utils.enums import CategoryTypes
 
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
@@ -185,7 +186,7 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
         scroll_view = ScrollView(
             size_hint=(1, None),
-            height="400dp",  # You can adjust this height as needed
+            height="400dp",
             do_scroll_x=False,
         )
         scroll_view.add_widget(content_box)
@@ -265,7 +266,7 @@ class CreateOrEditCompoundPopUpMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound, self.app.logged_in_group)
         return [
             {
                 "text": category["name"],

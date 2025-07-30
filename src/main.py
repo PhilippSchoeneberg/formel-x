@@ -10,8 +10,9 @@ from popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPo
 from screens.modes_menu import ModesMenuScreen
 from screens.element_menu import ElementMenuScreen
 from screens.compound_menu import CompoundMenuScreen
-from screens.question_learning import QuestionLearningScreen
 from screens.compound_learning import CompoundLearningScreen
+from screens.question_menu import QuestionMenuScreen
+from screens.question_learning import QuestionLearningScreen
 
 from database.database import Database
 from utils.language_manager import LanguageManager
@@ -66,11 +67,13 @@ class MainApp(MDApp):
         self.db = Database()
 
         # Instantiate screens
-        self.question_learning_screen = None
+        self.modes_menu_screen = None
+        self.element_menu_screen = None
         self.compound_menu_screen = None
         self.compound_learning_screen = None
-        self.element_menu_screen = None
-        self.modes_menu_screen = None
+        self.question_menu_screen = None
+        self.question_learning_screen = None
+
 
         # Instantiate popup menus
         self.register_or_login_account_popup_menu = None
@@ -87,10 +90,11 @@ class MainApp(MDApp):
         kv_files = [
             "src/main.kv",
             "src/screens/modes_menu.kv",
-            "src/screens/question_learning.kv",
+            "src/screens/element_menu.kv",
             "src/screens/compound_menu.kv",
             "src/screens/compound_learning.kv",
-            "src/screens/element_menu.kv",
+            "src/screens/question_menu.kv",
+            "src/screens/question_learning.kv",
         ]
         for file in kv_files:
             Builder.load_file(file)
@@ -99,12 +103,14 @@ class MainApp(MDApp):
         self.element_menu_screen = ElementMenuScreen(name="elementMenu")
         self.compound_menu_screen = CompoundMenuScreen(name="compoundMenu")
         self.compound_learning_screen = CompoundLearningScreen(name="compoundLearning")
+        self.question_menu_screen = QuestionMenuScreen(name="questionMenu")
         self.question_learning_screen = QuestionLearningScreen(name="questionLearning")
 
         self.screens.append(self.modes_menu_screen)
         self.screens.append(self.element_menu_screen)
         self.screens.append(self.compound_menu_screen)
         self.screens.append(self.compound_learning_screen)
+        self.screens.append(self.question_menu_screen)
         self.screens.append(self.question_learning_screen)
 
         self.register_or_login_account_popup_menu = RegisterOrLoginAccountPopUpMenu()
@@ -121,6 +127,7 @@ class MainApp(MDApp):
         sm.add_widget(self.element_menu_screen)
         sm.add_widget(self.compound_menu_screen)
         sm.add_widget(self.compound_learning_screen)
+        sm.add_widget(self.question_menu_screen)
         sm.add_widget(self.question_learning_screen)
         self.root = sm
         return sm

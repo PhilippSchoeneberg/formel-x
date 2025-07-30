@@ -11,8 +11,9 @@ import datetime
 class CreateOrEditCategoryPopUpMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
-        self.edit = False
         self.selected_category = None
+        self.category_type = None
+        self.edit = False
 
         self.name_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("category_name"))
         self.name_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error"), mode="on_error")
@@ -63,8 +64,9 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
         )
 
 
-    def open(self, edit=False):
+    def open(self, category_type=None, edit=False):
         self.app.general_dropdown_menu.dismiss()
+        self.category_type = category_type
         self.edit = edit
         self.name_hint_text.text = self.app.language_manager.translate("category_name")
         self.name_helper_text.text = self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error")
@@ -85,7 +87,7 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
         return [
             {
                 "text": category["name"],
@@ -114,7 +116,7 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
             self.name_field.error = True
             valid = False
 
-        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
         for cat in categories.values():
             if cat["name"] == name:
                 self.name_helper_text.text = self.app.language_manager.translate("category") + self.app.language_manager.translate("already_exists_error")
@@ -125,19 +127,19 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
         if not self.edit:
             if valid:
                 self.app.db.cursor.execute(
-                    "INSERT INTO categories (name, group_id, date) VALUES (?, ?, ?)",
-                    (name, self.app.logged_in_group["id"], date)
+                    "INSERT INTO categories (name, type, group_id, date) VALUES (?, ?, ?, ?)",
+                    (name, self.category_type.value, self.app.logged_in_group["id"], date)
                 )
                 self.app.db.connection.commit()
-                self.app.compound_menu_screen.fill_category_list()
+                self.app.root.get_screen(self.app.root.current).fill_category_list()
                 self.dismiss()
         else:
             if not category:
                 valid = False
             if valid:
                 self.app.db.cursor.execute(
-                    "UPDATE categories SET name = ?, group_id = ?, date = ? WHERE id = ?",
-                    (name, self.app.logged_in_group["id"], date, category["id"])
+                    "UPDATE categories SET name = ?, type = ?, group_id = ?, date = ? WHERE id = ?",
+                    (name, self.category_type.value, self.app.logged_in_group["id"], date, category["id"])
                 )
                 self.app.db.connection.commit()
                 self.app.compound_menu_screen.fill_category_list()

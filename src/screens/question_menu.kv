@@ -1,0 +1,27 @@
+<QuestionMenuScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        MDTopAppBar:
+            type: "small"
+            size_hint_x: 1
+
+            MDTopAppBarLeadingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: back_button
+                    icon: "arrow-left"
+                    on_release: app.change_screen("modesMenu")
+
+            MDTopAppBarTitle:
+                text: "FormulaX"
+                pos_hint: {"center_x": .5}
+
+            MDTopAppBarTrailingButtonContainer:
+                MDActionTopAppBarButton:
+                    id: general_menu_button
+                    icon: "menu"
+                    on_release: app.general_menu_open()
+
+        ScrollView:
+            MDList:
+                id: question_category_list

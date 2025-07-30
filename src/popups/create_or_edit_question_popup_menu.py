@@ -201,12 +201,6 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
         if not wrong_answer2:
             self.wrong_answer_field2.error = True
             valid = False
-        if not wrong_answer3:
-            self.wrong_answer_field3.error = True
-            valid = False
-        if not wrong_answer4:
-            self.wrong_answer_field4.error = True
-            valid = False
 
         if valid:
             if not self.question:

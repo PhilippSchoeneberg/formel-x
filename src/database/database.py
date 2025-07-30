@@ -23,8 +23,8 @@ class Database:
             row[0]: {
                 "symbol": row[0],
                 "name": row[1],
-                "group": row[2],
-                "period": row[3],
+                "system_group": row[2],
+                "system_period": row[3],
             }
             for row in rows
         }
@@ -51,14 +51,14 @@ class Database:
 
     def get_all_elements_by_group(self, group):
         if group:
-            self.cursor.execute("SELECT elements.symbol, elements.name, elements.\"group\", elements.period FROM elements_to_groups LEFT OUTER JOIN elements ON elements_to_groups.symbol = elements.symbol WHERE elements_to_groups.group_id = ?", (group["id"],))
+            self.cursor.execute("SELECT elements.symbol, elements.name, elements.system_group, elements.system_period FROM elements_to_groups LEFT OUTER JOIN elements ON elements_to_groups.symbol = elements.symbol WHERE elements_to_groups.group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
             category_dict = {
                 row[0]: {
                     "symbol": row[0],
                     "name": row[1],
-                    "group": row[2],
+                    "group_id": row[2],
                     "period": row[3],
                 }
                 for row in rows
@@ -76,21 +76,25 @@ class Database:
         category_dict = {
             "id": row[0],
             "name": row[1],
-            "date": row[2],
+            "type": row[2],
+            "group_id": row[3],
+            "date": row[4],
         }
         return category_dict
 
 
-    def get_all_categories_by_group(self, group):
+    def get_all_categories_by_type_and_group(self, type, group):
         if group:
-            self.cursor.execute("SELECT id, name, date FROM categories WHERE group_id = ?", (group["id"],))
+            self.cursor.execute("SELECT * FROM categories WHERE type = ? AND group_id = ?", (type.value, group["id"],))
             rows = self.cursor.fetchall()
 
             category_dict = {
                 row[0]: {
                     "id": row[0],
                     "name": row[1],
-                    "date": row[2],
+                    "type": row[2],
+                    "group_id": row[3],
+                    "date": row[4],
                 }
                 for row in rows
             }
@@ -107,7 +111,7 @@ class Database:
 
     def get_all_compounds_by_group(self, group):
         if group:
-            self.cursor.execute("SELECT id, correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, category_id, group_id, date FROM compounds WHERE group_id = ?", (group["id"],))
+            self.cursor.execute("SELECT * FROM compounds WHERE group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
             compound_dict = {
@@ -123,7 +127,7 @@ class Database:
                     "wrong_formula2": row[8],
                     "wrong_formula3": row[9],
                     "wrong_formula4": row[10],
-                    "category": row[11],
+                    "category_id": row[11],
                     "group_id": row[12],
                     "date": row[13],
                 }
@@ -142,7 +146,7 @@ class Database:
 
     def get_all_questions_by_group(self, group):
         if group:
-            self.cursor.execute("SELECT id, question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date FROM questions WHERE group_id = ?", (group["id"],))
+            self.cursor.execute("SELECT * FROM questions WHERE group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
             question_dict = {
@@ -154,8 +158,9 @@ class Database:
                     "wrong_answer2": row[4],
                     "wrong_answer3": row[5],
                     "wrong_answer4": row[6],
-                    "group_id": row[7],
-                    "date": row[8],
+                    "category_id": row[7],
+                    "group_id": row[8],
+                    "date": row[9],
                 }
                 for row in rows
             }
@@ -184,7 +189,7 @@ class Database:
 
 
     def get_all_groups_by_owner_id(self, owner_id):
-        self.cursor.execute("SELECT id, name, owner_id, date FROM groups WHERE owner_id = ?", (owner_id,))
+        self.cursor.execute("SELECT * FROM groups WHERE owner_id = ?", (owner_id,))
         rows = self.cursor.fetchall()
         group_list = []
 

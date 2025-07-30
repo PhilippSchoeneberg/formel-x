@@ -14,15 +14,22 @@ class QuestionLearningScreen(Screen):
 
 
     def refresh(self):
-        self.show_next_question()
+        if self.app.root.current == self.name:
+            self.show_next_question()
 
 
     def start_learning(self, category=None):
-        self.app.change_screen("compoundLearning")
+        self.app.change_screen("questionLearning")
         self.current_index = 0
-        self.questions_to_learn = [
-            question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
-        ]
+        if category:
+            self.questions_to_learn = [
+                question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
+                if question["category"] == category
+            ]
+        else:
+            self.questions_to_learn = [
+                question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
+            ]
         self.refresh()
 
 
@@ -30,7 +37,7 @@ class QuestionLearningScreen(Screen):
         self.ids.question_learning_list.clear_widgets()
 
         if self.current_index >= len(self.questions_to_learn):
-            self.app.change_screen("modesMenu")
+            self.app.change_screen("questionMenu")
             return
 
         self.current_question = self.questions_to_learn[self.current_index]
@@ -43,7 +50,6 @@ class QuestionLearningScreen(Screen):
             else:
                 item.theme_bg_color = "Custom"
                 item.md_bg_color = [1, 0, 0, 0.3]
-
 
         def add_option(text, correct):
             list_item = MDListItem(
@@ -60,8 +66,10 @@ class QuestionLearningScreen(Screen):
         add_option(self.current_question["correct_answer"], True)
         add_option(self.current_question["wrong_answer1"], False)
         add_option(self.current_question["wrong_answer2"], False)
-        add_option(self.current_question["wrong_answer3"], False)
-        add_option(self.current_question["wrong_answer4"], False)
+        if self.current_question["wrong_answer3"]:
+            add_option(self.current_question["wrong_answer3"], False)
+        if self.current_question["wrong_answer4"]:
+            add_option(self.current_question["wrong_answer4"], False)
 
 
     def next_question(self):

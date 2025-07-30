@@ -8,9 +8,9 @@ db.cursor.execute("PRAGMA foreign_keys = ON")
 # Drop tables if they exist (for re-creation)
 db.cursor.execute("DROP TABLE IF EXISTS elements_to_groups")
 db.cursor.execute("DROP TABLE IF EXISTS compounds")
+db.cursor.execute("DROP TABLE IF EXISTS questions")
 db.cursor.execute("DROP TABLE IF EXISTS elements")
 db.cursor.execute("DROP TABLE IF EXISTS categories")
-db.cursor.execute("DROP TABLE IF EXISTS questions")
 db.cursor.execute("DROP TABLE IF EXISTS groups")
 db.cursor.execute("DROP TABLE IF EXISTS accounts")
 
@@ -38,10 +38,10 @@ CREATE TABLE groups (
 # Create table "elements"
 db.cursor.execute("""
 CREATE TABLE elements (
-    symbol  TEXT PRIMARY KEY,
-    name    TEXT NOT NULL,
-    "group" INTEGER NOT NULL,
-    period  INTEGER NOT NULL
+    symbol          TEXT PRIMARY KEY,
+    name            TEXT NOT NULL,
+    system_group    INTEGER NOT NULL,
+    system_period   INTEGER NOT NULL
 )
 """)
 
@@ -61,6 +61,7 @@ db.cursor.execute("""
 CREATE TABLE categories (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        TEXT NOT NULL,
+    type        INTEGER NOT NULL,
     group_id    INTEGER NOT NULL,
     date        TEXT NOT NULL,
     FOREIGN KEY (group_id) REFERENCES groups(id)
@@ -99,8 +100,10 @@ CREATE TABLE questions (
     wrong_answer2   TEXT NOT NULL,
     wrong_answer3   TEXT,
     wrong_answer4   TEXT,
+    category_id     INTEGER NOT NULL,
     group_id        INTEGER NOT NULL,
     date            TEXT NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (group_id) REFERENCES groups(id)
 )
 """)

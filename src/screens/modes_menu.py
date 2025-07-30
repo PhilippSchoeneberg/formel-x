@@ -41,7 +41,7 @@ class ModesMenuScreen(Screen):
             self.ids.mode_list.add_widget(
                 MDListItem(
                     MDListItemHeadlineText(text=self.app.language_manager.translate("questions")),
-                    on_release=lambda _: self.app.change_screen("questionLearning")
+                    on_release=lambda _: self.app.change_screen("questionMenu")
                 )
             )
 
@@ -100,7 +100,7 @@ class ModesMenuScreen(Screen):
                 self.app.db.cursor.execute("SELECT * FROM groups WHERE id = ?", (group["id"],))
                 result = self.app.db.cursor.fetchone()
                 if not result:
-                    self.remove_group(group)
+                    self.remove(group)
         if self.app.logged_in_group not in self.app.groups:
             self.app.logged_in_group = None
             self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")

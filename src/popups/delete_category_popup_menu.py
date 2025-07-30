@@ -10,6 +10,7 @@ class DeleteCategoryPopUpMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.selected_category = None
+        self.category_type = None
 
         self.categories_button_text = MDButtonText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category"))
 
@@ -49,7 +50,8 @@ class DeleteCategoryPopUpMenu(MDDialog):
         )
 
 
-    def open(self):
+    def open(self, category_type=None):
+        self.category_type = category_type
         self.app.general_dropdown_menu.dismiss()
         self.categories_button_text.text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category")
         self.headline_text.text=self.app.language_manager.translate("delete") + self.app.language_manager.translate("category")
@@ -64,7 +66,7 @@ class DeleteCategoryPopUpMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_group(self.app.logged_in_group)
+        categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
         return [
             {
                 "text": category["name"],

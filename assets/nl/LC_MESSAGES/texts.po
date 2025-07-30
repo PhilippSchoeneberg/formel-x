@@ -64,6 +64,9 @@ msgstr "Inloggen"
 msgid "registration"
 msgstr "Registratie"
 
+msgid "register"
+msgstr "registreren"
+
 msgid "go_to_login"
 msgstr "Ga naar Inloggen"
 
@@ -124,8 +127,8 @@ msgstr "Categorie"
 msgid "category_name"
 msgstr "Categorie naam"
 
-msgid "add_formula"
-msgstr "Formule toevoegen"
+msgid "add_compound"
+msgstr "Verbindingen toevoegen"
 
 msgid "compound"
 msgstr "Verbinding"
@@ -180,6 +183,9 @@ msgstr " of "
 
 msgid " and "
 msgstr " en "
+
+msgid "add_question"
+msgstr "Vraag toevoegen"
 
 msgid "question"
 msgstr "Vraag"
