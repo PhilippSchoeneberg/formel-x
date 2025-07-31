@@ -1,3 +1,7 @@
+from src.popups.add_group_popup_menu import AddGroupPopupMenu
+from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
+from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
+from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.utils.json_parser import save_state
 
 from kivy.app import App
@@ -44,27 +48,56 @@ class ModesMenuScreen(Screen):
                     on_release=lambda _: self.app.change_screen("questionMenu")
                 )
             )
+        elif not self.app.groups:
+            error_item = MDListItem(
+                MDListItemHeadlineText(text=self.app.language_manager.translate("no_groups_yet_error")))
+            error_item.ripple_effect = False
+            error_item.focus_behavior = False
+            self.ids.mode_list.add_widget(error_item)
+            if self.app.logged_in_user_id:
+                self.ids.mode_list.add_widget(
+                    MDListItem(
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("create_hint")),
+                        on_release=lambda _: self.create()
+                    )
+                )
+            else:
+                self.ids.mode_list.add_widget(
+                    MDListItem(
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("add_hint")),
+                        on_release=lambda _: AddGroupPopupMenu().open()
+                    )
+                )
 
 
     def group_menu_open(self):
         group_menu_items = []
-        for group in self.app.groups:
-            group_menu_items.append({"text": group["name"],
-                                     "on_release": lambda x=group: self.set_group(x)})
-        self.group_dropdown_menu = MDDropdownMenu(
-            caller=self.ids.select_group_button,
-            items=group_menu_items
-        )
-        self.group_dropdown_menu.open()
+        if self.app.groups:
+            for group in self.app.groups:
+                group_menu_items.append({"text": group["name"],
+                                         "on_release": lambda x=group: self.set_group(x)})
+            self.group_dropdown_menu = MDDropdownMenu(
+                caller=self.ids.select_group_button,
+                items=group_menu_items
+            )
+            self.group_dropdown_menu.open()
+        else:
+            if self.app.logged_in_user_id:
+                self.create()
+            else:
+                AddGroupPopupMenu().open()
 
 
     def set_group(self, group):
+        if self.group_dropdown_menu:
+            self.group_dropdown_menu.dismiss()
         self.app.logged_in_group = group
         self.app.state["logged_in_group"] = self.app.logged_in_group
         save_state(self.app.state)
-        self.ids.group_name.text = group["name"]
-        if self.group_dropdown_menu:
-            self.group_dropdown_menu.dismiss()
+        if self.app.logged_in_group:
+            self.ids.group_name.text = group["name"]
+        else:
+            self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")
         self.refresh_groups()
 
 
@@ -77,17 +110,17 @@ class ModesMenuScreen(Screen):
 
 
     def create(self):
-        self.app.create_or_edit_group_popup_menu.open()
+        CreateOrEditGroupPopupMenu().open()
 
 
     def edit(self):
         if self.app.logged_in_group:
-            self.app.create_or_edit_group_popup_menu.open(self.app.logged_in_group)
+            CreateOrEditGroupPopupMenu().open(self.app.logged_in_group)
 
 
     def delete(self):
         if self.app.logged_in_group:
-            self.app.confirm_delete_popup_menu.open("Group", self.app.logged_in_group["name"], lambda: self.app.db.delete_group(self.app.logged_in_group), self.refresh_groups)
+            ConfirmDeletePopupMenu().open("Group", self.app.logged_in_group["name"], lambda: self.app.db.delete_group(self.app.logged_in_group), self.refresh_groups)
 
 
     def refresh_groups(self):
@@ -102,7 +135,9 @@ class ModesMenuScreen(Screen):
                 if not result:
                     self.remove(group)
         if self.app.logged_in_group not in self.app.groups:
-            self.app.logged_in_group = None
-            self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")
-        self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
+            if self.app.groups:
+                self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
+                self.set_group(self.app.groups[0])
+            elif self.app.logged_in_group is not None:
+                self.set_group(None)
         self.fill_modes_list()

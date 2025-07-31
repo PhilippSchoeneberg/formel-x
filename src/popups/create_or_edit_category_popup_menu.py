@@ -8,7 +8,7 @@ from kivymd.uix.menu import MDDropdownMenu
 import datetime
 
 
-class CreateOrEditCategoryPopUpMenu(MDDialog):
+class CreateOrEditCategoryPopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.selected_category = None
@@ -65,19 +65,17 @@ class CreateOrEditCategoryPopUpMenu(MDDialog):
 
 
     def open(self, category_type=None, edit=False):
-        self.app.general_dropdown_menu.dismiss()
+        if self.app.general_dropdown_menu:
+            self.app.general_dropdown_menu.dismiss()
+
         self.category_type = category_type
         self.edit = edit
-        self.name_hint_text.text = self.app.language_manager.translate("category_name")
-        self.name_helper_text.text = self.app.language_manager.translate("category_name") + self.app.language_manager.translate("empty_error")
-        self.categories_button_text.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("category")
         if self.edit:
             self.headline_text.text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("category")
             self.content_box.add_widget(self.categories_button)
         else:
             self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("category")
-        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
-        self.submit_button_text.text = self.app.language_manager.translate("submit")
+
         self.categories_dropdown_menu.items = self.get_category_items()
         super().open()
 

@@ -44,7 +44,7 @@
                 MDActionTopAppBarButton:
                     id: switch_learning_mode_button
                     icon: "autorenew"
-                    on_release: app.element_menu_screen.switch_learning_mode()
+                    on_release: app.element_menu_screen.set_learning_mode(not app.learning_mode)
 
             MDTopAppBarTitle:
                 id: learning_mode_title

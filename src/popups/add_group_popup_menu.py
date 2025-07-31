@@ -8,7 +8,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from src.utils.json_parser import save_state
 
 
-class AddGroupPopUpMenu(MDDialog):
+class AddGroupPopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
 
@@ -47,12 +47,8 @@ class AddGroupPopUpMenu(MDDialog):
         )
 
     def on_open(self):
-        self.app.general_dropdown_menu.dismiss()
-        self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
-        self.name_hint_text.text = self.app.language_manager.translate("group_name")
-        self.headline_text.text = self.app.language_manager.translate("add_group")
-        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
-        self.submit_button_text.text = self.app.language_manager.translate("submit")
+        if self.app.general_dropdown_menu:
+            self.app.general_dropdown_menu.dismiss()
         super().open()
 
 

@@ -6,7 +6,7 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from ext.kivymd.uix.label import MDLabel
 
 
-class ConfirmDeletePopUpMenu(MDDialog):
+class ConfirmDeletePopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.delete_function = None
@@ -38,14 +38,12 @@ class ConfirmDeletePopUpMenu(MDDialog):
         )
 
 
-    def open(self, type_name, item_name, delete_function, action_function):
+    def open(self, type_name=None, item_name=None, delete_function=None, action_function=None):
         self.app.general_dropdown_menu.dismiss()
         self.delete_function = delete_function
         self.action_function = action_function
         self.question_label.text = self.app.language_manager.translate("delete_text") + "\"" + item_name + "\"?"
         self.headline_text.text = self.app.language_manager.translate("delete") + type_name + "?"
-        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
-        self.submit_button_text.text = self.app.language_manager.translate("submit")
         super().open()
 
 

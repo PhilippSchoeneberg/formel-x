@@ -7,7 +7,7 @@ from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHe
 from kivymd.uix.boxlayout import MDBoxLayout
 
 
-class RegisterOrLoginAccountPopUpMenu(MDDialog):
+class RegisterOrLoginAccountPopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.register_mode = False
@@ -71,20 +71,6 @@ class RegisterOrLoginAccountPopUpMenu(MDDialog):
                 spacing="8dp",
             ),
         )
-
-
-    def open(self):
-        self.email_hint_text.text=self.app.language_manager.translate("email_address")
-        self.email_helper_text.text=self.app.language_manager.translate("email_address") + self.app.language_manager.translate("empty_error")
-        self.password_hint_text.text=self.app.language_manager.translate("password")
-        self.password_helper_text.text=self.app.language_manager.translate("password") + self.app.language_manager.translate("empty_error")
-        self.password_repetition_hint_text.text=self.app.language_manager.translate("password_repetition")
-        self.password_repetition_helper_text.text=self.app.language_manager.translate("password_repetition") + self.app.language_manager.translate("empty_error")
-        self.headline.text=self.app.language_manager.translate("login")
-        self.cancel_button_text.text=self.app.language_manager.translate("cancel")
-        self.submit_button_text.text=self.app.language_manager.translate("login")
-        self.toggle_button_text.text=self.app.language_manager.translate("go_to_registration")
-        super().open()
 
 
     def toggle_mode(self, *args, **kwargs):

@@ -37,6 +37,35 @@ msgstr " do not match."
 msgid "incorrect_error"
 msgstr " is incorrect."
 
+
+msgid "no_groups_yet_error"
+msgstr "No groups registered yet"
+
+msgid "no_categories_yet_error"
+msgstr "No categories registered yet"
+
+msgid "no_categories_error"
+msgstr "No categories registered yet"
+
+msgid "create_hint"
+msgstr "Click here or in the Menu at the top right to create one."
+
+msgid "add_hint"
+msgstr "Click here or in the Menu at the top right to add one."
+
+msgid "add_element_to_learning_mode_hint"
+msgstr "Click on an element to add it to the learning list and click it again to remove it."
+
+msgid "sorry"
+msgstr "Sorry"
+
+msgid "okay"
+msgstr "Okay"
+
+msgid "difficulty"
+msgstr "Okay"
+
+
 msgid "edit"
 msgstr "Edit "
 

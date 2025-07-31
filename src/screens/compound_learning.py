@@ -1,3 +1,7 @@
+from src.popups.create_or_edit_compound_popup_menu import CreateOrEditCompoundPopupMenu
+from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
+from src.popups.no_categories_error_popup_menu import NoCategoriesErrorPopupMenu
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
@@ -18,19 +22,24 @@ class CompoundLearningScreen(Screen):
             self.show_next_compound()
 
 
-    def start_learning(self, category=None):
-        self.app.change_screen("compoundLearning")
+    def start_learning(self, category=None, difficulty=None):
         self.current_index = 0
+        self.compounds_to_learn = self.app.db.get_all_compounds_by_group(self.app.logged_in_group).values()
         if category:
             self.compounds_to_learn = [
-                compound for compound in self.app.db.get_all_compounds_by_group(self.app.logged_in_group).values()
-                if compound["category"] == category
+                compound for compound in self.compounds_to_learn
+                if compound["category_id"] == category
             ]
-        else:
+        if difficulty:
             self.compounds_to_learn = [
-                compound for compound in self.app.db.get_all_compounds_by_group(self.app.logged_in_group).values()
+                compound for compound in self.compounds_to_learn
+                if compound["difficulty"] == difficulty.value
             ]
-        self.refresh()
+        if not self.compounds_to_learn:
+            NoCategoriesErrorPopupMenu().open(lambda: self.app.change_screen("compoundMenu"))
+        else:
+            self.app.change_screen("compoundLearning")
+            self.show_next_compound()
 
 
     def show_next_compound(self):
@@ -98,12 +107,12 @@ class CompoundLearningScreen(Screen):
 
 
     def create(self):
-        self.app.create_or_edit_compound_popup_menu.open()
+        CreateOrEditCompoundPopupMenu().open()
 
 
     def edit(self):
-        self.app.create_or_edit_compound_popup_menu.open(self.current_compound, self.next_compound)
+        CreateOrEditCompoundPopupMenu().open(self.current_compound, self.next_compound)
 
 
     def delete(self):
-        self.app.confirm_delete_popup_menu.open(self.app.language_manager.translate("compound"), self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)
+        ConfirmDeletePopupMenu().open(self.app.language_manager.translate("compound"), self.current_compound["correct_name"], lambda: self.app.db.delete_compound(self.current_compound), self.next_compound)

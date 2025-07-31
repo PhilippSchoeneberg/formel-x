@@ -1,3 +1,7 @@
+from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopupMenu
+from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
+from src.popups.no_categories_error_popup_menu import NoCategoriesErrorPopupMenu
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
@@ -18,19 +22,24 @@ class QuestionLearningScreen(Screen):
             self.show_next_question()
 
 
-    def start_learning(self, category=None):
-        self.app.change_screen("questionLearning")
+    def start_learning(self, category=None, difficulty=None):
         self.current_index = 0
+        self.questions_to_learn = self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
         if category:
             self.questions_to_learn = [
-                question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
-                if question["category"] == category
+                question for question in self.questions_to_learn
+                if question["category_id"] == category
             ]
-        else:
+        if difficulty:
             self.questions_to_learn = [
-                question for question in self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
+                question for question in self.questions_to_learn
+                if question["difficulty"] == difficulty.value
             ]
-        self.refresh()
+        if not self.questions_to_learn:
+            NoCategoriesErrorPopupMenu().open(lambda: self.app.change_screen("questionMenu"))
+        else:
+            self.app.change_screen("questionLearning")
+            self.show_next_question()
 
 
     def show_next_question(self):
@@ -78,12 +87,12 @@ class QuestionLearningScreen(Screen):
 
 
     def create(self):
-        self.app.create_or_edit_question_popup_menu.open()
+        CreateOrEditQuestionPopupMenu().open()
 
 
     def edit(self):
-        self.app.create_or_edit_question_popup_menu.open(self.current_question, self.next_question)
+        CreateOrEditQuestionPopupMenu().open(self.current_question, self.next_question)
 
 
     def delete(self):
-        self.app.confirm_delete_popup_menu.open(self.app.language_manager.translate("question"), self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)
+        ConfirmDeletePopupMenu().open(self.app.language_manager.translate("question"), self.current_question["question"], lambda: self.app.db.delete_question(self.current_question), self.next_question)

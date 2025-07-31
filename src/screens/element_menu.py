@@ -11,25 +11,25 @@ from kivy.core.window import Window
 class ElementMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.app = None
-        self.buttons = []
+        self.app = App.get_running_app()
+        self.buttons = None
         self.headline = None
         self.elements = None
         self.element_symbols = None
 
 
     def refresh(self, *args):
-        self.app = App.get_running_app()
-        self.ids.learning_mode_title.text = self.app.language_manager.translate("remembering_mode")
-        self.headline.text=self.app.language_manager.translate("element_remembering_mode_list_text")
-        self.refresh_buttons()
+        if not self.buttons:
+            self.fill_periodic_table()
+        self.set_learning_mode(self.app.learning_mode)
 
 
     def fill_periodic_table(self, *args):
-        self.app = App.get_running_app()
         self.buttons = []
         self.elements = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
         self.element_symbols = [element["symbol"] for element in self.elements.values()]
+
+        self.ids.element_learning_list.clear_widgets()
 
         self.headline = MDListItemHeadlineText(text=self.app.language_manager.translate("element_remembering_mode_list_text"))
         title_item = MDListItem(self.headline)
@@ -100,7 +100,6 @@ class ElementMenuScreen(Screen):
 
 
     def refresh_buttons(self):
-        self.app = App.get_running_app()
         self.elements = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
         self.element_symbols = [element["symbol"] for element in self.elements.values()]
         for button in self.buttons:
@@ -117,30 +116,30 @@ class ElementMenuScreen(Screen):
                 button["button"].md_bg_color = [0.10588235294117647, 0.10588235294117647, 0.12941176470588237, 1.0]
 
 
-    def switch_learning_mode(self):
-        self.app = App.get_running_app()
-        self.app.learning_mode = not self.app.learning_mode
+    def set_learning_mode(self, learning_mode):
+        self.app.learning_mode = learning_mode
         if self.app.learning_mode:
             self.ids.learning_mode_title.text = self.app.language_manager.translate("learning_mode")
             self.start_learning()
         else:
             self.ids.learning_mode_title.text = self.app.language_manager.translate("remembering_mode")
-            self.headline.text = self.app.language_manager.translate("element_remembering_mode_list_text")
-        self.refresh_buttons()
+            if self.app.logged_in_user_id:
+                self.headline.text = self.app.language_manager.translate("add_element_to_learning_mode_hint")
+            else:
+                self.headline.text = self.app.language_manager.translate("element_remembering_mode_list_text")
+            self.refresh_buttons()
 
 
     def start_learning(self):
-        self.app = App.get_running_app()
         self.elements_to_learn = [element for element in self.app.db.get_all_elements_by_group(self.app.logged_in_group).values()]
         self.current_index = 0
         self.show_next_element()
 
 
     def show_next_element(self):
-        self.app = App.get_running_app()
         self.refresh_buttons()
         if self.current_index >= len(self.elements_to_learn):
-            self.switch_learning_mode()
+            self.set_learning_mode(not self.app.learning_mode)
             return
         self.current_element = self.elements_to_learn[self.current_index]
         self.headline.text = self.app.language_manager.translate("element_learning_mode_list_text") + self.current_element['name']

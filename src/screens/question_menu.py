@@ -1,10 +1,12 @@
-from src.utils.enums import CategoryTypes
+from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
+from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
+from src.utils.enums import CategoryTypes, DifficultyTypes
 
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.screenmanager import Screen
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
@@ -12,6 +14,12 @@ class QuestionMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
+        self.difficulty_dropdown_menu = None
+        self.select_difficulty = None
+
+
+    def on_pre_enter(self, *args):
+        self.refresh()
 
 
     def refresh(self, *args):
@@ -28,21 +36,70 @@ class QuestionMenuScreen(Screen):
         title_item.focus_behavior = False
         self.ids.question_category_list.add_widget(title_item)
 
-        for question_category_id, question_category in question_categories.items():
-            self.ids.question_category_list.add_widget(
-                MDListItem(
+        if question_categories:
+            for question_category_id, question_category in question_categories.items():
+                button_text = MDButtonText(
+                    text=self.app.language_manager.translate("select") + self.app.language_manager.translate(
+                        "difficulty"))
+                button = MDButton(
+                    button_text,
+                    on_release=lambda x, btn_txt=button_text: self.difficulty_menu_open(x, btn_txt)
+                )
+                list_item = MDListItem(
                     MDListItemHeadlineText(text=question_category["name"]),
-                    on_release=lambda _, cat_id=question_category_id: self.app.question_learning_screen.start_learning(cat_id)
+                    on_release=lambda _, cat_id=question_category_id: self.select_category(cat_id)
                 )
-            )
+                list_item.add_widget(button)
+                self.ids.question_category_list.add_widget(list_item)
 
-        if len(question_categories) >= 2:
-            self.ids.question_category_list.add_widget(
-                MDListItem(
-                    MDListItemHeadlineText(text=self.app.language_manager.translate("all")),
-                    on_release=lambda _, cat_id=None: self.app.question_learning_screen.start_learning(cat_id)
+            if len(question_categories) >= 2:
+                button_text = MDButtonText(
+                    text=self.app.language_manager.translate("select") + self.app.language_manager.translate(
+                        "difficulty"))
+                button = MDButton(
+                    button_text,
+                    on_release=lambda x, btn_txt=button_text: self.difficulty_menu_open(x, btn_txt)
                 )
-            )
+                list_item = MDListItem(
+                    MDListItemHeadlineText(text=self.app.language_manager.translate("all")),
+                    on_release=lambda _, cat_id=None: self.select_category(cat_id)
+                )
+                list_item.add_widget(button)
+                self.ids.question_category_list.add_widget(list_item)
+        else:
+            error_item = MDListItem(
+                MDListItemHeadlineText(text=self.app.language_manager.translate("no_categories_yet_error")))
+            error_item.ripple_effect = False
+            error_item.focus_behavior = False
+            self.ids.question_category_list.add_widget(error_item)
+            if self.app.logged_in_user_id:
+                self.ids.question_category_list.add_widget(
+                    MDListItem(
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("create_hint")),
+                        on_release=lambda _, cat_id=None: CreateOrEditCategoryPopupMenu().open(CategoryTypes.question, False)
+                    )
+                )
+
+
+    def difficulty_menu_open(self, button, button_text):
+        difficulty_menu_items = []
+        for difficulty in DifficultyTypes:
+            difficulty_menu_items.append({"text": self.app.language_manager.translate(difficulty.value),
+                                          "on_release": lambda x=difficulty: self.set_difficulty(button_text, x)})
+        self.difficulty_dropdown_menu = MDDropdownMenu(
+            caller=button,
+            items=difficulty_menu_items
+        )
+        self.difficulty_dropdown_menu.open()
+
+
+    def set_difficulty(self, button_text, difficulty):
+        self.select_difficulty = difficulty
+        button_text.text = self.select_difficulty.value
+
+
+    def select_category(self, category_id):
+        self.app.question_learning_screen.start_learning(category_id, self.select_difficulty)
 
 
     def create(self):
@@ -61,7 +118,7 @@ class QuestionMenuScreen(Screen):
         add_menu_items = [
             {
                 "text": self.app.language_manager.translate("add_category"),
-                "on_release": lambda: self.app.create_or_edit_category_popup_menu.open(CategoryTypes.question, False),
+                "on_release": lambda: CreateOrEditCategoryPopupMenu().open(CategoryTypes.question, False),
             },
             {
                 "text": self.app.language_manager.translate("add_question"),
@@ -75,8 +132,8 @@ class QuestionMenuScreen(Screen):
 
 
     def edit(self):
-        self.app.create_or_edit_category_popup_menu.open(CategoryTypes.question, True)
+        CreateOrEditCategoryPopupMenu().open(CategoryTypes.question, True)
 
 
     def delete(self):
-        self.app.delete_category_popup_menu.open(CategoryTypes.question)
+        DeleteCategoryPopupMenu().open(CategoryTypes.question)

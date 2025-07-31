@@ -1,11 +1,5 @@
-from popups.add_group_popup_menu import AddGroupPopUpMenu
-from popups.confirm_delete_popup_menu import ConfirmDeletePopUpMenu
-from popups.delete_category_popup_menu import DeleteCategoryPopUpMenu
-from popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopUpMenu
-from popups.create_or_edit_compound_popup_menu import CreateOrEditCompoundPopUpMenu
-from popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopUpMenu
-from popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopUpMenu
-from popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPopUpMenu
+from src.popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPopupMenu
+from src.popups.add_group_popup_menu import AddGroupPopupMenu
 
 from screens.modes_menu import ModesMenuScreen
 from screens.element_menu import ElementMenuScreen
@@ -113,15 +107,6 @@ class MainApp(MDApp):
         self.screens.append(self.question_menu_screen)
         self.screens.append(self.question_learning_screen)
 
-        self.register_or_login_account_popup_menu = RegisterOrLoginAccountPopUpMenu()
-        self.create_or_edit_group_popup_menu = CreateOrEditGroupPopUpMenu()
-        self.add_group_popup_menu = AddGroupPopUpMenu()
-        self.create_or_edit_compound_popup_menu = CreateOrEditCompoundPopUpMenu()
-        self.create_or_edit_category_popup_menu = CreateOrEditCategoryPopUpMenu()
-        self.delete_category_popup_menu = DeleteCategoryPopUpMenu()
-        self.create_or_edit_question_popup_menu = CreateOrEditQuestionPopUpMenu()
-        self.confirm_delete_popup_menu = ConfirmDeletePopUpMenu()
-
         sm = ScreenManager()
         sm.add_widget(self.modes_menu_screen)
         sm.add_widget(self.element_menu_screen)
@@ -142,17 +127,14 @@ class MainApp(MDApp):
         if self.logged_in_group:
             self.modes_menu_screen.set_group(self.logged_in_group)
 
-        self.element_menu_screen.fill_periodic_table()
-        for screen in self.screens:
-            screen.refresh()
-
 
     def login(self, loggedInUserId):
         self.logged_in_user_id = loggedInUserId
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
-        self.modes_menu_screen.refresh_groups()
-        self.element_menu_screen.refresh_buttons()
+
+        for screen in self.screens:
+            screen.refresh()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "logout"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.logout
@@ -162,11 +144,12 @@ class MainApp(MDApp):
         self.logged_in_user_id = None
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
-        self.modes_menu_screen.refresh_groups()
-        self.element_menu_screen.refresh_buttons()
+
+        for screen in self.screens:
+            screen.refresh()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "account"
-        self.root.get_screen("modesMenu").ids.account_button.on_release = self.register_or_login_account_popup_menu.open
+        self.root.get_screen("modesMenu").ids.account_button.on_release = RegisterOrLoginAccountPopupMenu().open
 
 
     def change_screen(self, name):
@@ -210,7 +193,7 @@ class MainApp(MDApp):
                 {
                     "leading_icon": "plus",
                     "text": self.language_manager.translate("add"),
-                    "on_release": lambda: self.add_group_popup_menu.open(),
+                    "on_release": lambda: AddGroupPopupMenu().open(),
                 },
                 {
                     "leading_icon": "exit-to-app",

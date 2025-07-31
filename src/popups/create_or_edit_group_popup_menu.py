@@ -7,7 +7,7 @@ from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHe
 from kivymd.uix.boxlayout import MDBoxLayout
 
 
-class CreateOrEditGroupPopUpMenu(MDDialog):
+class CreateOrEditGroupPopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.group = None
@@ -48,17 +48,16 @@ class CreateOrEditGroupPopUpMenu(MDDialog):
 
 
     def open(self, group = None):
-        self.app.general_dropdown_menu.dismiss()
+        if self.app.general_dropdown_menu:
+            self.app.general_dropdown_menu.dismiss()
+
         self.group = group
-        self.name_hint_text.text=self.app.language_manager.translate("group_name")
-        self.name_helper_text.text=self.app.language_manager.translate("group_name") + self.app.language_manager.translate("empty_error")
         if self.group:
             self.headline_text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("group")
             self.name_field.text = self.group["name"]
         else:
             self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("group")
-        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
-        self.submit_button_text.text = self.app.language_manager.translate("submit")
+
         super().open()
 
 

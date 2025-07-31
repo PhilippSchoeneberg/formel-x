@@ -127,9 +127,10 @@ class Database:
                     "wrong_formula2": row[8],
                     "wrong_formula3": row[9],
                     "wrong_formula4": row[10],
-                    "category_id": row[11],
-                    "group_id": row[12],
-                    "date": row[13],
+                    "difficulty": row[11],
+                    "category_id": row[12],
+                    "group_id": row[13],
+                    "date": row[14],
                 }
                 for row in rows
             }
@@ -158,9 +159,10 @@ class Database:
                     "wrong_answer2": row[4],
                     "wrong_answer3": row[5],
                     "wrong_answer4": row[6],
-                    "category_id": row[7],
-                    "group_id": row[8],
-                    "date": row[9],
+                    "difficulty": row[7],
+                    "category_id": row[8],
+                    "group_id": row[9],
+                    "date": row[10],
                 }
                 for row in rows
             }

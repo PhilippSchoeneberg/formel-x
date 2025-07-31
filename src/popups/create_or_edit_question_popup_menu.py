@@ -1,4 +1,5 @@
-import datetime
+from src.utils.enums import CategoryTypes, DifficultyTypes
+
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -6,13 +7,17 @@ from kivy.uix.scrollview import ScrollView
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.menu import MDDropdownMenu
+import datetime
 
 
-class CreateOrEditQuestionPopUpMenu(MDDialog):
+class CreateOrEditQuestionPopupMenu(MDDialog):
     def __init__(self):
         self.app = App.get_running_app()
         self.question = None
         self.action_function = None
+        self.selected_category = None
+        self.selected_difficulty = None
 
         self.question_hint_text = MDTextFieldHintText(text=self.app.language_manager.translate("question"))
         self.question_helper_text = MDTextFieldHelperText(text=self.app.language_manager.translate("question") + self.app.language_manager.translate("empty_error"), mode="on_error")
@@ -100,6 +105,33 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
             pos_hint={"center_x": 0.5},
         )
 
+        self.categories_button_text = MDButtonText(
+            text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category"))
+
+        self.categories_button = MDButton(
+            self.categories_button_text,
+            style="outlined",
+            on_release=self.open_categories_dropdown,
+        )
+
+        self.difficulty_button_text = MDButtonText(
+            text=self.app.language_manager.translate("select") + self.app.language_manager.translate("difficulty"))
+
+        self.difficulties_button = MDButton(
+            self.difficulty_button_text,
+            style="outlined",
+            on_release=self.open_difficulties_dropdown,
+        )
+
+        button_box = MDBoxLayout(
+            self.categories_button,
+            self.difficulties_button,
+            orientation="horizontal",
+            spacing="30dp",
+            adaptive_height=True,
+            size_hint_y=None,
+        )
+
         content_box = MDBoxLayout(
             self.question_field,
             self.correct_answer_field,
@@ -107,6 +139,7 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
             self.wrong_answer_field2,
             self.wrong_answer_field3,
             self.wrong_answer_field4,
+            button_box,
             orientation="vertical",
             spacing="30dp",
             adaptive_height=True,
@@ -135,37 +168,23 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
             ),
         )
 
+        self.categories_dropdown_menu = MDDropdownMenu(
+            caller=self.categories_button,
+            items=[],
+            width_mult=4,
+        )
+
+        self.difficulties_dropdown_menu = MDDropdownMenu(
+            caller=self.difficulties_button,
+            items=[],
+            width_mult=4,
+        )
+
 
     def open(self, question = None, action_function = None):
         self.app.general_dropdown_menu.dismiss()
         self.question = question
         self.action_function = action_function
-
-        self.question_hint_text.text = self.app.language_manager.translate("question")
-        self.question_helper_text.text = self.app.language_manager.translate("question") + self.app.language_manager.translate("empty_error")
-        self.correct_answer_hint_text.text = self.app.language_manager.translate("correct_answer")
-        self.correct_answer_helper_text.text = self.app.language_manager.translate("correct_answer") + self.app.language_manager.translate("empty_error")
-        self.wrong_answer1_hint_text.text = self.app.language_manager.translate("first_wrong_answer")
-        self.wrong_answer1_helper_text.text = self.app.language_manager.translate("first_wrong_answer") + self.app.language_manager.translate("empty_error")
-        self.wrong_answer2_hint_text.text = self.app.language_manager.translate("second_wrong_answer")
-        self.wrong_answer2_helper_text.text = self.app.language_manager.translate("second_wrong_answer") + self.app.language_manager.translate("empty_error")
-        self.wrong_answer3_hint_text.text = self.app.language_manager.translate("third_wrong_answer")
-        self.wrong_answer3_helper_text.text = self.app.language_manager.translate("third_wrong_answer") + self.app.language_manager.translate("empty_error")
-        self.wrong_answer4_hint_text.text = self.app.language_manager.translate("fourth_wrong_answer")
-        self.wrong_answer4_helper_text.text = self.app.language_manager.translate("fourth_wrong_answer") + self.app.language_manager.translate("empty_error")
-
-        self.question_hint_text.canvas.ask_update()
-        self.question_helper_text.canvas.ask_update()
-        self.correct_answer_hint_text.canvas.ask_update()
-        self.correct_answer_helper_text.canvas.ask_update()
-        self.wrong_answer1_hint_text.canvas.ask_update()
-        self.wrong_answer1_helper_text.canvas.ask_update()
-        self.wrong_answer2_hint_text.canvas.ask_update()
-        self.wrong_answer2_helper_text.canvas.ask_update()
-        self.wrong_answer3_hint_text.canvas.ask_update()
-        self.wrong_answer3_helper_text.canvas.ask_update()
-        self.wrong_answer4_hint_text.canvas.ask_update()
-        self.wrong_answer4_helper_text.canvas.ask_update()
 
         if self.question:
             self.headline_text.text = self.app.language_manager.translate("edit") + self.app.language_manager.translate("question")
@@ -177,9 +196,51 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
             self.wrong_answer_field4.text = self.question["wrong_answer4"]
         else:
             self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("question")
-        self.cancel_button_text.text = self.app.language_manager.translate("cancel")
-        self.submit_button_text.text = self.app.language_manager.translate("submit")
+
+        self.categories_dropdown_menu.items = self.get_category_items()
+        self.difficulties_dropdown_menu.items = self.get_difficulty_items()
         super().open()
+
+
+    def open_categories_dropdown(self, *args, **kwargs):
+        self.categories_dropdown_menu.open()
+
+
+    def get_category_items(self):
+        categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.question, self.app.logged_in_group)
+        return [
+            {
+                "text": category["name"],
+                "on_release": lambda x=category: self.set_category(x),
+            }
+            for category in categories.values()
+        ]
+
+
+    def set_category(self, category):
+        self.selected_category = category
+        self.categories_button_text.text = category["name"]
+        self.categories_dropdown_menu.dismiss()
+
+
+    def open_difficulties_dropdown(self, *args, **kwargs):
+        self.difficulties_dropdown_menu.open()
+
+
+    def get_difficulty_items(self):
+        return [
+            {
+                "text": difficulty.value,
+                "on_release": lambda x=difficulty: self.set_difficulty(x),
+            }
+            for difficulty in DifficultyTypes
+        ]
+
+
+    def set_difficulty(self, difficulty):
+        self.selected_difficulty = difficulty
+        self.difficulty_button_text.text = difficulty.value
+        self.difficulties_dropdown_menu.dismiss()
 
 
     def add_question(self, *args, **kwargs):
@@ -189,29 +250,45 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
         wrong_answer2 = self.wrong_answer_field2.text.strip()
         wrong_answer3 = self.wrong_answer_field3.text.strip()
         wrong_answer4 = self.wrong_answer_field4.text.strip()
+        category = self.selected_category
+        difficulty = self.selected_difficulty
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not correct_answer:
             self.correct_answer_field.error = True
             valid = False
+        else:
+            self.correct_answer_field.error = False
+
         if not wrong_answer1:
             self.wrong_answer_field1.error = True
             valid = False
+        else:
+            self.wrong_answer_field1.error = False
+
         if not wrong_answer2:
             self.wrong_answer_field2.error = True
+            valid = False
+        else:
+            self.wrong_answer_field2.error = False
+
+        if not category:
+            valid = False
+
+        if not difficulty:
             valid = False
 
         if valid:
             if not self.question:
                 self.app.db.cursor.execute(
-                    "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, self.app.logged_in_group["id"], date)
+                    "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty.value, category["id"], self.app.logged_in_group["id"], date)
                 )
             else:
                 self.app.db.cursor.execute(
-                    "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, group_id = ?, date = ? WHERE id = ?",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, self.app.logged_in_group["id"], date, self.question["id"])
+                    "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, difficulty = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
+                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty.value, category["id"], self.app.logged_in_group["id"], date, self.question["id"])
                 )
                 self.action_function()
             self.app.db.connection.commit()
@@ -231,4 +308,6 @@ class CreateOrEditQuestionPopUpMenu(MDDialog):
         self.wrong_answer_field2.error = False
         self.wrong_answer_field3.error = False
         self.wrong_answer_field4.error = False
+        self.selected_category = None
+        self.selected_difficulty = None
         super().dismiss()
