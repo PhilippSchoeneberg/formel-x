@@ -213,7 +213,7 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
                 "text": category["name"],
                 "on_release": lambda x=category: self.set_category(x),
             }
-            for category in categories.values()
+            for category in categories
         ]
 
 

@@ -15,6 +15,7 @@ class CompoundMenuScreen(MDScreen):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
         self.difficulty_dropdown_menu = None
+        self.create_dropdown_menu = None
         self.select_difficulty = None
 
 
@@ -30,6 +31,7 @@ class CompoundMenuScreen(MDScreen):
     def fill_category_list(self):
         self.ids.compound_category_list.clear_widgets()
         compound_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound, self.app.logged_in_group)
+        compound_categories = sorted(compound_categories, key=lambda x: x["name"])
 
         title_item = MDListItem(
             MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category") + ":"))
@@ -38,19 +40,6 @@ class CompoundMenuScreen(MDScreen):
         self.ids.compound_category_list.add_widget(title_item)
 
         if compound_categories:
-            for compound_category_id, compound_category in compound_categories.items():
-                button_text = MDButtonText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("difficulty"))
-                button = MDButton(
-                    button_text,
-                    on_release=lambda x, btn_txt=button_text: self.difficulty_menu_open(x, btn_txt)
-                )
-                list_item = MDListItem(
-                    MDListItemHeadlineText(text=compound_category["name"]),
-                    on_release=lambda _, cat_id=compound_category_id: self.select_category(cat_id)
-                )
-                list_item.add_widget(button)
-                self.ids.compound_category_list.add_widget(list_item)
-
             if len(compound_categories) >= 2:
                 button_text = MDButtonText(
                     text=self.app.language_manager.translate("select") + self.app.language_manager.translate(
@@ -63,6 +52,19 @@ class CompoundMenuScreen(MDScreen):
                         MDListItemHeadlineText(text=self.app.language_manager.translate("all")),
                         on_release=lambda _, cat_id=None: self.select_category(cat_id)
                     )
+                list_item.add_widget(button)
+                self.ids.compound_category_list.add_widget(list_item)
+
+            for compound_category in compound_categories:
+                button_text = MDButtonText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("difficulty"))
+                button = MDButton(
+                    button_text,
+                    on_release=lambda x, btn_txt=button_text: self.difficulty_menu_open(x, btn_txt)
+                )
+                list_item = MDListItem(
+                    MDListItemHeadlineText(text=compound_category["name"]),
+                    on_release=lambda _, cat_id=compound_category["id"]: self.select_category(cat_id)
+                )
                 list_item.add_widget(button)
                 self.ids.compound_category_list.add_widget(list_item)
         else:
@@ -123,10 +125,11 @@ class CompoundMenuScreen(MDScreen):
                 "on_release": lambda: self.app.root.get_screen("compoundLearning").create(),
             },
         ]
-        MDDropdownMenu(
+        self.create_dropdown_menu = MDDropdownMenu(
             caller=create_button,
             items=add_menu_items
-        ).open()
+        )
+        self.create_dropdown_menu.open()
 
 
     def edit(self):

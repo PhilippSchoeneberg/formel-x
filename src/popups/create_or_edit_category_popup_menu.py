@@ -67,6 +67,10 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
     def open(self, category_type=None, edit=False):
         if self.app.general_dropdown_menu:
             self.app.general_dropdown_menu.dismiss()
+        if self.app.root.get_screen("compoundMenu").create_dropdown_menu:
+            self.app.root.get_screen("compoundMenu").create_dropdown_menu.dismiss()
+        if self.app.root.get_screen("questionMenu").create_dropdown_menu:
+            self.app.root.get_screen("questionMenu").create_dropdown_menu.dismiss()
 
         self.category_type = category_type
         self.edit = edit
@@ -91,7 +95,7 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
                 "text": category["name"],
                 "on_release": lambda x=category: self.set_category(x),
             }
-            for category in categories.values()
+            for category in categories
         ]
 
 
@@ -115,7 +119,7 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
             valid = False
 
         categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
-        for cat in categories.values():
+        for cat in categories:
             if cat["name"] == name:
                 self.name_helper_text.text = self.app.language_manager.translate("category") + self.app.language_manager.translate("already_exists_error")
                 self.name_field.error = False

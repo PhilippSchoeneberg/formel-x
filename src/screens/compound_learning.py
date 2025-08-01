@@ -107,6 +107,8 @@ class CompoundLearningScreen(MDScreen):
 
 
     def create(self):
+        if self.app.root.get_screen("compoundMenu").create_dropdown_menu:
+            self.app.root.get_screen("compoundMenu").create_dropdown_menu.dismiss()
         CreateOrEditCompoundPopupMenu().open()
 
 

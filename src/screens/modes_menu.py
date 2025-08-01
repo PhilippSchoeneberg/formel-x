@@ -135,8 +135,8 @@ class ModesMenuScreen(MDScreen):
                     self.remove(group)
         if self.app.logged_in_group not in self.app.groups:
             if self.app.groups:
-                self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
                 self.set_group(self.app.groups[0])
             elif self.app.logged_in_group is not None:
                 self.set_group(None)
+        self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
         self.fill_modes_list()

@@ -88,8 +88,8 @@ class Database:
             self.cursor.execute("SELECT * FROM categories WHERE type = ? AND group_id = ?", (type.value, group["id"],))
             rows = self.cursor.fetchall()
 
-            category_dict = {
-                row[0]: {
+            category_list = [
+                {
                     "id": row[0],
                     "name": row[1],
                     "type": row[2],
@@ -97,9 +97,9 @@ class Database:
                     "date": row[4],
                 }
                 for row in rows
-            }
+            ]
 
-            return category_dict
+            return category_list
         else:
             return {}
 

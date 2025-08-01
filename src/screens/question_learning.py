@@ -87,6 +87,8 @@ class QuestionLearningScreen(MDScreen):
 
 
     def create(self):
+        if self.app.root.get_screen("questionMenu").create_dropdown_menu:
+            self.app.root.get_screen("questionMenu").create_dropdown_menu.dismiss()
         CreateOrEditQuestionPopupMenu().open()
 
 
