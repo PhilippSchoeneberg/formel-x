@@ -12,6 +12,7 @@ from database.database import Database
 from utils.language_manager import LanguageManager
 from utils.json_parser import load_state, save_state
 
+import os
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.core.window import Window
@@ -81,6 +82,10 @@ class MainApp(MDApp):
 
 
     def build(self):
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(current_dir, "..", "assets", "logo20250712.png")
+        self.icon = os.path.normpath(icon_path)
+
         kv_files = [
             "src/main.kv",
             "src/screens/modes_menu.kv",
