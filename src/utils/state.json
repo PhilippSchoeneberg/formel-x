@@ -1,19 +1,19 @@
 {
     "dark_mode": true,
     "language": "de",
-    "logged_in_user_id": null,
+    "logged_in_user_id": 1,
     "logged_in_group": {
-        "id": 5,
+        "id": 6,
         "name": "a",
         "owner_id": 1,
-        "date": "2025-08-01 00:39:12"
+        "date": "2025-08-01 17:46:25"
     },
     "groups": [
         {
-            "id": 5,
+            "id": 6,
             "name": "a",
             "owner_id": 1,
-            "date": "2025-08-01 00:39:12"
+            "date": "2025-08-01 17:46:25"
         }
     ]
 }

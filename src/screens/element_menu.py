@@ -31,7 +31,10 @@ class ElementMenuScreen(Screen):
 
         self.ids.element_learning_list.clear_widgets()
 
-        self.headline = MDListItemHeadlineText(text=self.app.language_manager.translate("element_remembering_mode_list_text"))
+        self.headline = MDListItemHeadlineText(text=self.app.language_manager.translate("element_remembering_mode_list_text"),
+                                               max_lines=2)
+        self.headline.shorten = False
+        self.headline.ellipsize = False
         title_item = MDListItem(self.headline)
         title_item.ripple_effect = False
         title_item.focus_behavior = False

@@ -37,6 +37,15 @@ msgstr " sind uneinheitlich"
 msgid "incorrect_error"
 msgstr " ist falsch"
 
+msgid "no_groups_yet_error"
+msgstr "Es sind noch keine Gruppen registriert."
+
+msgid "no_categories_yet_error"
+msgstr "Es sind noch keine Kategorien registriert."
+
+msgid "no_entries_yet_error"
+msgstr "Es wurden keine Einträge gefunden, die Ihrer Suche entsprechen."
+
 msgid "edit"
 msgstr "Bearbeite "
 
@@ -44,10 +53,10 @@ msgid "delete"
 msgstr "Lösche "
 
 msgid "add"
-msgstr "Hinzufügen "
+msgstr "Ergänze "
 
 msgid "leave"
-msgstr "Verlassen "
+msgstr "Verlasse "
 
 msgid "delete_text"
 msgstr "Bist du dir sicher, dass sie folgendes löschen wollen: "
@@ -93,6 +102,15 @@ msgstr "Verbindungen"
 
 msgid "questions"
 msgstr "Fragen"
+
+msgid "sorry"
+msgstr "Entschuldigen Sie"
+
+msgid "add_element_to_learning_mode_hint"
+msgstr "Klicken Sie auf ein Element, um es zur Lernliste hinzuzufügen, und klicken Sie erneut darauf, um es zu entfernen."
+
+msgid "okay"
+msgstr "Okay"
 
 msgid "group"
 msgstr "Gruppe"
@@ -162,6 +180,9 @@ msgstr "Dritte falsche Formel"
 
 msgid "fourth_wrong_formula"
 msgstr "Vierte falsche Formel"
+
+msgid "difficulty"
+msgstr "Schwierigkeitsgrad"
 
 msgid "formula_to_name"
 msgstr "Formel zu Name"

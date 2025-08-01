@@ -31,7 +31,7 @@ class QuestionMenuScreen(Screen):
         question_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.question, self.app.logged_in_group)
 
         title_item = MDListItem(
-            MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category")))
+            MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category") + ":"))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
         self.ids.question_category_list.add_widget(title_item)
@@ -75,7 +75,7 @@ class QuestionMenuScreen(Screen):
             if self.app.logged_in_user_id:
                 self.ids.question_category_list.add_widget(
                     MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("create_hint")),
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("category")),
                         on_release=lambda _, cat_id=None: CreateOrEditCategoryPopupMenu().open(CategoryTypes.question, False)
                     )
                 )

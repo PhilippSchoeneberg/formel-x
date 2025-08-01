@@ -1,6 +1,5 @@
 from src.popups.add_group_popup_menu import AddGroupPopupMenu
 from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
-from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
 from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.utils.json_parser import save_state
 
@@ -26,7 +25,7 @@ class ModesMenuScreen(Screen):
 
         if self.app.logged_in_group:
             title_item = MDListItem(
-                MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("mode")))
+                MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("mode") + ":"))
             title_item.ripple_effect = False
             title_item.focus_behavior = False
             self.ids.mode_list.add_widget(title_item)
@@ -57,14 +56,14 @@ class ModesMenuScreen(Screen):
             if self.app.logged_in_user_id:
                 self.ids.mode_list.add_widget(
                     MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("create_hint")),
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("group")),
                         on_release=lambda _: self.create()
                     )
                 )
             else:
                 self.ids.mode_list.add_widget(
                     MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("add_hint")),
+                        MDListItemHeadlineText(text=self.app.language_manager.translate("add") + self.app.language_manager.translate("group")),
                         on_release=lambda _: AddGroupPopupMenu().open()
                     )
                 )
@@ -120,7 +119,7 @@ class ModesMenuScreen(Screen):
 
     def delete(self):
         if self.app.logged_in_group:
-            ConfirmDeletePopupMenu().open("Group", self.app.logged_in_group["name"], lambda: self.app.db.delete_group(self.app.logged_in_group), self.refresh_groups)
+            ConfirmDeletePopupMenu().open(self.app.language_manager.translate("group"), self.app.logged_in_group["name"], lambda: self.app.db.delete_group(self.app.logged_in_group), self.refresh_groups)
 
 
     def refresh_groups(self):

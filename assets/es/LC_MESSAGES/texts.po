@@ -37,6 +37,15 @@ msgstr " no coinciden."
 msgid "incorrect_error"
 msgstr " es incorrecto."
 
+msgid "no_groups_yet_error"
+msgstr "Aún no hay grupos registrados."
+
+msgid "no_entries_yet_error"
+msgstr "Aún no hay categorías registradas."
+
+msgid "no_entries_yet_error"
+msgstr "Aún no hay entradas que coincidan con tu búsqueda."
+
 msgid "edit"
 msgstr "Editar "
 
@@ -93,6 +102,15 @@ msgstr "compuestos"
 
 msgid "questions"
 msgstr "Preguntas"
+
+msgid "sorry"
+msgstr "Lo siento."
+
+msgid "add_element_to_learning_mode_hint"
+msgstr "Haga clic en un elemento para añadirlo a la lista de aprendizaje y vuelva a hacer clic en él para eliminarlo."
+
+msgid "okay"
+msgstr "Vale"
 
 msgid "group"
 msgstr "Grupo"
@@ -162,6 +180,9 @@ msgstr "Tercera fórmula errónea"
 
 msgid "fourth_wrong_formula"
 msgstr "Cuarta fórmula errónea"
+
+msgid "difficulty"
+msgstr "Dificultad"
 
 msgid "formula_to_name"
 msgstr "Fórmula para nombrar"

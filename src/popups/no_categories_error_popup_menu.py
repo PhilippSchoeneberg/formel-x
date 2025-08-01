@@ -11,7 +11,7 @@ class NoCategoriesErrorPopupMenu(MDDialog):
         self.app = App.get_running_app()
         self.action_function = None
 
-        self.error_label = MDLabel(text=self.app.language_manager.translate("no_categories_error"))
+        self.error_label = MDLabel(text=self.app.language_manager.translate("no_entries_yet_error"))
 
         content_box = MDBoxLayout(
             self.error_label,

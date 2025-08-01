@@ -37,6 +37,15 @@ msgstr " ne correspondent pas."
 msgid "incorrect_error"
 msgstr " est incorrect."
 
+msgid "no_groups_yet_error"
+msgstr "Aucun groupe n'est encore enregistré."
+
+msgid "no_categories_yet_error"
+msgstr "Aucune catégorie n'est encore enregistrée."
+
+msgid "no_entries_yet_error"
+msgstr "Aucune entrée correspondant à votre recherche n'a encore été enregistrée."
+
 msgid "edit"
 msgstr "Modifier "
 
@@ -93,6 +102,15 @@ msgstr "Composés"
 
 msgid "questions"
 msgstr "Questions"
+
+msgid "sorry"
+msgstr "Désolé"
+
+msgid "add_element_to_learning_mode_hint"
+msgstr "Cliquez sur un élément pour l'ajouter à la liste d'apprentissage et cliquez à nouveau dessus pour le supprimer."
+
+msgid "okay"
+msgstr "D'accord"
 
 msgid "group"
 msgstr "Groupe"
@@ -162,6 +180,9 @@ msgstr "Troisième formule erronée"
 
 msgid "fourth_wrong_formula"
 msgstr "Quatrième erreur Formule"
+
+msgid "difficulty"
+msgstr "Difficulté"
 
 msgid "formula_to_name"
 msgstr "Formule pour nommer"

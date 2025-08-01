@@ -37,6 +37,15 @@ msgstr " komen niet overeen."
 msgid "incorrect_error"
 msgstr " is onjuist."
 
+msgid "no_groups_yet_error"
+msgstr "Er zijn nog geen groepen geregistreerd."
+
+msgid "no_categories_yet_error"
+msgstr "Er zijn nog geen categorieën geregistreerd."
+
+msgid "no_entries_yet_error"
+msgstr "Er zijn nog geen resultaten gevonden die aan uw zoekopdracht voldoen."
+
 msgid "edit"
 msgstr "Bewerken "
 
@@ -93,6 +102,15 @@ msgstr "Verbindingen"
 
 msgid "questions"
 msgstr "Vragen"
+
+msgid "sorry"
+msgstr "Sorry"
+
+msgid "add_element_to_learning_mode_hint"
+msgstr "Klik op een element om het toe te voegen aan de leerlijst en klik er nogmaals op om het te verwijderen."
+
+msgid "okay"
+msgstr "Oké"
 
 msgid "group"
 msgstr "Groep"
@@ -162,6 +180,9 @@ msgstr "Derde verkeerde formule"
 
 msgid "fourth_wrong_formula"
 msgstr "Vierde verkeerde formule"
+
+msgid "difficulty"
+msgstr "Moeilijkheidsgraad"
 
 msgid "formula_to_name"
 msgstr "Formule om te benoemen"
