@@ -187,6 +187,15 @@ msgstr "Quatrième erreur Formule"
 msgid "difficulty"
 msgstr "Difficulté"
 
+msgid "easy"
+msgstr "Facile"
+
+msgid "medium"
+msgstr "Moyen"
+
+msgid "hard"
+msgstr "Difficile"
+
 msgid "formula_to_name"
 msgstr "Formule pour nommer"
 

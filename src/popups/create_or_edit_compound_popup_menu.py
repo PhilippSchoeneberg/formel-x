@@ -115,9 +115,9 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
         )
 
         self.wrong_formula2_hint_text = MDTextFieldHintText(
-            text=self.app.language_manager.translate("first_wrong_formula"))
+            text=self.app.language_manager.translate("second_wrong_formula"))
         self.wrong_formula2_helper_text = MDTextFieldHelperText(
-            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+            text=self.app.language_manager.translate("second_wrong_formula") + self.app.language_manager.translate(
                 "empty_error"), mode="on_error")
 
         self.wrong_formula_field2 = MDTextField(
@@ -130,9 +130,9 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
         )
 
         self.wrong_formula3_hint_text = MDTextFieldHintText(
-            text=self.app.language_manager.translate("first_wrong_formula"))
+            text=self.app.language_manager.translate("third_wrong_formula"))
         self.wrong_formula3_helper_text = MDTextFieldHelperText(
-            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+            text=self.app.language_manager.translate("third_wrong_formula") + self.app.language_manager.translate(
                 "empty_error"), mode="on_error")
 
         self.wrong_formula_field3 = MDTextField(
@@ -145,9 +145,9 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
         )
 
         self.wrong_formula4_hint_text = MDTextFieldHintText(
-            text=self.app.language_manager.translate("first_wrong_formula"))
+            text=self.app.language_manager.translate("fourth_wrong_formula"))
         self.wrong_formula4_helper_text = MDTextFieldHelperText(
-            text=self.app.language_manager.translate("first_wrong_formula") + self.app.language_manager.translate(
+            text=self.app.language_manager.translate("fourth_wrong_formula") + self.app.language_manager.translate(
                 "empty_error"), mode="on_error")
 
         self.wrong_formula_field4 = MDTextField(
@@ -267,14 +267,15 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound, self.app.logged_in_group)
-        return [
+        raw_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound, self.app.logged_in_group)
+        categories = [
             {
                 "text": category["name"],
                 "on_release": lambda x=category: self.set_category(x),
             }
-            for category in categories
+            for category in raw_categories
         ]
+        return sorted(categories, key=lambda x: x["text"])
 
 
     def set_category(self, category):

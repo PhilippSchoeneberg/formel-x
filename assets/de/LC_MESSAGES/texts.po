@@ -107,7 +107,7 @@ msgid "questions"
 msgstr "Fragen"
 
 msgid "sorry"
-msgstr "Entschuldigen Sie"
+msgstr "Entschuldigung"
 
 msgid "add_element_to_learning_mode_hint"
 msgstr "Klicken Sie auf ein Element, um es zur Lernliste hinzuzufügen, und klicken Sie erneut darauf, um es zu entfernen."
@@ -186,6 +186,15 @@ msgstr "Vierte falsche Formel"
 
 msgid "difficulty"
 msgstr "Schwierigkeitsgrad"
+
+msgid "easy"
+msgstr "Einfach"
+
+msgid "medium"
+msgstr "Mittel"
+
+msgid "hard"
+msgstr "Schwer"
 
 msgid "formula_to_name"
 msgstr "Formel zu Name"

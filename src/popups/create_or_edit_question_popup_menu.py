@@ -207,14 +207,16 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.question, self.app.logged_in_group)
-        return [
+        raw_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound,
+                                                                          self.app.logged_in_group)
+        categories = [
             {
                 "text": category["name"],
                 "on_release": lambda x=category: self.set_category(x),
             }
-            for category in categories
+            for category in raw_categories
         ]
+        return sorted(categories, key=lambda x: x["text"])
 
 
     def set_category(self, category):

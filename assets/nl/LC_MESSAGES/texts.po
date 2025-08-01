@@ -187,6 +187,15 @@ msgstr "Vierde verkeerde formule"
 msgid "difficulty"
 msgstr "Moeilijkheidsgraad"
 
+msgid "easy"
+msgstr "Eenvoudig"
+
+msgid "medium"
+msgstr "Gemiddeld"
+
+msgid "hard"
+msgstr "Hard"
+
 msgid "formula_to_name"
 msgstr "Formule om te benoemen"
 

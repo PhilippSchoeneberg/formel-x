@@ -3,17 +3,17 @@
     "language": "de",
     "logged_in_user_id": 1,
     "logged_in_group": {
-        "id": 16,
-        "name": "a",
+        "id": 2,
+        "name": "Auszubildene 1",
         "owner_id": 1,
-        "date": "2025-08-01 19:49:19"
+        "date": "2025-08-01 23:48:28"
     },
     "groups": [
         {
-            "id": 16,
-            "name": "a",
+            "id": 2,
+            "name": "Auszubildene 1",
             "owner_id": 1,
-            "date": "2025-08-01 19:49:19"
+            "date": "2025-08-01 23:48:28"
         }
     ]
 }

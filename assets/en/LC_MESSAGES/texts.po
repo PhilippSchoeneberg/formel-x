@@ -193,6 +193,15 @@ msgstr "Fourth wrong Formula"
 msgid "difficulty"
 msgstr "Difficulty"
 
+msgid "easy"
+msgstr "Easy"
+
+msgid "medium"
+msgstr "Medium"
+
+msgid "hard"
+msgstr "Hard"
+
 msgid "formula_to_name"
 msgstr "Formula to Name"
 

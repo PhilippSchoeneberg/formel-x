@@ -190,6 +190,15 @@ msgstr "Cuarta fórmula errónea"
 msgid "difficulty"
 msgstr "Dificultad"
 
+msgid "easy"
+msgstr "Fácil"
+
+msgid "medium"
+msgstr "Medio"
+
+msgid "hard"
+msgstr "Difícil"
+
 msgid "formula_to_name"
 msgstr "Fórmula para nombrar"
 
