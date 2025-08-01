@@ -24,7 +24,7 @@ class CompoundLearningScreen(MDScreen):
 
     def start_learning(self, category=None, difficulty=None):
         self.current_index = 0
-        self.compounds_to_learn = self.app.db.get_all_compounds_by_group(self.app.logged_in_group).values()
+        self.compounds_to_learn = self.app.db.get_all_compounds_by_group(self.app.logged_in_group)
         if category:
             self.compounds_to_learn = [
                 compound for compound in self.compounds_to_learn
@@ -61,10 +61,8 @@ class CompoundLearningScreen(MDScreen):
                 item.md_bg_color = [1, 0, 0, 0.3]
 
         def add_option(text, correct):
-            headline = MDListItemHeadlineText(text=text)
-            headline.font_name = "RobotoDownloaded"
             list_item = MDListItem(
-                headline,
+                MDListItemHeadlineText(text=text),
                 on_release=lambda item: on_clicked(list_item, correct)
             )
             self.ids.compound_learning_list.add_widget(list_item)

@@ -24,7 +24,7 @@ class QuestionLearningScreen(MDScreen):
 
     def start_learning(self, category=None, difficulty=None):
         self.current_index = 0
-        self.questions_to_learn = self.app.db.get_all_questions_by_group(self.app.logged_in_group).values()
+        self.questions_to_learn = self.app.db.get_all_questions_by_group(self.app.logged_in_group)
         if category:
             self.questions_to_learn = [
                 question for question in self.questions_to_learn

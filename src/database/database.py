@@ -117,8 +117,8 @@ class Database:
             self.cursor.execute("SELECT * FROM compounds WHERE group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
-            compound_dict = {
-                row[0]: {
+            compound_list = [
+                {
                     "id": row[0],
                     "correct_name": row[1],
                     "wrong_name1": row[2],
@@ -136,9 +136,9 @@ class Database:
                     "date": row[14],
                 }
                 for row in rows
-            }
+            ]
 
-            return compound_dict
+            return compound_list
         else:
             return {}
 
@@ -153,8 +153,8 @@ class Database:
             self.cursor.execute("SELECT * FROM questions WHERE group_id = ?", (group["id"],))
             rows = self.cursor.fetchall()
 
-            question_dict = {
-                row[0]: {
+            question_list = [
+                {
                     "id": row[0],
                     "question": row[1],
                     "correct_answer": row[2],
@@ -168,9 +168,9 @@ class Database:
                     "date": row[10],
                 }
                 for row in rows
-            }
+            ]
 
-            return question_dict
+            return question_list
         else:
             return {}
 

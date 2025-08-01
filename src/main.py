@@ -20,6 +20,7 @@ from kivy.core.text import LabelBase
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.screenmanager import ScreenManager
+from kivymd.font_definitions import theme_font_styles
 
 
 LabelBase.register(name="RobotoDownloaded", fn_regular="assets/Roboto-VariableFont_wdth,wght.ttf")
@@ -85,6 +86,11 @@ class MainApp(MDApp):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         icon_path = os.path.join(current_dir, "..", "assets", "logo20250712.png")
         self.icon = os.path.normpath(icon_path)
+
+        for style in theme_font_styles:
+            if style != "Icon":
+                for role in theme_font_styles[style]:
+                    theme_font_styles[style][role]["font-name"] = "RobotoDownloaded"
 
         kv_files = [
             "src/main.kv",
