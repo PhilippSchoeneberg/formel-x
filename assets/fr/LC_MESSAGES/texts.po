@@ -40,8 +40,11 @@ msgstr " est incorrect."
 msgid "no_groups_yet_error"
 msgstr "Aucun groupe n'est encore enregistré."
 
+msgid "no_elements_yet_error"
+msgstr "Aucun élément n'est encore enregistré pour l'apprentissage."
+
 msgid "no_categories_yet_error"
-msgstr "Aucune catégorie n'est encore enregistrée."
+msgstr "Ce groupe n'a encore aucune catégorie enregistrée dans ce mode."
 
 msgid "no_entries_yet_error"
 msgstr "Aucune entrée correspondant à votre recherche n'a encore été enregistrée."

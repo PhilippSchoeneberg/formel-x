@@ -1,3 +1,5 @@
+from src.popups.error_popup_menu import ErrorPopupMenu
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivymd.uix.button import MDButton, MDButtonText
@@ -135,8 +137,11 @@ class ElementMenuScreen(MDScreen):
 
     def start_learning(self):
         self.elements_to_learn = [element for element in self.app.db.get_all_elements_by_group(self.app.logged_in_group).values()]
-        self.current_index = 0
-        self.show_next_element()
+        if self.elements_to_learn:
+            self.current_index = 0
+            self.show_next_element()
+        else:
+            ErrorPopupMenu().open(self.app.language_manager.translate("no_elements_yet_error"))
 
 
     def show_next_element(self):

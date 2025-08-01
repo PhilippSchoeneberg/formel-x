@@ -38,10 +38,13 @@ msgid "incorrect_error"
 msgstr " is incorrect."
 
 msgid "no_groups_yet_error"
-msgstr "No groups registered yet"
+msgstr "No groups registered yet."
+
+msgid "no_elements_yet_error"
+msgstr "No elements registered for learning yet."
 
 msgid "no_categories_yet_error"
-msgstr "No categories registered yet"
+msgstr "This group does not yet have any registered categories in this mode."
 
 msgid "no_entries_yet_error"
 msgstr "No entries fitting your search registered yet"

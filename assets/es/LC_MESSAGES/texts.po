@@ -40,6 +40,12 @@ msgstr " es incorrecto."
 msgid "no_groups_yet_error"
 msgstr "Aún no hay grupos registrados."
 
+msgid "no_elements_yet_error"
+msgstr "Aún no hay elementos registrados para el aprendizaje."
+
+msgid "no_categories_yet_error"
+msgstr "Este grupo aún no tiene ninguna categoría registrada en este modo."
+
 msgid "no_entries_yet_error"
 msgstr "Aún no hay categorías registradas."
 

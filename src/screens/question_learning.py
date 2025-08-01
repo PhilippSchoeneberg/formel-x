@@ -1,6 +1,6 @@
 from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopupMenu
 from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
-from src.popups.no_categories_error_popup_menu import NoCategoriesErrorPopupMenu
+from src.popups.error_popup_menu import ErrorPopupMenu
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -36,7 +36,7 @@ class QuestionLearningScreen(MDScreen):
                 if question["difficulty"] == difficulty.value
             ]
         if not self.questions_to_learn:
-            NoCategoriesErrorPopupMenu().open(lambda: self.app.change_screen("questionMenu"))
+            ErrorPopupMenu().open(self.app.language_manager.translate("no_entries_yet_error"), lambda: self.app.change_screen("questionMenu"))
         else:
             self.app.change_screen("questionLearning")
             self.show_next_question()

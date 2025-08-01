@@ -73,14 +73,17 @@ class Database:
         self.cursor.execute("SELECT * FROM categories WHERE id = ?", (category_id,))
         row = self.cursor.fetchone()
 
-        category_dict = {
-            "id": row[0],
-            "name": row[1],
-            "type": row[2],
-            "group_id": row[3],
-            "date": row[4],
-        }
-        return category_dict
+        if row:
+            category_dict = {
+                "id": row[0],
+                "name": row[1],
+                "type": row[2],
+                "group_id": row[3],
+                "date": row[4],
+            }
+            return category_dict
+        else:
+            return None
 
 
     def get_all_categories_by_type_and_group(self, type, group):
@@ -181,13 +184,16 @@ class Database:
         self.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
         row = self.cursor.fetchone()
 
-        group_dict = {
-            "id": row[0],
-            "name": row[1],
-            "owner_id": row[2],
-            "date": row[3],
-        }
-        return group_dict
+        if row:
+            group_dict = {
+                "id": row[0],
+                "name": row[1],
+                "owner_id": row[2],
+                "date": row[3],
+            }
+            return group_dict
+        else:
+            return None
 
 
     def get_all_groups_by_owner_id(self, owner_id):

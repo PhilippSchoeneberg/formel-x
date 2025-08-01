@@ -40,8 +40,11 @@ msgstr " is onjuist."
 msgid "no_groups_yet_error"
 msgstr "Er zijn nog geen groepen geregistreerd."
 
+msgid "no_elements_yet_error"
+msgstr "Er zijn nog geen elementen geregistreerd voor het leren."
+
 msgid "no_categories_yet_error"
-msgstr "Er zijn nog geen categorieën geregistreerd."
+msgstr "Deze groep heeft nog geen geregistreerde categorieën in deze modus."
 
 msgid "no_entries_yet_error"
 msgstr "Er zijn nog geen resultaten gevonden die aan uw zoekopdracht voldoen."

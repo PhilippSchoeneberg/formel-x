@@ -6,6 +6,7 @@ from src.utils.json_parser import save_state
 from kivy.app import App
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
@@ -14,6 +15,7 @@ class ModesMenuScreen(MDScreen):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
         self.group_dropdown_menu = None
+        self.help_button = None
 
 
     def refresh(self):
@@ -22,6 +24,8 @@ class ModesMenuScreen(MDScreen):
 
     def fill_modes_list(self):
         self.ids.mode_list.clear_widgets()
+        if self.help_button:
+            self.remove_widget(self.help_button)
 
         if self.app.logged_in_group:
             title_item = MDListItem(
@@ -48,25 +52,24 @@ class ModesMenuScreen(MDScreen):
                 )
             )
         elif not self.app.groups:
-            error_item = MDListItem(
-                MDListItemHeadlineText(text=self.app.language_manager.translate("no_groups_yet_error")))
-            error_item.ripple_effect = False
-            error_item.focus_behavior = False
-            self.ids.mode_list.add_widget(error_item)
             if self.app.logged_in_user_id:
-                self.ids.mode_list.add_widget(
-                    MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("group")),
-                        on_release=lambda _: self.create()
-                    )
+                self.help_button = MDButton(
+                    MDButtonText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("group")),
+                    size_hint=(None, None),
+                    size=("150dp", "48dp"),
+                    pos_hint={"center_x": 0.5, "center_y": 0.5},
+                    on_release=lambda _: self.create()
                 )
+                self.add_widget(self.help_button)
             else:
-                self.ids.mode_list.add_widget(
-                    MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("add") + self.app.language_manager.translate("group")),
-                        on_release=lambda _: AddGroupPopupMenu().open()
-                    )
+                self.help_button = MDButton(
+                    MDButtonText(text=self.app.language_manager.translate("add") + self.app.language_manager.translate("group")),
+                    size_hint=(None, None),
+                    size=("150dp", "48dp"),
+                    pos_hint={"center_x": 0.5, "center_y": 0.5},
+                    on_release=lambda _: AddGroupPopupMenu().open()
                 )
+                self.add_widget(self.help_button)
 
 
     def group_menu_open(self):

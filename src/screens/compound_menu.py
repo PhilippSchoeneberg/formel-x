@@ -4,6 +4,7 @@ from src.utils.enums import CategoryTypes, DifficultyTypes
 
 from kivy.app import App
 from kivy.core.window import Window
+from kivymd.uix.label import MDLabel
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
@@ -17,6 +18,7 @@ class CompoundMenuScreen(MDScreen):
         self.difficulty_dropdown_menu = None
         self.create_dropdown_menu = None
         self.select_difficulty = None
+        self.helper_ui = None
 
 
     def on_pre_enter(self, *args):
@@ -30,16 +32,19 @@ class CompoundMenuScreen(MDScreen):
 
     def fill_category_list(self):
         self.ids.compound_category_list.clear_widgets()
+        if self.helper_ui:
+            self.remove_widget(self.helper_ui)
+
         compound_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound, self.app.logged_in_group)
         compound_categories = sorted(compound_categories, key=lambda x: x["name"])
 
-        title_item = MDListItem(
-            MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category") + ":"))
-        title_item.ripple_effect = False
-        title_item.focus_behavior = False
-        self.ids.compound_category_list.add_widget(title_item)
-
         if compound_categories:
+            title_item = MDListItem(
+                MDListItemHeadlineText(text=self.app.language_manager.translate("select") + self.app.language_manager.translate("category") + ":"))
+            title_item.ripple_effect = False
+            title_item.focus_behavior = False
+            self.ids.compound_category_list.add_widget(title_item)
+
             if len(compound_categories) >= 2:
                 button_text = MDButtonText(
                     text=self.app.language_manager.translate("select") + self.app.language_manager.translate(
@@ -68,17 +73,25 @@ class CompoundMenuScreen(MDScreen):
                 list_item.add_widget(button)
                 self.ids.compound_category_list.add_widget(list_item)
         else:
-            error_item = MDListItem(MDListItemHeadlineText(text=self.app.language_manager.translate("no_categories_yet_error")))
-            error_item.ripple_effect = False
-            error_item.focus_behavior = False
-            self.ids.compound_category_list.add_widget(error_item)
             if self.app.logged_in_user_id:
-                self.ids.compound_category_list.add_widget(
-                    MDListItem(
-                        MDListItemHeadlineText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("category")),
-                        on_release=lambda _, cat_id=None: CreateOrEditCategoryPopupMenu().open(CategoryTypes.compound, False)
-                    )
+                self.helper_ui = MDButton(
+                    MDButtonText(text=self.app.language_manager.translate("create") + self.app.language_manager.translate("category")),
+                    size_hint=(None, None),
+                    size=("150dp", "48dp"),
+                    pos_hint={"center_x": 0.5, "center_y": 0.5},
+                    on_release=lambda _, cat_id=None: CreateOrEditCategoryPopupMenu().open(CategoryTypes.compound, False)
                 )
+                self.add_widget(self.helper_ui)
+            else:
+                self.helper_ui = MDLabel(
+                    text=self.app.language_manager.translate("no_categories_yet_error"),
+                    size_hint=(None, None),
+                    size=("250", "48"),
+                    pos_hint={"center_x": 0.5, "center_y": 0.5},
+                    halign="center",
+                    valign="middle"
+                )
+                self.add_widget(self.helper_ui)
 
 
     def difficulty_menu_open(self, button, button_text):
