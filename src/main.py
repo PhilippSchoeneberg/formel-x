@@ -218,15 +218,12 @@ class MainApp(MDApp):
 
 
     def set_theme(self):
-        self.theme_cls.primary_palette = (
-            "Darkblue" if self.dark_mode else "Lightblue"
-        )
-        self.theme_cls.theme_style = (
-            "Dark" if self.dark_mode else "Light"
-        )
-        self.theme_icon = (
-            "weather-sunny" if self.dark_mode else "weather-night"
-        )
+        self.theme_cls.primary_palette = "Darkblue" if self.dark_mode else "Lightblue"
+        self.theme_cls.theme_style = "Dark" if self.dark_mode else "Light"
+        self.theme_icon = "weather-sunny" if self.dark_mode else "weather-night"
+        bg_color = (18 / 255, 18 / 255, 18 / 255, 1) if self.dark_mode else (1, 1, 1, 1)
+        for screen in self.screens:
+            screen.md_bg_color = bg_color
 
 
     def language_menu_open(self):
@@ -264,5 +261,4 @@ class MainApp(MDApp):
         self.general_dropdown_menu.dismiss()
 
 
-#app.theme_cls.backgroundColor
 MainApp().run()

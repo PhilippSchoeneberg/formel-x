@@ -1,14 +1,14 @@
 from kivy.app import App
 from kivy.clock import Clock
 from kivymd.uix.button import MDButton, MDButtonText
-from kivymd.uix.screen import Screen
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
 
 
-class ElementMenuScreen(Screen):
+class ElementMenuScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()

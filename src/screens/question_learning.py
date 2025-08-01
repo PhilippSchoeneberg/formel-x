@@ -4,11 +4,11 @@ from src.popups.no_categories_error_popup_menu import NoCategoriesErrorPopupMenu
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.uix.screenmanager import Screen
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class QuestionLearningScreen(Screen):
+class QuestionLearningScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()

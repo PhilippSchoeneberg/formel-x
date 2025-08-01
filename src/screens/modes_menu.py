@@ -4,12 +4,12 @@ from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.utils.json_parser import save_state
 
 from kivy.app import App
-from kivy.uix.screenmanager import Screen
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class ModesMenuScreen(Screen):
+class ModesMenuScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()

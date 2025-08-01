@@ -4,13 +4,13 @@ from src.utils.enums import CategoryTypes, DifficultyTypes
 
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.uix.screenmanager import Screen
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class CompoundMenuScreen(Screen):
+class CompoundMenuScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
