@@ -1,6 +1,6 @@
-from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
-from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
 from src.utils.enums import CategoryTypes, DifficultyTypes
+from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
+from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
 
 from kivy.app import App
 from kivymd.uix.label import MDLabel

@@ -1,11 +1,11 @@
-from src.popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPopupMenu
 from src.popups.add_group_popup_menu import AddGroupPopupMenu
+from src.popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPopupMenu
 
 from screens.modes_menu import ModesMenuScreen
+from screens.question_menu import QuestionMenuScreen
 from screens.element_menu import ElementMenuScreen
 from screens.compound_menu import CompoundMenuScreen
 from screens.compound_learning import CompoundLearningScreen
-from screens.question_menu import QuestionMenuScreen
 from screens.question_learning import QuestionLearningScreen
 
 from database.database import Database

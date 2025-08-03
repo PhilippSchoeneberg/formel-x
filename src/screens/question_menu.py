@@ -1,12 +1,12 @@
-from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
-from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
 from src.utils.enums import CategoryTypes, DifficultyTypes
+from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
+from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
 
 from kivy.app import App
 from kivymd.uix.label import MDLabel
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 

@@ -1,6 +1,6 @@
-from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopupMenu
-from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.popups.error_popup_menu import ErrorPopupMenu
+from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
+from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopupMenu
 
 from kivy.app import App
 from kivy.clock import Clock
