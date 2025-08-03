@@ -3,11 +3,10 @@ from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
 from src.utils.enums import CategoryTypes, DifficultyTypes
 
 from kivy.app import App
-from kivy.core.window import Window
 from kivymd.uix.label import MDLabel
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
+from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
@@ -115,19 +114,7 @@ class CompoundMenuScreen(MDScreen):
         self.app.compound_learning_screen.start_learning(category_id, self.select_difficulty)
 
 
-    def create(self):
-        create_button = MDIconButton(
-            opacity=0,
-            size_hint=(None, None),
-            size=("1dp", "1dp"),
-        )
-
-        screen = self.app.root.get_screen(self.app.root.current)
-        screen.add_widget(create_button)
-
-        mouse_x, mouse_y = Window.mouse_pos
-        create_button.pos = (mouse_x, mouse_y - 40)
-
+    def create(self, original_caller):
         add_menu_items = [
             {
                 "text": self.app.language_manager.translate("add_category"),
@@ -139,9 +126,11 @@ class CompoundMenuScreen(MDScreen):
             },
         ]
         self.create_dropdown_menu = MDDropdownMenu(
-            caller=create_button,
+            caller=original_caller,
             items=add_menu_items
         )
+        if self.app.general_dropdown_menu:
+            self.app.general_dropdown_menu.dismiss()
         self.create_dropdown_menu.open()
 
 

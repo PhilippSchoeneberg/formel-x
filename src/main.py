@@ -15,9 +15,7 @@ from utils.json_parser import load_state, save_state
 import os
 from kivymd.app import MDApp
 from kivy.lang import Builder
-from kivy.core.window import Window
 from kivy.core.text import LabelBase
-from kivymd.uix.button import MDIconButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.screenmanager import ScreenManager
 from kivymd.font_definitions import theme_font_styles
@@ -168,6 +166,7 @@ class MainApp(MDApp):
 
 
     def general_menu_open(self):
+        caller = self.root.get_screen(self.root.current).ids.general_menu_button
         general_menu_items = [
             {
                 "leading_icon": self.theme_icon,
@@ -177,7 +176,7 @@ class MainApp(MDApp):
             {
                 "leading_icon": "translate",
                 "text": self.language_manager.translate("language"),
-                "on_release": lambda: self.language_menu_open(),
+                "on_release": lambda: self.language_menu_open(caller),
             },
         ]
 
@@ -186,7 +185,7 @@ class MainApp(MDApp):
                 {
                     "leading_icon": "plus-circle",
                     "text": self.language_manager.translate("create"),
-                    "on_release": lambda: self.root.get_screen(self.root.current).create(),
+                    "on_release": lambda: self.root.get_screen(self.root.current).create(caller),
                 },
                 {
                     "leading_icon": "border-color",
@@ -214,7 +213,7 @@ class MainApp(MDApp):
             ]
 
         self.general_dropdown_menu = MDDropdownMenu(
-            caller=self.root.get_screen(self.root.current).ids.general_menu_button,
+            caller=caller,
             items=general_menu_items
         )
         self.general_dropdown_menu.open()
@@ -237,27 +236,16 @@ class MainApp(MDApp):
             screen.md_bg_color = bg_color
 
 
-    def language_menu_open(self):
-        select_language_button = MDIconButton(
-            opacity=0,
-            size_hint=(None, None),
-            size=("1dp", "1dp"),
-        )
-
-        screen = self.root.get_screen(self.root.current)
-        screen.add_widget(select_language_button)
-
-        mouse_x, mouse_y = Window.mouse_pos
-        select_language_button.pos = (mouse_x, mouse_y - 40)
-
+    def language_menu_open(self, original_caller):
         language_menu_items = []
         for language in self.language_manager.get_available_languages():
             language_menu_items.append({"text": language,
                                      "on_release": lambda x=language: self.set_language(x)})
         self.language_dropdown_menu = MDDropdownMenu(
-            caller=select_language_button,
+            caller=original_caller,
             items=language_menu_items
         )
+        self.general_dropdown_menu.dismiss()
         self.language_dropdown_menu.open()
 
 
@@ -269,7 +257,6 @@ class MainApp(MDApp):
         for screen in self.screens:
             screen.refresh()
         self.language_dropdown_menu.dismiss()
-        self.general_dropdown_menu.dismiss()
 
 
 MainApp().run()

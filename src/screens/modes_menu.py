@@ -111,7 +111,7 @@ class ModesMenuScreen(MDScreen):
             self.refresh_groups()
 
 
-    def create(self):
+    def create(self, *args):
         CreateOrEditGroupPopupMenu().open()
 
 
