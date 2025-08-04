@@ -1,4 +1,3 @@
-import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivymd.uix.menu import MDDropdownMenu
@@ -89,14 +88,15 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
 
 
     def get_category_items(self):
-        categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
-        return [
+        raw_categories = self.app.db.get_all_categories_by_type_and_group(self.category_type, self.app.logged_in_group)
+        categories = [
             {
                 "text": category["name"],
                 "on_release": lambda x=category: self.set_category(x),
             }
-            for category in categories
+            for category in raw_categories
         ]
+        return sorted(categories, key=lambda x: x["text"])
 
 
     def set_category(self, category):
@@ -109,7 +109,6 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
     def add_category(self, *args, **kwargs):
         name = self.name_field.text.strip()
         category = self.selected_category
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         valid = True
 
         if not name:
@@ -128,23 +127,16 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
 
         if not self.edit:
             if valid:
-                self.app.db.cursor.execute(
-                    "INSERT INTO categories (name, type, group_id, date) VALUES (?, ?, ?, ?)",
-                    (name, self.category_type.value, self.app.logged_in_group["id"], date)
-                )
-                self.app.db.connection.commit()
+                self.app.db.create_category(name, self.category_type, self.app.logged_in_group)
                 self.app.root.get_screen(self.app.root.current).fill_category_list()
                 self.dismiss()
         else:
             if not category:
                 valid = False
             if valid:
-                self.app.db.cursor.execute(
-                    "UPDATE categories SET name = ?, type = ?, group_id = ?, date = ? WHERE id = ?",
-                    (name, self.category_type.value, self.app.logged_in_group["id"], date, category["id"])
-                )
-                self.app.db.connection.commit()
+                self.app.db.update_category(category["id"], name, self.category_type, self.app.logged_in_group)
                 self.app.compound_menu_screen.fill_category_list()
+                self.app.question_menu_screen.fill_category_list()
                 self.dismiss()
 
 
@@ -153,4 +145,5 @@ class CreateOrEditCategoryPopupMenu(MDDialog):
         self.name_field.text = ""
         self.name_field.error = False
         self.selected_category = None
+        self.category_type = None
         super().dismiss()

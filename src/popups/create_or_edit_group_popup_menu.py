@@ -1,4 +1,3 @@
-import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -63,7 +62,6 @@ class CreateOrEditGroupPopupMenu(MDDialog):
 
     def create_group(self, *args, **kwargs):
         name = self.name_field.text.strip()
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not name:
@@ -75,25 +73,17 @@ class CreateOrEditGroupPopupMenu(MDDialog):
             self.name_field.error = False
 
         if valid:
-            self.app.db.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
-            result = self.app.db.cursor.fetchone()
-            if result:
+            group = self.app.db.get_group_by_name(name)
+            if group:
                 self.name_helper_text.text = self.app.language_manager.translate("group_name") + self.app.language_manager.translate("already_exists_error")
                 self.name_field.error = False
                 self.name_field.error = True
             else:
                 if not self.group:
-                    self.app.db.cursor.execute(
-                        "INSERT INTO groups (name, owner_id, date) VALUES (?, ?, ?)",
-                        (name, self.app.logged_in_user_id, date)
-                    )
+                    self.app.db.create_group(name, self.app.logged_in_user_id)
                 else:
-                    self.app.db.cursor.execute(
-                        "UPDATE groups SET name = ?, owner_id = ?, date = ? WHERE id = ?",
-                        (name, self.app.logged_in_user_id, date, self.group["id"])
-                    )
+                    self.app.db.update_group(self.group["id"], name, self.app.logged_in_user_id)
                 self.app.modes_menu_screen.refresh_groups()
-                self.app.db.connection.commit()
                 self.dismiss()
 
 

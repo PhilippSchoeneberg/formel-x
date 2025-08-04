@@ -1,6 +1,5 @@
 from src.utils.enums import CategoryTypes, DifficultyTypes
 
-import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -256,7 +255,6 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
         wrong_answer4 = self.wrong_answer_field4.text.strip()
         category = self.selected_category
         difficulty = self.selected_difficulty
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not correct_answer:
@@ -285,17 +283,10 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
 
         if valid:
             if not self.question:
-                self.app.db.cursor.execute(
-                    "INSERT INTO questions (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty.value, category["id"], self.app.logged_in_group["id"], date)
-                )
+                self.app.db.create_question(question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category, self.app.logged_in_group)
             else:
-                self.app.db.cursor.execute(
-                    "UPDATE questions SET question = ?, correct_answer = ?, wrong_answer1 = ?, wrong_answer2 = ?, wrong_answer3 = ?, wrong_answer4 = ?, difficulty = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
-                    (question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty.value, category["id"], self.app.logged_in_group["id"], date, self.question["id"])
-                )
+                self.app.db.update_question(self.question["id"], question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category, self.app.logged_in_group)
                 self.action_function()
-            self.app.db.connection.commit()
             self.dismiss()
 
 

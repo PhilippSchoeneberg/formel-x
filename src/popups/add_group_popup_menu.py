@@ -72,7 +72,6 @@ class AddGroupPopupMenu(MDDialog):
                     self.app.state["groups"] = self.app.groups
                     save_state(self.state)
                     self.app.modes_menu_screen.refresh_groups()
-                    self.app.db.connection.commit()
                     self.dismiss()
                 else:
                     self.name_helper_text.text = self.app.language_manager.translate("group") + self.app.language_manager.translate("already_added_error")

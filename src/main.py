@@ -58,7 +58,7 @@ class MainApp(MDApp):
         self.language_manager = LanguageManager(self.language)
 
         # Instantiate database
-        self.db = Database()
+        self.db = Database("https://jbweqnndqbvbsorzngff.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impid2Vxbm5kcWJ2YnNvcnpuZ2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMjEzNzcsImV4cCI6MjA2OTg5NzM3N30.Fkno72iJDHwY4bq0EPd2GHadTqdwqDuvnrFoeREAIQU")
 
         # Instantiate screens
         self.modes_menu_screen = None

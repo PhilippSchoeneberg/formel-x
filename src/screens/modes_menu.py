@@ -132,9 +132,7 @@ class ModesMenuScreen(MDScreen):
         else:
             self.app.groups = self.app.state["groups"]
             for group in self.app.groups:
-                self.app.db.cursor.execute("SELECT * FROM groups WHERE id = ?", (group["id"],))
-                result = self.app.db.cursor.fetchone()
-                if not result:
+                if not self.app.db.group_exists_by_id(group["id"]):
                     self.remove(group)
         if self.app.logged_in_group not in self.app.groups:
             if self.app.groups:

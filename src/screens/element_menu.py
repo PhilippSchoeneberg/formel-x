@@ -32,7 +32,7 @@ class ElementMenuScreen(MDScreen):
     def fill_periodic_table(self, *args):
         self.buttons = []
         self.elements = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
-        self.element_symbols = [element["symbol"] for element in self.elements.values()]
+        self.element_symbols = [element["symbol"] for element in self.elements]
 
         self.ids.element_learning_list.clear_widgets()
 
@@ -109,7 +109,7 @@ class ElementMenuScreen(MDScreen):
 
     def refresh_buttons(self):
         self.elements = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
-        self.element_symbols = [element["symbol"] for element in self.elements.values()]
+        self.element_symbols = [element["symbol"] for element in self.elements]
         for button in self.buttons:
             if not self.app.learning_mode:
                 button["text"].text_color = [0.7490196078431373, 0.7607843137254902, 1.0, 1.0]
@@ -139,7 +139,7 @@ class ElementMenuScreen(MDScreen):
 
 
     def start_learning(self):
-        self.elements_to_learn = [element for element in self.app.db.get_all_elements_by_group(self.app.logged_in_group).values()]
+        self.elements_to_learn = self.app.db.get_all_elements_by_group(self.app.logged_in_group)
         random.shuffle(self.elements_to_learn)
 
         if self.elements_to_learn:
@@ -147,6 +147,7 @@ class ElementMenuScreen(MDScreen):
             self.show_next_element()
         else:
             ErrorPopupMenu().open(self.app.language_manager.translate("no_elements_yet_error"))
+            self.set_learning_mode(not self.app.learning_mode)
 
 
     def show_next_element(self):

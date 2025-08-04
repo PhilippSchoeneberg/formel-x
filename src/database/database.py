@@ -1,225 +1,323 @@
-import datetime
-import sqlite3
+from supabase import create_client, Client
 
 
 class Database:
-    def __init__(self, db_path="src/database/formulaX.db"):
-        self.connection = sqlite3.connect(db_path)
-        self.cursor = self.connection.cursor()
+    def __init__(self, url, key):
+        self.supabase: Client = create_client(url, key)
 
 
-    def fill_elements_table(self):
-        with open("src/database/insert_elements.sql", "r", encoding="utf-8") as f:
-            sql_script = f.read()
-            self.cursor.executescript(sql_script)
-        self.connection.commit()
+    def create_account(self, email, password):
+        self.supabase.table("accounts").insert({
+            "email": email,
+            "password": password,
+        }).execute()
+
+
+    def get_account_by_email(self, email):
+        response = self.supabase.table("accounts").select("*").eq("email", email).limit(1).execute()
+        if response.data:
+            row = response.data[0]
+            return {
+                "id": row["id"],
+                "email": row["email"],
+                "password": row["password"],
+                "date": row["date"],
+            }
+        return None
+
+
+    def create_group(self, name, owner_id):
+        self.supabase.table("groups").insert({
+            "name": name,
+            "owner_id": owner_id,
+        }).execute()
+
+
+    def update_group(self, id, name, owner_id):
+        group = {
+            "id": id,
+            "name": name,
+            "owner_id": owner_id,
+        }
+        response = self.supabase.table("groups").update(group).eq("id", group["id"]).execute()
+        return bool(response.data)
+
+
+    def group_exists_by_id(self, group_id):
+        response = self.supabase.table("groups").select("id").eq("id", group_id).limit(1).execute()
+        return len(response.data or []) > 0
+
+
+    def get_group_by_name(self, name):
+        response = self.supabase.table("groups").select("*").eq("name", name).limit(1).execute()
+        if response.data:
+            row = response.data[0]
+            return {
+                "id": row["id"],
+                "name": row["name"],
+                "owner_id": row["owner_id"],
+                "date": row["date"],
+            }
+        return None
+
+
+    def get_all_groups_by_owner_id(self, owner_id):
+        response = self.supabase.table("groups").select("*").eq("owner_id", owner_id).execute()
+
+        return [
+            {
+                "id": row["id"],
+                "name": row["name"],
+                "owner_id": row["owner_id"],
+                "date": row["date"],
+            }
+            for row in response.data or []
+        ]
+
+
+    def delete_group(self, group):
+        gid = group["id"]
+        self.supabase.table("elements_to_groups").delete().eq("group_id", gid).execute()
+        self.supabase.table("categories").delete().eq("group_id", gid).execute()
+        self.supabase.table("compounds").delete().eq("group_id", gid).execute()
+        self.supabase.table("questions").delete().eq("group_id", gid).execute()
+        self.supabase.table("groups").delete().eq("id", gid).execute()
 
 
     def get_all_elements(self):
-        self.cursor.execute("SELECT * FROM elements")
-        rows = self.cursor.fetchall()
+        response = self.supabase.table("elements").select("*").execute()
+        rows = response.data or []
 
-        element_dict = {
-            row[0]: {
-                "symbol": row[0],
-                "name": row[1],
-                "system_group": row[2],
-                "system_period": row[3],
+        return {
+            row["symbol"]: {
+                "symbol": row["symbol"],
+                "name": row["name"],
+                "system_group": row["system_group"],
+                "system_period": row["system_period"],
             }
             for row in rows
         }
 
-        return element_dict
-
 
     def link_element_to_group(self, element, group):
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.cursor.execute(
-            "INSERT INTO elements_to_groups (symbol, group_id, date) VALUES (?, ?, ?)",
-            (element["symbol"], group["id"], date)
-        )
-        self.connection.commit()
+        self.supabase.table("elements_to_groups").insert({
+            "symbol": element["symbol"],
+            "group_id": group["id"],
+        }).execute()
 
 
     def unlink_element_to_group(self, element, group):
-        self.cursor.execute(
-            "DELETE FROM elements_to_groups WHERE symbol = ? AND group_id = ?",
-            (element["symbol"], group["id"])
-        )
-        self.connection.commit()
+        self.supabase.table("elements_to_groups") \
+            .delete() \
+            .eq("symbol", element["symbol"]) \
+            .eq("group_id", group["id"]) \
+            .execute()
 
 
     def get_all_elements_by_group(self, group):
-        if group:
-            self.cursor.execute("SELECT elements.symbol, elements.name, elements.system_group, elements.system_period FROM elements_to_groups LEFT OUTER JOIN elements ON elements_to_groups.symbol = elements.symbol WHERE elements_to_groups.group_id = ?", (group["id"],))
-            rows = self.cursor.fetchall()
+        if not group:
+            return []
 
-            category_dict = {
-                row[0]: {
-                    "symbol": row[0],
-                    "name": row[1],
-                    "group_id": row[2],
-                    "period": row[3],
-                }
-                for row in rows
+        response = self.supabase \
+            .table("elements_to_groups") \
+            .select("symbol, date, elements(symbol, name, system_group, system_period)") \
+            .eq("group_id", group["id"]) \
+            .execute()
+
+        rows = response.data or []
+
+        return [
+            {
+                "symbol": row["symbol"],
+                "name": row["elements"]["name"],
+                "system_group": row["elements"]["system_group"],
+                "system_period": row["elements"]["system_period"],
             }
+            for row in rows if row.get("elements")
+        ]
 
-            return category_dict
-        else:
-            return {}
+
+    def create_category(self, name, category_type, group):
+        self.supabase.table("categories").insert({
+            "name": name,
+            "type": category_type.value,
+            "group_id": group["id"],
+        }).execute()
+
+
+    def update_category(self, id, name, category_type, group):
+        category = {
+            "id": id,
+            "name": name,
+            "type": category_type.value,
+            "group_id": group["id"],
+        }
+        response = self.supabase.table("categories").update(category).eq("id", category["id"]).execute()
+        return bool(response.data)
 
 
     def get_category_by_id(self, category_id):
-        self.cursor.execute("SELECT * FROM categories WHERE id = ?", (category_id,))
-        row = self.cursor.fetchone()
-
-        if row:
-            category_dict = {
-                "id": row[0],
-                "name": row[1],
-                "type": row[2],
-                "group_id": row[3],
-                "date": row[4],
+        response = self.supabase.table("categories").select("*").eq("id", category_id).limit(1).execute()
+        if response.data:
+            row = response.data[0]
+            return {
+                "id": row["id"],
+                "name": row["name"],
+                "type": row["type"],
+                "group_id": row["group_id"],
+                "date": row["date"],
             }
-            return category_dict
-        else:
-            return None
+        return None
 
 
     def get_all_categories_by_type_and_group(self, type, group):
-        if group:
-            self.cursor.execute("SELECT * FROM categories WHERE type = ? AND group_id = ?", (type.value, group["id"],))
-            rows = self.cursor.fetchall()
-
-            category_list = [
-                {
-                    "id": row[0],
-                    "name": row[1],
-                    "type": row[2],
-                    "group_id": row[3],
-                    "date": row[4],
-                }
-                for row in rows
-            ]
-
-            return category_list
-        else:
+        if not group:
             return {}
+
+        response = self.supabase.table("categories").select("*") \
+            .eq("type", type.value).eq("group_id", group["id"]).execute()
+
+        return [
+            {
+                "id": row["id"],
+                "name": row["name"],
+                "type": row["type"],
+                "group_id": row["group_id"],
+                "date": row["date"],
+            }
+            for row in response.data or []
+        ]
 
 
     def delete_category(self, category):
-        self.cursor.execute("DELETE FROM categories WHERE id = ?", (category["id"],))
-        self.connection.commit()
+        self.supabase.table("categories").delete().eq("id", category["id"]).execute()
+
+
+    def create_compound(self, correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty, category, group):
+        self.supabase.table("compounds").insert({
+            "correct_name": correct_name,
+            "wrong_name1": wrong_name1,
+            "wrong_name2": wrong_name2,
+            "wrong_name3": wrong_name3,
+            "wrong_name4": wrong_name4,
+            "correct_formula": correct_formula,
+            "wrong_formula1": wrong_formula1,
+            "wrong_formula2": wrong_formula2,
+            "wrong_formula3": wrong_formula3,
+            "wrong_formula4": wrong_formula4,
+            "difficulty": difficulty.value,
+            "category_id": category["id"],
+            "group_id": group["id"],
+        }).execute()
+
+
+    def update_compound(self, id, correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty, category, group):
+        compound = {
+            "id": id,
+            "correct_name": correct_name,
+            "wrong_name1": wrong_name1,
+            "wrong_name2": wrong_name2,
+            "wrong_name3": wrong_name3,
+            "wrong_name4": wrong_name4,
+            "correct_formula": correct_formula,
+            "wrong_formula1": wrong_formula1,
+            "wrong_formula2": wrong_formula2,
+            "wrong_formula3": wrong_formula3,
+            "wrong_formula4": wrong_formula4,
+            "difficulty": difficulty.value,
+            "category_id": category["id"],
+            "group_id": group["id"],
+        }
+        response = self.supabase.table("compounds").update(compound).eq("id", compound["id"]).execute()
+        return bool(response.data)
 
 
     def get_all_compounds_by_group(self, group):
-        if group:
-            self.cursor.execute("SELECT * FROM compounds WHERE group_id = ?", (group["id"],))
-            rows = self.cursor.fetchall()
-
-            compound_list = [
-                {
-                    "id": row[0],
-                    "correct_name": row[1],
-                    "wrong_name1": row[2],
-                    "wrong_name2": row[3],
-                    "wrong_name3": row[4],
-                    "wrong_name4": row[5],
-                    "correct_formula": row[6],
-                    "wrong_formula1": row[7],
-                    "wrong_formula2": row[8],
-                    "wrong_formula3": row[9],
-                    "wrong_formula4": row[10],
-                    "difficulty": row[11],
-                    "category_id": row[12],
-                    "group_id": row[13],
-                    "date": row[14],
-                }
-                for row in rows
-            ]
-
-            return compound_list
-        else:
+        if not group:
             return {}
+
+        response = self.supabase.table("compounds").select("*").eq("group_id", group["id"]).execute()
+
+        return [
+            {
+                "id": row["id"],
+                "correct_name": row["correct_name"],
+                "wrong_name1": row["wrong_name1"],
+                "wrong_name2": row["wrong_name2"],
+                "wrong_name3": row["wrong_name3"],
+                "wrong_name4": row["wrong_name4"],
+                "correct_formula": row["correct_formula"],
+                "wrong_formula1": row["wrong_formula1"],
+                "wrong_formula2": row["wrong_formula2"],
+                "wrong_formula3": row["wrong_formula3"],
+                "wrong_formula4": row["wrong_formula4"],
+                "difficulty": row["difficulty"],
+                "category_id": row["category_id"],
+                "group_id": row["group_id"],
+                "date": row["date"],
+            }
+            for row in response.data or []
+        ]
 
 
     def delete_compound(self, compound):
-        self.cursor.execute("DELETE FROM compounds WHERE id = ?", (compound["id"],))
-        self.connection.commit()
+        self.supabase.table("compounds").delete().eq("id", compound["id"]).execute()
+
+
+    def create_question(self, question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category, group):
+        self.supabase.table("questions").insert({
+            "question": question,
+            "correct_answer": correct_answer,
+            "wrong_answer1": wrong_answer1,
+            "wrong_answer2": wrong_answer2,
+            "wrong_answer3": wrong_answer3,
+            "wrong_answer4": wrong_answer4,
+            "difficulty": difficulty.value,
+            "category_id": category["id"],
+            "group_id": group["id"],
+        }).execute()
+
+
+    def update_question(self, id, question, correct_answer, wrong_answer1, wrong_answer2, wrong_answer3, wrong_answer4, difficulty, category, group):
+        question = {
+            "id": id,
+            "question": question,
+            "correct_answer": correct_answer,
+            "wrong_answer1": wrong_answer1,
+            "wrong_answer2": wrong_answer2,
+            "wrong_answer3": wrong_answer3,
+            "wrong_answer4": wrong_answer4,
+            "difficulty": difficulty.value,
+            "category_id": category["id"],
+            "group_id": group["id"],
+        }
+        response = self.supabase.table("questions").update(question).eq("id", question["id"]).execute()
+        return bool(response.data)
 
 
     def get_all_questions_by_group(self, group):
-        if group:
-            self.cursor.execute("SELECT * FROM questions WHERE group_id = ?", (group["id"],))
-            rows = self.cursor.fetchall()
-
-            question_list = [
-                {
-                    "id": row[0],
-                    "question": row[1],
-                    "correct_answer": row[2],
-                    "wrong_answer1": row[3],
-                    "wrong_answer2": row[4],
-                    "wrong_answer3": row[5],
-                    "wrong_answer4": row[6],
-                    "difficulty": row[7],
-                    "category_id": row[8],
-                    "group_id": row[9],
-                    "date": row[10],
-                }
-                for row in rows
-            ]
-
-            return question_list
-        else:
+        if not group:
             return {}
+
+        response = self.supabase.table("questions").select("*").eq("group_id", group["id"]).execute()
+
+        return [
+            {
+                "id": row["id"],
+                "question": row["question"],
+                "correct_answer": row["correct_answer"],
+                "wrong_answer1": row["wrong_answer1"],
+                "wrong_answer2": row["wrong_answer2"],
+                "wrong_answer3": row["wrong_answer3"],
+                "wrong_answer4": row["wrong_answer4"],
+                "difficulty": row["difficulty"],
+                "category_id": row["category_id"],
+                "group_id": row["group_id"],
+                "date": row["date"],
+            }
+            for row in response.data or []
+        ]
 
 
     def delete_question(self, question):
-        self.cursor.execute("DELETE FROM questions WHERE id = ?", (question["id"],))
-        self.connection.commit()
-
-
-    def get_group_by_name(self, name):
-        self.cursor.execute("SELECT * FROM groups WHERE name = ?", (name,))
-        row = self.cursor.fetchone()
-
-        if row:
-            group_dict = {
-                "id": row[0],
-                "name": row[1],
-                "owner_id": row[2],
-                "date": row[3],
-            }
-            return group_dict
-        else:
-            return None
-
-
-    def get_all_groups_by_owner_id(self, owner_id):
-        self.cursor.execute("SELECT * FROM groups WHERE owner_id = ?", (owner_id,))
-        rows = self.cursor.fetchall()
-        group_list = []
-
-        for row in rows:
-            group_list.append({
-                "id": row[0],
-                "name": row[1],
-                "owner_id": row[2],
-                "date": row[3],
-            })
-
-        return group_list
-
-
-    def delete_group(self, group):
-        self.cursor.execute("DELETE FROM elements_to_groups WHERE group_id = ?", (group["id"],))
-        self.cursor.execute("DELETE FROM categories WHERE group_id = ?", (group["id"],))
-        self.cursor.execute("DELETE FROM compounds WHERE group_id = ?", (group["id"],))
-        self.cursor.execute("DELETE FROM questions WHERE group_id = ?", (group["id"],))
-        self.cursor.execute("DELETE FROM groups WHERE id = ?", (group["id"],))
-        self.connection.commit()
-
-
-    def close(self):
-        self.connection.close()
+        self.supabase.table("questions").delete().eq("id", question["id"]).execute()

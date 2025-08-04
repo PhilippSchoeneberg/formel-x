@@ -1,5 +1,4 @@
 import bcrypt
-import datetime
 from kivy.app import App
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDButton, MDButtonText
@@ -110,11 +109,9 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
 
         if not self.register_mode:
             if valid:
-                self.app.db.cursor.execute("SELECT id, password FROM accounts WHERE email = ?", (email,))
-                result = self.app.db.cursor.fetchone()
-                if result and bcrypt.checkpw(password.encode("utf-8"), result[1].encode("utf-8")):
-                    self.app.db.connection.commit()
-                    self.app.login(result[0])
+                account = self.app.db.get_account_by_email(email)
+                if account and bcrypt.checkpw(password.encode("utf-8"), account["password"].encode("utf-8")):
+                    self.app.login(account["id"])
                     self.dismiss()
                 else:
                     self.email_helper_text.text = self.app.language_manager.translate("email_address") + self.app.language_manager.translate("or") + self.app.language_manager.translate("password") + self.app.language_manager.translate("incorrect_error")
@@ -125,7 +122,6 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
                     self.password_field.error = True
         else:
             password_repetition = self.password_repetition_field.text.strip()
-            date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             if not password_repetition:
                 self.password_repetition_helper_text.text = self.app.language_manager.translate("password_repetition") + self.app.language_manager.translate("empty_error")
                 self.password_repetition_field.error = False
@@ -142,19 +138,16 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
             else:
                 self.password_repetition_field.error = False
             if valid:
-                self.app.db.cursor.execute("SELECT * FROM accounts WHERE email = ?", (email,))
-                result = self.app.db.cursor.fetchone()
-                if result:
+                account = self.app.db.get_account_by_email(email)
+                if account:
                     self.email_helper_text.text =  self.app.language_manager.translate("account") +  self.app.language_manager.translate("already_exists_error")
                     self.email_field.error = False
                     self.email_field.error = True
                 else:
                     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                    self.app.db.cursor.execute(
-                        "INSERT INTO accounts (email, password, date) VALUES (?, ?, ?)",
-                        (email, hashed_password, date)
-                    )
-                    self.app.login(self.app.db.cursor.lastrowid)
+                    self.app.db.create_account(email, hashed_password)
+                    account = self.app.db.get_account_by_email(email)
+                    self.app.login(account["id"])
                     self.dismiss()
 
 

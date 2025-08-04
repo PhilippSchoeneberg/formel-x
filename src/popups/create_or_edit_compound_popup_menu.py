@@ -1,6 +1,5 @@
 from src.utils.enums import CategoryTypes, DifficultyTypes
 
-import datetime
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
@@ -316,7 +315,6 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
         wrong_formula4 = self.wrong_formula_field4.text.strip()
         category = self.selected_category
         difficulty = self.selected_difficulty
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         valid = True
         if not correct_name:
@@ -363,16 +361,10 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
 
         if valid:
             if not self.compound:
-                self.app.db.cursor.execute(
-                    "INSERT INTO compounds (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty, category_id, group_id, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty.value, category["id"], self.app.logged_in_group["id"], date)
-                )
+                self.app.db.create_compound(correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty, category, self.app.logged_in_group)
             else:
-                self.app.db.cursor.execute("UPDATE compounds SET correct_name = ?, wrong_name1 = ?, wrong_name2 = ?,  wrong_name3 = ?, wrong_name4 = ?, correct_formula = ?, wrong_formula1 = ?, wrong_formula2 = ?, wrong_formula3 = ?, wrong_formula4 = ?, difficulty = ?, category_id = ?, group_id = ?, date = ? WHERE id = ?",
-                    (correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty.value, category["id"], self.app.logged_in_group["id"], date, self.compound["id"])
-                )
+                self.app.db.update_compound(self.compound["id"], correct_name, wrong_name1, wrong_name2, wrong_name3, wrong_name4, correct_formula, wrong_formula1, wrong_formula2, wrong_formula3, wrong_formula4, difficulty, category, self.app.logged_in_group)
                 self.action_function()
-            self.app.db.connection.commit()
             self.dismiss()
 
 
