@@ -98,7 +98,7 @@ msgid "account"
 msgstr "Account"
 
 msgid "elements"
-msgstr "Elementen"
+msgstr "Periodiek Systeem"
 
 msgid "compounds"
 msgstr "Verbindingen"
@@ -237,3 +237,357 @@ msgstr "Derde fout antwoord"
 
 msgid "fourth_wrong_answer"
 msgstr "Vierde fout antwoord"
+
+msgid "hydrogen"
+msgstr "Waterstof"
+
+msgid "helium"
+msgstr "Helium"
+
+msgid "lithium"
+msgstr "Lithium"
+
+msgid "beryllium"
+msgstr "Beryllium"
+
+msgid "boron"
+msgstr "Boor"
+
+msgid "carbon"
+msgstr "Koolstof"
+
+msgid "nitrogen"
+msgstr "Stikstof"
+
+msgid "oxygen"
+msgstr "Zuurstof"
+
+msgid "fluorine"
+msgstr "Fluor"
+
+msgid "neon"
+msgstr "Neon"
+
+msgid "sodium"
+msgstr "Natrium"
+
+msgid "magnesium"
+msgstr "Magnesium"
+
+msgid "aluminum"
+msgstr "Aluminium"
+
+msgid "silicon"
+msgstr "Silicium"
+
+msgid "phosphorus"
+msgstr "Fosfor"
+
+msgid "sulfur"
+msgstr "Zwavel"
+
+msgid "chlorine"
+msgstr "Chloor"
+
+msgid "argon"
+msgstr "Argon"
+
+msgid "potassium"
+msgstr "Kalium"
+
+msgid "calcium"
+msgstr "Calcium"
+
+msgid "scandium"
+msgstr "Scandium"
+
+msgid "titanium"
+msgstr "Titanium"
+
+msgid "vanadium"
+msgstr "Vanadium"
+
+msgid "chromium"
+msgstr "Chroom"
+
+msgid "manganese"
+msgstr "Mangaan"
+
+msgid "iron"
+msgstr "Ijzer"
+
+msgid "cobalt"
+msgstr "Kobalt"
+
+msgid "nickel"
+msgstr "Nikkel"
+
+msgid "copper"
+msgstr "Koper"
+
+msgid "zinc"
+msgstr "Zink"
+
+msgid "gallium"
+msgstr "Gallium"
+
+msgid "germanium"
+msgstr "Germanium"
+
+msgid "arsenic"
+msgstr "Arseen"
+
+msgid "selenium"
+msgstr "Seleen"
+
+msgid "bromine"
+msgstr "Broom"
+
+msgid "krypton"
+msgstr "Krypton"
+
+msgid "rubidium"
+msgstr "Rubidium"
+
+msgid "strontium"
+msgstr "Strontium"
+
+msgid "yttrium"
+msgstr "Yttrium"
+
+msgid "zirconium"
+msgstr "Zirkoon"
+
+msgid "niobium"
+msgstr "Niobium"
+
+msgid "molybdenum"
+msgstr "Molybdeen"
+
+msgid "technetium"
+msgstr "Technetium"
+
+msgid "ruthenium"
+msgstr "Ruthenium"
+
+msgid "rhodium"
+msgstr "Rodium"
+
+msgid "palladium"
+msgstr "Palladium"
+
+msgid "silver"
+msgstr "Zilver"
+
+msgid "cadmium"
+msgstr "Cadmium"
+
+msgid "indium"
+msgstr "Indium"
+
+msgid "tin"
+msgstr "Tin"
+
+msgid "antimony"
+msgstr "Antimoon"
+
+msgid "tellurium"
+msgstr "Telluur"
+
+msgid "iodine"
+msgstr "Jood"
+
+msgid "xenon"
+msgstr "Xenon"
+
+msgid "cesium"
+msgstr "Cesium"
+
+msgid "barium"
+msgstr "Barium"
+
+msgid "lanthanum"
+msgstr "Lanthaan"
+
+msgid "cerium"
+msgstr "Cerium"
+
+msgid "praseodymium"
+msgstr "Praseodymium"
+
+msgid "neodymium"
+msgstr "Neodymium"
+
+msgid "promethium"
+msgstr "Promethium"
+
+msgid "samarium"
+msgstr "Samarium"
+
+msgid "europium"
+msgstr "Europium"
+
+msgid "gadolinium"
+msgstr "Gadolinium"
+
+msgid "terbium"
+msgstr "Terbium"
+
+msgid "dysprosium"
+msgstr "Dysprosium"
+
+msgid "holmium"
+msgstr "Holmium"
+
+msgid "erbium"
+msgstr "Erbium"
+
+msgid "thulium"
+msgstr "Thulium"
+
+msgid "ytterbium"
+msgstr "Ytterbium"
+
+msgid "lutetium"
+msgstr "Lutetium"
+
+msgid "hafnium"
+msgstr "Hafnium"
+
+msgid "tantalum"
+msgstr "Tantaal"
+
+msgid "tungsten"
+msgstr "Wolfraam"
+
+msgid "rhenium"
+msgstr "Rhenium"
+
+msgid "osmium"
+msgstr "Osmium"
+
+msgid "iridium"
+msgstr "Iridium"
+
+msgid "platinum"
+msgstr "Platina"
+
+msgid "gold"
+msgstr "Goud"
+
+msgid "mercury"
+msgstr "Kwik"
+
+msgid "thallium"
+msgstr "Tallium"
+
+msgid "lead"
+msgstr "Lood"
+
+msgid "bismuth"
+msgstr "Wismut"
+
+msgid "polonium"
+msgstr "Polonium"
+
+msgid "astatine"
+msgstr "Astatine"
+
+msgid "radon"
+msgstr "Radon"
+
+msgid "francium"
+msgstr "Francium"
+
+msgid "radium"
+msgstr "Radium"
+
+msgid "actinium"
+msgstr "Actinium"
+
+msgid "thorium"
+msgstr "Thorium"
+
+msgid "protactinium"
+msgstr "Protactinium"
+
+msgid "uranium"
+msgstr "Uranium"
+
+msgid "neptunium"
+msgstr "Neptunium"
+
+msgid "plutonium"
+msgstr "Plutonium"
+
+msgid "americium"
+msgstr "Americium"
+
+msgid "curium"
+msgstr "Curium"
+
+msgid "berkelium"
+msgstr "Berkelium"
+
+msgid "californium"
+msgstr "Californium"
+
+msgid "einsteinium"
+msgstr "Einsteinium"
+
+msgid "fermium"
+msgstr "Fermium"
+
+msgid "mendelevium"
+msgstr "Mendelevium"
+
+msgid "nobelium"
+msgstr "Nobelium"
+
+msgid "lawrencium"
+msgstr "Lawrencium"
+
+msgid "rutherfordium"
+msgstr "Rutherfordium"
+
+msgid "dubnium"
+msgstr "Dubnium"
+
+msgid "seaborgium"
+msgstr "Seaborgium"
+
+msgid "bohrium"
+msgstr "Bohrium"
+
+msgid "hassium"
+msgstr "Hassium"
+
+msgid "meitnerium"
+msgstr "Meitnerium"
+
+msgid "darmstadtium"
+msgstr "Darmstadtium"
+
+msgid "roentgenium"
+msgstr "Roentgenium"
+
+msgid "copernicium"
+msgstr "Copernicium"
+
+msgid "nihonium"
+msgstr "Nihonium"
+
+msgid "flerovium"
+msgstr "Flerovium"
+
+msgid "moscovium"
+msgstr "Moscovium"
+
+msgid "livermorium"
+msgstr "Livermorium"
+
+msgid "tennessine"
+msgstr "Tennessine"
+
+msgid "oganesson"
+msgstr "Oganesson"

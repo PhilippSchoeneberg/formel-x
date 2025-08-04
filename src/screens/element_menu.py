@@ -156,7 +156,7 @@ class ElementMenuScreen(MDScreen):
             self.set_learning_mode(not self.app.learning_mode)
             return
         self.current_element = self.elements_to_learn[self.current_index]
-        self.headline.text = self.app.language_manager.translate("element_learning_mode_list_text") + self.current_element['name']
+        self.headline.text = self.app.language_manager.translate("element_learning_mode_list_text") + self.app.language_manager.translate(self.current_element['name'])
 
 
     def next_element(self):

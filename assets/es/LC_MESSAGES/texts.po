@@ -101,7 +101,7 @@ msgid "account"
 msgstr "Cuenta"
 
 msgid "elements"
-msgstr "Elementos"
+msgstr "Tabla Periódica"
 
 msgid "compounds"
 msgstr "compuestos"
@@ -240,3 +240,357 @@ msgstr "Tercera respuesta incorrecta"
 
 msgid "fourth_wrong_answer"
 msgstr "Cuarta respuesta incorrecta"
+
+msgid "hydrogen"
+msgstr "Hidrógeno"
+
+msgid "helium"
+msgstr "Helio"
+
+msgid "lithium"
+msgstr "Litio"
+
+msgid "beryllium"
+msgstr "Berilio"
+
+msgid "boron"
+msgstr "Boro"
+
+msgid "carbon"
+msgstr "Carbono"
+
+msgid "nitrogen"
+msgstr "Nitrógeno"
+
+msgid "oxygen"
+msgstr "Oxígeno"
+
+msgid "fluorine"
+msgstr "Flúor"
+
+msgid "neon"
+msgstr "Neón"
+
+msgid "sodium"
+msgstr "Sodio"
+
+msgid "magnesium"
+msgstr "Magnesio"
+
+msgid "aluminum"
+msgstr "Aluminio"
+
+msgid "silicon"
+msgstr "Silicio"
+
+msgid "phosphorus"
+msgstr "Fósforo"
+
+msgid "sulfur"
+msgstr "Azufre"
+
+msgid "chlorine"
+msgstr "Cloro"
+
+msgid "argon"
+msgstr "Argón"
+
+msgid "potassium"
+msgstr "Potasio"
+
+msgid "calcium"
+msgstr "Calcio"
+
+msgid "scandium"
+msgstr "Escandio"
+
+msgid "titanium"
+msgstr "Titanio"
+
+msgid "vanadium"
+msgstr "Vanadio"
+
+msgid "chromium"
+msgstr "Cromo"
+
+msgid "manganese"
+msgstr "Manganeso"
+
+msgid "iron"
+msgstr "Hierro"
+
+msgid "cobalt"
+msgstr "Cobalto"
+
+msgid "nickel"
+msgstr "Níquel"
+
+msgid "copper"
+msgstr "Cobre"
+
+msgid "zinc"
+msgstr "Cinc"
+
+msgid "gallium"
+msgstr "Galio"
+
+msgid "germanium"
+msgstr "Germanio"
+
+msgid "arsenic"
+msgstr "Arsénico"
+
+msgid "selenium"
+msgstr "Selenio"
+
+msgid "bromine"
+msgstr "Bromo"
+
+msgid "krypton"
+msgstr "Kriptón"
+
+msgid "rubidium"
+msgstr "Rubidio"
+
+msgid "strontium"
+msgstr "Estroncio"
+
+msgid "yttrium"
+msgstr "Itrio"
+
+msgid "zirconium"
+msgstr "Circonio"
+
+msgid "niobium"
+msgstr "Niobio"
+
+msgid "molybdenum"
+msgstr "Molibdeno"
+
+msgid "technetium"
+msgstr "Tecnecio"
+
+msgid "ruthenium"
+msgstr "Rutenio"
+
+msgid "rhodium"
+msgstr "Rodio"
+
+msgid "palladium"
+msgstr "Paladio"
+
+msgid "silver"
+msgstr "Plata"
+
+msgid "cadmium"
+msgstr "Cadmio"
+
+msgid "indium"
+msgstr "Indio"
+
+msgid "tin"
+msgstr "Estaño"
+
+msgid "antimony"
+msgstr "Antimonio"
+
+msgid "tellurium"
+msgstr "Telurio"
+
+msgid "iodine"
+msgstr "Yodo"
+
+msgid "xenon"
+msgstr "Xenón"
+
+msgid "cesium"
+msgstr "Cesio"
+
+msgid "barium"
+msgstr "Bario"
+
+msgid "lanthanum"
+msgstr "Lantano"
+
+msgid "cerium"
+msgstr "Cerio"
+
+msgid "praseodymium"
+msgstr "Praseodimio"
+
+msgid "neodymium"
+msgstr "Neodimio"
+
+msgid "promethium"
+msgstr "Prometio"
+
+msgid "samarium"
+msgstr "Samario"
+
+msgid "europium"
+msgstr "Europio"
+
+msgid "gadolinium"
+msgstr "Gadolinio"
+
+msgid "terbium"
+msgstr "Terbio"
+
+msgid "dysprosium"
+msgstr "Disprosio"
+
+msgid "holmium"
+msgstr "Holmio"
+
+msgid "erbium"
+msgstr "Erbio"
+
+msgid "thulium"
+msgstr "Tulio"
+
+msgid "ytterbium"
+msgstr "Iterbio"
+
+msgid "lutetium"
+msgstr "Lutecio"
+
+msgid "hafnium"
+msgstr "Hafnio"
+
+msgid "tantalum"
+msgstr "Tantalio"
+
+msgid "tungsten"
+msgstr "Wolframio"
+
+msgid "rhenium"
+msgstr "Renio"
+
+msgid "osmium"
+msgstr "Osmio"
+
+msgid "iridium"
+msgstr "Iridio"
+
+msgid "platinum"
+msgstr "Platino"
+
+msgid "gold"
+msgstr "Oro"
+
+msgid "mercury"
+msgstr "Mercurio"
+
+msgid "thallium"
+msgstr "Talio"
+
+msgid "lead"
+msgstr "Plomo"
+
+msgid "bismuth"
+msgstr "Bismuto"
+
+msgid "polonium"
+msgstr "Polonio"
+
+msgid "astatine"
+msgstr "Astato"
+
+msgid "radon"
+msgstr "Radón"
+
+msgid "francium"
+msgstr "Francio"
+
+msgid "radium"
+msgstr "Radio"
+
+msgid "actinium"
+msgstr "Actinio"
+
+msgid "thorium"
+msgstr "Torio"
+
+msgid "protactinium"
+msgstr "Protactinio"
+
+msgid "uranium"
+msgstr "Uranio"
+
+msgid "neptunium"
+msgstr "Neptunio"
+
+msgid "plutonium"
+msgstr "Plutonio"
+
+msgid "americium"
+msgstr "Americio"
+
+msgid "curium"
+msgstr "Curio"
+
+msgid "berkelium"
+msgstr "Berkelio"
+
+msgid "californium"
+msgstr "Californio"
+
+msgid "einsteinium"
+msgstr "Einstenio"
+
+msgid "fermium"
+msgstr "Fermio"
+
+msgid "mendelevium"
+msgstr "Mendelevio"
+
+msgid "nobelium"
+msgstr "Nobelio"
+
+msgid "lawrencium"
+msgstr "Lawrencio"
+
+msgid "rutherfordium"
+msgstr "Rutherfordio"
+
+msgid "dubnium"
+msgstr "Dubnio"
+
+msgid "seaborgium"
+msgstr "Seaborgio"
+
+msgid "bohrium"
+msgstr "Bohrio"
+
+msgid "hassium"
+msgstr "Hassio"
+
+msgid "meitnerium"
+msgstr "Meitnerio"
+
+msgid "darmstadtium"
+msgstr "Darmstadtio"
+
+msgid "roentgenium"
+msgstr "Roentgenio"
+
+msgid "copernicium"
+msgstr "Copernicio"
+
+msgid "nihonium"
+msgstr "Nihonio"
+
+msgid "flerovium"
+msgstr "Flerovio"
+
+msgid "moscovium"
+msgstr "Moscovio"
+
+msgid "livermorium"
+msgstr "Livermorio"
+
+msgid "tennessine"
+msgstr "Tennessino"
+
+msgid "oganesson"
+msgstr "Oganesón"

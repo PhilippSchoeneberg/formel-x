@@ -181,23 +181,24 @@ class MainApp(MDApp):
         ]
 
         if self.logged_in_user_id:
-            general_menu_items = general_menu_items + [
-                {
-                    "leading_icon": "plus-circle",
-                    "text": self.language_manager.translate("create"),
-                    "on_release": lambda: self.root.get_screen(self.root.current).create(caller),
-                },
-                {
-                    "leading_icon": "border-color",
-                    "text": self.language_manager.translate("edit"),
-                    "on_release": lambda: self.root.get_screen(self.root.current).edit(),
-                },
-                {
-                    "leading_icon": "delete",
-                    "text": self.language_manager.translate("delete"),
-                    "on_release": lambda: self.root.get_screen(self.root.current).delete(),
-                }
-            ]
+            if self.root.current != "elementMenu":
+                general_menu_items = general_menu_items + [
+                    {
+                        "leading_icon": "plus-circle",
+                        "text": self.language_manager.translate("create"),
+                        "on_release": lambda: self.root.get_screen(self.root.current).create(caller),
+                    },
+                    {
+                        "leading_icon": "border-color",
+                        "text": self.language_manager.translate("edit"),
+                        "on_release": lambda: self.root.get_screen(self.root.current).edit(),
+                    },
+                    {
+                        "leading_icon": "delete",
+                        "text": self.language_manager.translate("delete"),
+                        "on_release": lambda: self.root.get_screen(self.root.current).delete(),
+                    }
+                ]
         elif self.root.get_screen(self.root.current) == self.root.get_screen("modesMenu"):
             general_menu_items = general_menu_items + [
                 {
