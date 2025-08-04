@@ -194,6 +194,8 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
             self.wrong_answer_field2.text = self.question["wrong_answer2"]
             self.wrong_answer_field3.text = self.question["wrong_answer3"]
             self.wrong_answer_field4.text = self.question["wrong_answer4"]
+            self.set_difficulty(DifficultyTypes(self.question["difficulty"]))
+            self.set_category(self.app.db.get_category_by_id(self.question["category_id"]))
         else:
             self.headline_text.text = self.app.language_manager.translate("create") + self.app.language_manager.translate("question")
 
@@ -207,7 +209,7 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
 
 
     def get_category_items(self):
-        raw_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.compound,
+        raw_categories = self.app.db.get_all_categories_by_type_and_group(CategoryTypes.question,
                                                                           self.app.logged_in_group)
         categories = [
             {
@@ -232,7 +234,7 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
     def get_difficulty_items(self):
         return [
             {
-                "text": difficulty.value,
+                "text": self.app.language_manager.translate(difficulty.value),
                 "on_release": lambda x=difficulty: self.set_difficulty(x),
             }
             for difficulty in DifficultyTypes
@@ -241,7 +243,7 @@ class CreateOrEditQuestionPopupMenu(MDDialog):
 
     def set_difficulty(self, difficulty):
         self.selected_difficulty = difficulty
-        self.difficulty_button_text.text = difficulty.value
+        self.difficulty_button_text.text = self.app.language_manager.translate(difficulty.value)
         self.difficulties_dropdown_menu.dismiss()
 
 

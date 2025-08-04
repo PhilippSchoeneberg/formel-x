@@ -1,3 +1,5 @@
+import random
+
 from src.popups.error_popup_menu import ErrorPopupMenu
 
 from kivy.app import App
@@ -14,6 +16,7 @@ class ElementMenuScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
+        self.elements_to_learn = []
         self.buttons = None
         self.headline = None
         self.elements = None
@@ -137,6 +140,8 @@ class ElementMenuScreen(MDScreen):
 
     def start_learning(self):
         self.elements_to_learn = [element for element in self.app.db.get_all_elements_by_group(self.app.logged_in_group).values()]
+        random.shuffle(self.elements_to_learn)
+
         if self.elements_to_learn:
             self.current_index = 0
             self.show_next_element()

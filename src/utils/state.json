@@ -1,19 +1,19 @@
 {
     "dark_mode": true,
     "language": "de",
-    "logged_in_user_id": null,
+    "logged_in_user_id": 1,
     "logged_in_group": {
-        "id": 2,
-        "name": "Auszubildene 1",
+        "id": 8,
+        "name": "CKLF1",
         "owner_id": 1,
-        "date": "2025-08-01 23:48:28"
+        "date": "2025-08-03 16:43:46"
     },
     "groups": [
         {
-            "id": 2,
-            "name": "Auszubildene 1",
+            "id": 8,
+            "name": "CKLF1",
             "owner_id": 1,
-            "date": "2025-08-01 23:48:28"
+            "date": "2025-08-03 16:43:46"
         }
     ]
 }
