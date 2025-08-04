@@ -1,5 +1,4 @@
 from src.utils.enums import CategoryTypes, DifficultyTypes
-from src.utils.transform_to_unicode import transform_to_unicode
 
 import datetime
 from kivy.app import App
@@ -254,8 +253,8 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
             self.wrong_formula_field2.text = self.compound["wrong_formula2"]
             self.wrong_formula_field3.text = self.compound["wrong_formula3"]
             self.wrong_formula_field4.text = self.compound["wrong_formula4"]
-            self.selected_category = self.app.db.get_category_by_id(self.compound["category"])
-            self.categories_button_text.text = self.selected_category["name"]
+            self.set_difficulty(DifficultyTypes(self.compound["difficulty"]))
+            self.set_category(self.app.db.get_category_by_id(self.compound["category_id"]))
 
         self.categories_dropdown_menu.items = self.get_category_items()
         self.difficulties_dropdown_menu.items = self.get_difficulty_items()
@@ -291,7 +290,7 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
     def get_difficulty_items(self):
         return [
             {
-                "text": difficulty.value,
+                "text": self.app.language_manager.translate(difficulty.value),
                 "on_release": lambda x=difficulty: self.set_difficulty(x),
             }
             for difficulty in DifficultyTypes
@@ -300,7 +299,7 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
 
     def set_difficulty(self, difficulty):
         self.selected_difficulty = difficulty
-        self.difficulty_button_text.text = difficulty.value
+        self.difficulty_button_text.text = self.app.language_manager.translate(difficulty.value)
         self.difficulties_dropdown_menu.dismiss()
 
 
@@ -310,11 +309,11 @@ class CreateOrEditCompoundPopupMenu(MDDialog):
         wrong_name2 = self.wrong_name_field2.text.strip()
         wrong_name3 = self.wrong_name_field3.text.strip()
         wrong_name4 = self.wrong_name_field4.text.strip()
-        correct_formula = transform_to_unicode(self.correct_formula_field.text.strip())
-        wrong_formula1 = transform_to_unicode(self.wrong_formula_field1.text.strip())
-        wrong_formula2 = transform_to_unicode(self.wrong_formula_field2.text.strip())
-        wrong_formula3 = transform_to_unicode(self.wrong_formula_field3.text.strip())
-        wrong_formula4 = transform_to_unicode(self.wrong_formula_field4.text.strip())
+        correct_formula = self.correct_formula_field.text.strip()
+        wrong_formula1 = self.wrong_formula_field1.text.strip()
+        wrong_formula2 = self.wrong_formula_field2.text.strip()
+        wrong_formula3 = self.wrong_formula_field3.text.strip()
+        wrong_formula4 = self.wrong_formula_field4.text.strip()
         category = self.selected_category
         difficulty = self.selected_difficulty
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

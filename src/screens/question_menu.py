@@ -110,7 +110,7 @@ class QuestionMenuScreen(MDScreen):
 
     def set_difficulty(self, button_text, difficulty):
         self.select_difficulty = difficulty
-        button_text.text = self.select_difficulty.value
+        button_text.text = self.app.language_manager.translate(self.select_difficulty.value)
 
 
     def select_category(self, category_id):

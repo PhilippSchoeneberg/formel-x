@@ -2,6 +2,7 @@ from src.popups.error_popup_menu import ErrorPopupMenu
 from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPopupMenu
 
+import random
 from kivy.app import App
 from kivy.clock import Clock
 from kivymd.uix.screen import MDScreen
@@ -25,6 +26,8 @@ class QuestionLearningScreen(MDScreen):
     def start_learning(self, category=None, difficulty=None):
         self.current_index = 0
         self.questions_to_learn = self.app.db.get_all_questions_by_group(self.app.logged_in_group)
+        random.shuffle(self.questions_to_learn)
+
         if category:
             self.questions_to_learn = [
                 question for question in self.questions_to_learn
@@ -60,25 +63,28 @@ class QuestionLearningScreen(MDScreen):
                 item.theme_bg_color = "Custom"
                 item.md_bg_color = [1, 0, 0, 0.3]
 
-        def add_option(text, correct):
+        def create_list_item(text, correct):
             list_item = MDListItem(
                 MDListItemHeadlineText(text=text),
                 on_release=lambda item: on_clicked(item, correct)
             )
-            self.ids.question_learning_list.add_widget(list_item)
+            return list_item
 
         title_item = MDListItem(MDListItemHeadlineText(text=self.current_question["question"]))
         title_item.ripple_effect = False
         title_item.focus_behavior = False
         self.ids.question_learning_list.add_widget(title_item)
 
-        add_option(self.current_question["correct_answer"], True)
-        add_option(self.current_question["wrong_answer1"], False)
-        add_option(self.current_question["wrong_answer2"], False)
+        list_items = [create_list_item(self.current_question["correct_answer"], True),
+                      create_list_item(self.current_question["wrong_answer1"], False),
+                      create_list_item(self.current_question["wrong_answer2"], False)]
         if self.current_question["wrong_answer3"]:
-            add_option(self.current_question["wrong_answer3"], False)
+            list_items.append(create_list_item(self.current_question["wrong_answer3"], False))
         if self.current_question["wrong_answer4"]:
-            add_option(self.current_question["wrong_answer4"], False)
+            list_items.append(create_list_item(self.current_question["wrong_answer4"], False))
+        random.shuffle(list_items)
+        for element in list_items:
+            self.ids.question_learning_list.add_widget(element)
 
 
     def next_question(self):
