@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = FormulaX
+title = FormelX
 
 # (str) Package name
-package.name = FormulaX
+package.name = formelx
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = philipp.schoeneberg
