@@ -7,7 +7,7 @@ title = FormulaX
 package.name = FormulaX
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = philipp.schoeneberg.formulax
+package.domain = philipp.schoeneberg
 
 # (str) Source code where the main.py file is located
 source.dir = src
@@ -293,7 +293,7 @@ android.archs = arm64-v8a, armeabi-v7a
 
 # (int) overrides automatic versionCode computation (used in build.gradle)
 # this is not the same as app version and should only be edited if you know what you're doing
-# android.numeric_version = 1
+android.numeric_version = 10212
 
 # (bool) enables Android auto backup feature (Android API >=23)
 android.allow_backup = True
