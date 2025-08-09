@@ -100,7 +100,8 @@ class ModesMenuScreen(MDScreen):
             self.ids.group_name.text = group["name"]
         else:
             self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")
-        self.refresh_groups()
+        if self.app.logged_in_group is not None:
+            self.refresh_groups()
 
 
     def remove(self, group):
@@ -137,7 +138,7 @@ class ModesMenuScreen(MDScreen):
         if self.app.logged_in_group not in self.app.groups:
             if self.app.groups:
                 self.set_group(self.app.groups[0])
-            elif self.app.logged_in_group is not None:
+            else:
                 self.set_group(None)
         self.app.groups = sorted(self.app.groups, key=lambda x: x["name"])
         self.fill_modes_list()

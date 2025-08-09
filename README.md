@@ -10,7 +10,7 @@ The source code of the mobile application "FormelX".
 
 ## Publication
 ### Android
-- Increase version number in the "buildozer.spec" file by 1
+- Increase numeric version number in the "buildozer.spec" file by 1
 - Create Android App Bundle (.aab) using `buildozer android release`
 - Rename the file to `formelx-release.aab`
 - Sign the file using `jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore my-release-key.keystore bin/formelx-release.aab my-key-alias`
