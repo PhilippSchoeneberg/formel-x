@@ -1,0 +1,3 @@
+[submodule "ext/ext/KivyMD"]
+	path = ext/ext/KivyMD
+	url = https://github.com/kivymd/KivyMD.git

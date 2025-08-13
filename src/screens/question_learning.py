@@ -5,8 +5,8 @@ from src.popups.create_or_edit_question_popup_menu import CreateOrEditQuestionPo
 import random
 from kivy.app import App
 from kivy.clock import Clock
-from ext.kivymd.uix.screen import MDScreen
-from ext.kivymd.uix.list import MDListItem, MDListItemHeadlineText
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
 class QuestionLearningScreen(MDScreen):

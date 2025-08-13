@@ -6,10 +6,10 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
-from ext.kivymd.uix.screen import MDScreen
-from ext.kivymd.uix.gridlayout import MDGridLayout
-from ext.kivymd.uix.button import MDButton, MDButtonText
-from ext.kivymd.uix.list import MDListItem, MDListItemHeadlineText
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.gridlayout import MDGridLayout
+from kivymd.uix.button import MDButton, MDButtonText
+from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
 class ElementMenuScreen(MDScreen):

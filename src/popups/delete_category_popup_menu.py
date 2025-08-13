@@ -1,9 +1,9 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from ext.kivymd.uix.menu import MDDropdownMenu
-from ext.kivymd.uix.boxlayout import MDBoxLayout
-from ext.kivymd.uix.button import MDButton, MDButtonText
-from ext.kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.button import MDButton, MDButtonText
+from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 
 
 class DeleteCategoryPopupMenu(MDDialog):

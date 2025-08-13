@@ -3,11 +3,11 @@ from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
 from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
 
 from kivy.app import App
-from ext.kivymd.uix.label import MDLabel
-from ext.kivymd.uix.screen import MDScreen
-from ext.kivymd.uix.menu import MDDropdownMenu
-from ext.kivymd.uix.button import MDButton, MDButtonText
-from ext.kivymd.uix.list import MDListItem, MDListItemHeadlineText
+from kivymd.uix.label import MDLabel
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.button import MDButton, MDButtonText
+from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
 class CompoundMenuScreen(MDScreen):
