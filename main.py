@@ -13,12 +13,12 @@ from src.utils.language_manager import LanguageManager
 from src.utils.json_parser import load_state, save_state
 
 import os
-from kivymd.app import MDApp
+from ext.kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.core.text import LabelBase
-from kivymd.uix.menu import MDDropdownMenu
+from ext.kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.screenmanager import ScreenManager
-from kivymd.font_definitions import theme_font_styles
+from ext.kivymd.font_definitions import theme_font_styles
 
 
 LabelBase.register(name="RobotoDownloaded", fn_regular="assets/Roboto-VariableFont_wdth,wght.ttf")

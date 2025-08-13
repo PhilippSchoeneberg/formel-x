@@ -1,9 +1,9 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivymd.uix.label import MDLabel
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDButton, MDButtonText
-from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
+from ext.kivymd.uix.label import MDLabel
+from ext.kivymd.uix.boxlayout import MDBoxLayout
+from ext.kivymd.uix.button import MDButton, MDButtonText
+from ext.kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 
 
 class ConfirmDeletePopupMenu(MDDialog):

@@ -4,10 +4,10 @@ from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
 
 from kivy.app import App
-from kivymd.uix.screen import MDScreen
-from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.button import MDButton, MDButtonText
-from kivymd.uix.list import MDListItem, MDListItemHeadlineText
+from ext.kivymd.uix.screen import MDScreen
+from ext.kivymd.uix.menu import MDDropdownMenu
+from ext.kivymd.uix.button import MDButton, MDButtonText
+from ext.kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
 class ModesMenuScreen(MDScreen):

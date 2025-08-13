@@ -2,10 +2,10 @@ from src.utils.json_parser import save_state
 
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDButton, MDButtonText
-from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
-from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
+from ext.kivymd.uix.boxlayout import MDBoxLayout
+from ext.kivymd.uix.button import MDButton, MDButtonText
+from ext.kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
+from ext.kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
 
 
 class AddGroupPopupMenu(MDDialog):
