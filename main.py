@@ -1,16 +1,16 @@
 from src.popups.add_group_popup_menu import AddGroupPopupMenu
 from src.popups.register_or_login_account_popup_menu import RegisterOrLoginAccountPopupMenu
 
-from screens.modes_menu import ModesMenuScreen
-from screens.question_menu import QuestionMenuScreen
-from screens.element_menu import ElementMenuScreen
-from screens.compound_menu import CompoundMenuScreen
-from screens.compound_learning import CompoundLearningScreen
-from screens.question_learning import QuestionLearningScreen
+from src.screens.modes_menu import ModesMenuScreen
+from src.screens.question_menu import QuestionMenuScreen
+from src.screens.element_menu import ElementMenuScreen
+from src.screens.compound_menu import CompoundMenuScreen
+from src.screens.compound_learning import CompoundLearningScreen
+from src.screens.question_learning import QuestionLearningScreen
 
-from database.database import Database
-from utils.language_manager import LanguageManager
-from utils.json_parser import load_state, save_state
+from src.database.database import Database
+from src.utils.language_manager import LanguageManager
+from src.utils.json_parser import load_state, save_state
 
 import os
 from kivymd.app import MDApp
@@ -58,7 +58,9 @@ class MainApp(MDApp):
         self.language_manager = LanguageManager(self.language)
 
         # Instantiate database
-        self.db = Database("https://jbweqnndqbvbsorzngff.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impid2Vxbm5kcWJ2YnNvcnpuZ2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMjEzNzcsImV4cCI6MjA2OTg5NzM3N30.Fkno72iJDHwY4bq0EPd2GHadTqdwqDuvnrFoeREAIQU")
+        url = "https://jbweqnndqbvbsorzngff.supabase.co"
+        api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impid2Vxbm5kcWJ2YnNvcnpuZ2ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzMjEzNzcsImV4cCI6MjA2OTg5NzM3N30.Fkno72iJDHwY4bq0EPd2GHadTqdwqDuvnrFoeREAIQU"
+        self.db = Database(url, api_key)
 
         # Instantiate screens
         self.modes_menu_screen = None
@@ -91,13 +93,13 @@ class MainApp(MDApp):
                     theme_font_styles[style][role]["font-name"] = "RobotoDownloaded"
 
         kv_files = [
-            "src/main.kv",
-            "src/screens/modes_menu.kv",
-            "src/screens/element_menu.kv",
-            "src/screens/compound_menu.kv",
-            "src/screens/compound_learning.kv",
-            "src/screens/question_menu.kv",
-            "src/screens/question_learning.kv",
+            "src/kivy/main.kv",
+            "src/kivy/modes_menu.kv",
+            "src/kivy/element_menu.kv",
+            "src/kivy/compound_menu.kv",
+            "src/kivy/compound_learning.kv",
+            "src/kivy/question_menu.kv",
+            "src/kivy/question_learning.kv",
         ]
         for file in kv_files:
             Builder.load_file(file)
