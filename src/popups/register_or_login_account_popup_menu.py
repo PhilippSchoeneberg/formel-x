@@ -1,4 +1,4 @@
-import bcrypt
+from passlib.hash import bcrypt
 from kivy.app import App
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDButton, MDButtonText
@@ -110,7 +110,7 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
         if not self.register_mode:
             if valid:
                 account = self.app.db.get_account_by_email(email)
-                if account and bcrypt.checkpw(password.encode("utf-8"), account["password"].encode("utf-8")):
+                if account and bcrypt.verify(password, account["password"]):
                     self.app.login(account["id"])
                     self.dismiss()
                 else:
@@ -144,9 +144,8 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
                     self.email_field.error = False
                     self.email_field.error = True
                 else:
-                    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                    self.app.db.create_account(email, hashed_password)
-                    account = self.app.db.get_account_by_email(email)
+                    hashed_password = bcrypt.hash(password)
+                    account = self.app.db.create_account(email, hashed_password)
                     self.app.login(account["id"])
                     self.dismiss()
 

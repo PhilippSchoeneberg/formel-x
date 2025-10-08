@@ -42,12 +42,11 @@ version = 0
 # version.filename = %(source.dir)s/main.py
 
 # Tell pip to ignore prebuilt wheels
-pip_options = --no-binary pydantic,pydantic-core
+#pip_options =
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-environment = PIP_NO_BINARY=pydantic
-requirements = 
+requirements = python3, kivy, polib, passlib, httpx, openssl, pillow
 
 
 # (str) Custom source folders for requirements
@@ -75,10 +74,10 @@ orientation = portrait
 # author = © Copyright Info
 
 # change the major version of python used by the app
-osx.python_version = 3
+# osx.python_version = 3
 
 # Kivy version to use
-osx.kivy_version = 1.9.1
+# osx.kivy_version = 1.9.1
 
 #
 # Android specific
@@ -106,7 +105,7 @@ fullscreen = 0
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
-#android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
+android.permissions = INTERNET
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -115,13 +114,13 @@ fullscreen = 0
 android.api = 35
 
 # (int) Minimum API your APK / AAB will support.
-#android.minapi = 21
+android.minapi = 27
 
 # (int) Android SDK version to use
 #android.sdk = 20
 
 # (str) Android NDK version to use
-#android.ndk = 23b
+android.ndk = 26b
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 #android.ndk_api = 21
@@ -341,13 +340,13 @@ android.allow_backup = True
 #p4a.source_dir =
 
 # (str) The directory in which python-for-android should look for your own build recipes (if any)
-p4a.local_recipes = 
+# p4a.local_recipes =
 
 # (str) Filename to the hook for p4a
-p4a.hook = 
+# p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+p4a.bootstrap = sdl2
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
 #p4a.port =
@@ -371,18 +370,18 @@ p4a.hook =
 # (str) Path to a custom kivy-ios folder
 #ios.kivy_ios_dir = ../kivy-ios
 # Alternately, specify the URL and branch of a git checkout:
-ios.kivy_ios_url = https://github.com/kivy/kivy-ios
-ios.kivy_ios_branch = master
+#ios.kivy_ios_url = https://github.com/kivy/kivy-ios
+#ios.kivy_ios_branch = master
 
 # Another platform dependency: ios-deploy
 # Uncomment to use a custom checkout
 #ios.ios_deploy_dir = ../ios_deploy
 # Or specify URL and branch
-ios.ios_deploy_url = https://github.com/phonegap/ios-deploy
-ios.ios_deploy_branch = 1.10.0
+#.ios_deploy_url = https://github.com/phonegap/ios-deploy
+#ios.ios_deploy_branch = 1.10.0
 
 # (bool) Whether or not to sign the code
-ios.codesign.allowed = false
+#ios.codesign.allowed = false
 
 # (str) Name of the certificate to use for signing the debug version
 # Get a list of available identities: buildozer ios list_identities
@@ -419,10 +418,10 @@ log_level = 2
 warn_on_root = 1
 
 # (str) Path to build artifact storage, absolute or relative to spec file
-# build_dir = ./.buildozer
+build_dir = ./.buildozer
 
 # (str) Path to build output (i.e. .apk, .aab, .ipa) storage
-# bin_dir = ./bin
+bin_dir = ./bin
 
 #    -----------------------------------------------------------------------------
 #    List as sections
