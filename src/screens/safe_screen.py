@@ -6,34 +6,40 @@ from kivymd.uix.screen import MDScreen
 if platform == "android":
     from jnius import autoclass
 
-
 class SafeScreen(MDScreen):
     def on_pre_enter(self, *args):
         super().on_pre_enter(*args)
-        Window.softinput_mode = "below_target"
+        Window.softinput_mode = "resize"
         Window.borderless = False
+        Window.bind(on_resize=self.update_safe_padding)
+        self.update_safe_padding()
 
+    def update_safe_padding(self, *args):
         top_padding = dp(0)
         bottom_padding = dp(0)
 
         if hasattr(self, "ids") and "main_box" in self.ids:
             if platform == "android":
-                # Get status bar height
                 PythonActivity = autoclass("org.kivy.android.PythonActivity")
-                Context = autoclass("android.content.Context")
                 activity = PythonActivity.mActivity
-                res_id = activity.getResources().getIdentifier("status_bar_height", "dimen", "android")
-                if res_id > 0:
-                    top_padding = activity.getResources().getDimensionPixelSize(res_id) / Window.density
+                res = activity.getResources()
 
-                # Get navigation bar height
-                res_id = activity.getResources().getIdentifier("navigation_bar_height", "dimen", "android")
-                if res_id > 0:
-                    bottom_padding = activity.getResources().getDimensionPixelSize(res_id) / Window.density
+                status_bar_id = res.getIdentifier("status_bar_height", "dimen", "android")
+                if status_bar_id > 0:
+                    top_padding = res.getDimensionPixelSize(status_bar_id) / Window._density
+
+                nav_bar_id = res.getIdentifier("navigation_bar_height", "dimen", "android")
+                if nav_bar_id > 0:
+                    bottom_padding = res.getDimensionPixelSize(nav_bar_id) / Window._density
+
+                # Keyboard adjustment
+                if Window.height < Window.system_size[1]:
+                    bottom_padding = dp(0)
 
             elif platform == "ios":
-                # iOS typical safe area offsets (approx)
-                top_padding = dp(44)  # status bar + notch
-                bottom_padding = dp(34)  # home indicator
+                top_padding = dp(44)
+                bottom_padding = dp(34)
+                if Window.height < Window.system_size[1]:
+                    bottom_padding = dp(0)
 
             self.ids.main_box.padding = [0, top_padding, 0, bottom_padding]
