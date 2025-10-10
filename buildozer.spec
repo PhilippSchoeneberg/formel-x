@@ -46,8 +46,7 @@ version = 0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy, asynckivy, asyncgui, polib, passlib, httpx, httpcore, h11, openssl, pillow, materialyoucolor
-
+requirements = python3, kivy, asynckivy, asyncgui, polib, passlib, bcrypt, httpx, httpcore, h11, openssl, pillow, materialyoucolor
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
