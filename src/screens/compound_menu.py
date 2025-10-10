@@ -1,16 +1,16 @@
+from src.screens.safe_screen import SafeScreen
 from src.utils.enums import CategoryTypes, DifficultyTypes
 from src.popups.delete_category_popup_menu import DeleteCategoryPopupMenu
 from src.popups.create_or_edit_category_popup_menu import CreateOrEditCategoryPopupMenu
 
 from kivy.app import App
 from kivymd.uix.label import MDLabel
-from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class CompoundMenuScreen(MDScreen):
+class CompoundMenuScreen(SafeScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()

@@ -1,16 +1,16 @@
+from src.screens.safe_screen import SafeScreen
 from src.utils.json_parser import save_state
 from src.popups.add_group_popup_menu import AddGroupPopupMenu
 from src.popups.confirm_delete_popup_menu import ConfirmDeletePopupMenu
 from src.popups.create_or_edit_group_popup_menu import CreateOrEditGroupPopupMenu
 
 from kivy.app import App
-from kivymd.uix.screen import MDScreen
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class ModesMenuScreen(MDScreen):
+class ModesMenuScreen(SafeScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()

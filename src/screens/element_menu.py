@@ -1,18 +1,18 @@
 import random
 
+from src.screens.safe_screen import SafeScreen
 from src.popups.error_popup_menu import ErrorPopupMenu
 
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
-from kivymd.uix.screen import MDScreen
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.list import MDListItem, MDListItemHeadlineText
 
 
-class ElementMenuScreen(MDScreen):
+class ElementMenuScreen(SafeScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.app = App.get_running_app()
