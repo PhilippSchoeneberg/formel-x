@@ -1,6 +1,8 @@
 from passlib.hash import bcrypt
 from kivy.app import App
+from kivy.metrics import dp
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.textfield import MDTextField, MDTextFieldHintText, MDTextFieldHelperText
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogContentContainer, MDDialogButtonContainer
@@ -60,15 +62,25 @@ class RegisterOrLoginAccountPopupMenu(MDDialog):
         self.submit_button_text = MDButtonText(text=self.app.language_manager.translate("login"))
         self.toggle_button_text = MDButtonText(text=self.app.language_manager.translate("go_to_registration"))
 
+        self.cancel_button = MDButton(self.cancel_button_text, style="text", on_release=self.dismiss)
+        self.submit_button = MDButton(self.submit_button_text, style="text", on_release=self.login)
+        self.toggle_button = MDButton(self.toggle_button_text, style="text", on_release=self.toggle_mode)
+
+        self.button_grid = MDGridLayout(
+            cols=2,
+            adaptive_height=True,
+            spacing=dp(8),
+            padding=dp(8),
+        )
+
+        self.button_grid.add_widget(self.cancel_button)
+        self.button_grid.add_widget(self.submit_button)
+        self.button_grid.add_widget(self.toggle_button)
+
         super().__init__(
             self.headline,
             MDDialogContentContainer(self.content_box),
-            MDDialogButtonContainer(
-                MDButton(self.cancel_button_text, style="text", on_release=self.dismiss),
-                MDButton(self.submit_button_text, style="text", on_release=self.login),
-                MDButton(self.toggle_button_text, style="text", on_release=self.toggle_mode),
-                spacing="8dp",
-            ),
+            MDDialogButtonContainer(self.button_grid),
         )
 
 
