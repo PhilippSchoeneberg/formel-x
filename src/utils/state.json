@@ -1,7 +1,12 @@
 {
     "dark_mode": true,
     "language": "de",
-    "logged_in_user_id": null,
-    "logged_in_group": null,
+    "logged_in_user_id": 1,
+    "logged_in_group": {
+        "id": 4,
+        "name": "Demokurs",
+        "owner_id": 1,
+        "date": "2025-10-15T19:48:00.54948"
+    },
     "groups": []
 }

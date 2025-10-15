@@ -20,6 +20,11 @@ class QuestionMenuScreen(SafeScreen):
         self.helper_ui = None
 
 
+    def on_pre_enter(self, *args):
+        super().on_pre_enter(*args)
+        self.refresh()
+
+
     def refresh(self, *args):
         self.fill_category_list()
 
