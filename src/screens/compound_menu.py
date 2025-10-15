@@ -20,10 +20,6 @@ class CompoundMenuScreen(SafeScreen):
         self.helper_ui = None
 
 
-    def on_pre_enter(self, *args):
-        self.refresh()
-
-
     def refresh(self, *args):
         self.ids.query_mode_title.text = self.app.language_manager.translate("formula_to_name")
         self.fill_category_list()

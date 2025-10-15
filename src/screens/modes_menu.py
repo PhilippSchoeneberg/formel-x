@@ -102,6 +102,8 @@ class ModesMenuScreen(SafeScreen):
             self.ids.group_name.text = self.app.language_manager.translate("select") + self.app.language_manager.translate("group")
         if self.app.logged_in_group is not None:
             self.refresh_groups()
+        for screen in self.app.screens:
+            screen.refresh()
 
 
     def remove(self, group):

@@ -143,7 +143,7 @@ class Database:
     def create_category(self, name, category_type, group):
         data = {
             "name": name,
-            "category_type": category_type,
+            "type": category_type.value,
             "group_id": group["id"],
         }
         response = self.client.post("/categories", json=data)
@@ -153,7 +153,7 @@ class Database:
     def update_category(self, id, name, category_type, group):
         data = {
             "name": name,
-            "type": category_type,
+            "type": category_type.value,
             "group_id": group["id"],
         }
         response = self.client.patch(f"/categories?id=eq.{id}", json=data)

@@ -111,7 +111,6 @@ class MainApp(MDApp):
         self.question_menu_screen = QuestionMenuScreen(name="questionMenu")
         self.question_learning_screen = QuestionLearningScreen(name="questionLearning")
 
-        self.screens.append(self.modes_menu_screen)
         self.screens.append(self.element_menu_screen)
         self.screens.append(self.compound_menu_screen)
         self.screens.append(self.compound_learning_screen)
@@ -144,8 +143,7 @@ class MainApp(MDApp):
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
 
-        for screen in self.screens:
-            screen.refresh()
+        self.modes_menu_screen.refresh()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "logout"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.logout
@@ -156,8 +154,7 @@ class MainApp(MDApp):
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
 
-        for screen in self.screens:
-            screen.refresh()
+        self.modes_menu_screen.refresh()
 
         self.root.get_screen("modesMenu").ids.account_button.icon = "account"
         self.root.get_screen("modesMenu").ids.account_button.on_release = RegisterOrLoginAccountPopupMenu().open
