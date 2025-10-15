@@ -72,8 +72,8 @@ class ElementMenuScreen(SafeScreen):
             text = MDButtonText(text="")
             btn.add_widget(text)
             text.text = symbol
-            text.theme_text_color = "Custom"
-            btn.theme_bg_color = "Custom"
+            text.theme_text_color = "Secondary"
+            btn.theme_bg_color = "Primary"
 
             self.buttons.append({"button": btn, "text": text})
 
@@ -100,11 +100,12 @@ class ElementMenuScreen(SafeScreen):
             if element["symbol"] not in self.element_symbols:
                 self.app.db.link_element_to_group(element, self.app.logged_in_group)
                 self.element_symbols.append(element["symbol"])
+                item.theme_bg_color = "Custom"
                 item.md_bg_color = [0, 1, 0, 0.3]
             else:
                 self.app.db.unlink_element_to_group(element, self.app.logged_in_group)
                 self.element_symbols.remove(element["symbol"])
-                item.md_bg_color = [0.10588235294117647, 0.10588235294117647, 0.12941176470588237, 1.0]
+                item.theme_bg_color = "Primary"
 
 
     def refresh_buttons(self):
@@ -112,16 +113,21 @@ class ElementMenuScreen(SafeScreen):
         self.element_symbols = [element["symbol"] for element in self.elements]
         for button in self.buttons:
             if not self.app.learning_mode:
-                button["text"].text_color = [0.7490196078431373, 0.7607843137254902, 1.0, 1.0]
+                button["text"].theme_text_color = "Custom"
+                button["text"].text_color = [0.7490196078431373, 0.7607843137254902, 1.0, 1]
+                button["text"].theme_text_color = "Secondary"
                 if self.app.logged_in_user_id:
-                    button["button"].md_bg_color = (
-                        [0.10588235294117647, 0.10588235294117647, 0.12941176470588237, 1.0] if button["text"].text not in self.element_symbols else [0, 1, 0, 0.3]
-                    )
+                    if button["text"].text not in self.element_symbols:
+                        button["button"].theme_bg_color = "Primary"
+                    else:
+                        button["button"].theme_bg_color = "Custom"
+                        button["button"].md_bg_color = [0, 1, 0, 0.3]
                 else:
-                    button["button"].md_bg_color = [0.10588235294117647, 0.10588235294117647, 0.12941176470588237, 1.0]
+                    button["button"].theme_bg_color = "Primary"
             else:
+                button["text"].theme_text_color = "Custom"
                 button["text"].text_color = [0.7490196078431373, 0.7607843137254902, 1.0, 0]
-                button["button"].md_bg_color = [0.10588235294117647, 0.10588235294117647, 0.12941176470588237, 1.0]
+                button["button"].theme_bg_color = "Primary"
 
 
     def set_learning_mode(self, learning_mode):
