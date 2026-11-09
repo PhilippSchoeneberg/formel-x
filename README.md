@@ -1,8 +1,8 @@
-# FormulaX
+# FormelX
 The source code of the mobile application "FormelX"
 
 ## Installation
-- To install the project, first clone it via `git clone https://github.com/PhilippSchoeneberg/FormelX.git`
+- To install the project, first clone it via `git clone https://github.com/PhilippSchoeneberg/formel-x.git`
 - Then create a virtual environment using at least python version 3.11
 - Finally, install the necessary libraries using `pip install -r requirements.txt`
 
