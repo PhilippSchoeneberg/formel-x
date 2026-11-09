@@ -1,16 +1,37 @@
 # FormelX
-The source code of the mobile application "FormelX"
 
-## Installation
-- To install the project, first clone it via `git clone https://github.com/PhilippSchoeneberg/formel-x.git`
-- Then create a virtual environment using at least python version 3.11
-- Finally, install the necessary libraries using `pip install -r requirements.txt`
+A web app for learning chemistry: find elements in the periodic table, match compound names
+and formulas, and answer multiple-choice questions. Content is organised in groups (courses)
+that their owners create and edit; anyone can add a group by its name and learn.
 
-## Publication
-### Android
-- Increase numeric version number in the "buildozer.spec" file by 1
-- Create Android App Bundle (.aab) using `buildozer android release`
-- Rename the file to `formelx-release.aab`
-- Sign the file using `jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore my-release-key.keystore bin/formelx-release.aab my-key-alias`
-- Verify the signature using `jarsigner -verify -verbose -certs bin/formelx-release.aab`
-- Zipalign the file using `zipalign -v -p 4 bin/formelx-release.aab bin/formelx-release-aligned.aab`
+- Frontend: plain HTML, CSS and JavaScript (`src/frontend`)
+- Backend: Python with FastAPI (`src/backend`), data in Supabase (Postgres)
+
+## Quick start
+
+```bash
+python3 -m venv .venv
+```
+```bash
+.venv/bin/pip install -r requirements-dev.txt
+```
+```bash
+cp .env.example .env        # fill in the Supabase URL/key and a session secret
+```
+```bash
+.venv/bin/uvicorn src.backend.main:app --reload
+```
+
+Then open http://127.0.0.1:8000.
+
+Run the tests with `.venv/bin/pytest`.
+
+## Documentation
+
+- [Architecture](doc/architecture.md)
+- [API](doc/api.md)
+- [Development](doc/development.md)
+- [Deployment](doc/deployment.md)
+
+The earlier Android app (Kivy) is available in the git history and on `main` up to its last
+release (version 4).
