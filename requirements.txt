@@ -1,15 +1,6 @@
-# Desktop development dependencies. Keep in sync with `requirements` in buildozer.spec.
-kivy>=2.3
-# KivyMD 2.x pinned to the exact upstream commit the app was built against.
-# The PyPI 2.0.0 release diverged from this commit and is untested with the app.
-kivymd @ https://github.com/kivymd/KivyMD/archive/d2f77408999d0298cfbdf75c89d66649880d7492.zip
-# KivyMD at that commit requires asynckivy>=0.6,<0.7
-asynckivy==0.6.4
-asyncgui==0.6.3
-materialyoucolor
-polib
-passlib==1.7.4
-# passlib 1.7.4 breaks with bcrypt >= 4.1 (hashing raises ValueError)
-bcrypt==4.0.1
-httpx
-pillow
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+bcrypt==4.2.1
+itsdangerous==2.2.0
+python-dotenv==1.0.1
