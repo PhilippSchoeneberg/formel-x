@@ -85,4 +85,17 @@ assets/<lang>/LC_MESSAGES/texts.po|.mo   Translations (de, en, es, fr, nl)
 
 ## Git
 
-- Default branch: `main`. Commit messages are short imperative English sentences (e.g. "Fix the refreshing of categories after creation.").
+Feature-branch workflow:
+
+- **`development`** is the default branch and the integration branch. It changes **only through merged pull requests** from feature branches. Never commit or push to it directly.
+- **`main`** contains released versions only. It is updated by a pull request from `development` when a release is made (bump `android.numeric_version`, then build from `main`).
+- **Feature branches** start from the latest `development` and are named by type: `feature/<short-name>`, `fix/<short-name>`, `docs/<short-name>`. Open the PR against `development`.
+  ```bash
+  git switch development && git pull
+  git switch -c feature/<short-name>
+  # ...commit...
+  git push -u origin feature/<short-name>
+  gh pr create --base development
+  ```
+- Urgent fixes to a release: branch `hotfix/<name>` from `main`, PR into `main`, then merge `main` back into `development`.
+- Commit messages are short imperative English sentences (e.g. "Fix the refreshing of categories after creation.").
