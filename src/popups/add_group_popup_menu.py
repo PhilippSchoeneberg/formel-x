@@ -70,7 +70,7 @@ class AddGroupPopupMenu(MDDialog):
                 if group not in self.app.groups:
                     self.app.groups.append(group)
                     self.app.state["groups"] = self.app.groups
-                    save_state(self.state)
+                    save_state(self.app.state)
                     self.app.modes_menu_screen.refresh_groups()
                     self.dismiss()
                 else:

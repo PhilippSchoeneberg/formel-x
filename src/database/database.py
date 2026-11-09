@@ -1,5 +1,18 @@
 import httpx
 
+
+class DatabaseConnectionError(Exception):
+    """Raised when the server cannot be reached (offline, DNS failure, timeout)."""
+
+
+class _ConnectionErrorTransport(httpx.HTTPTransport):
+    def handle_request(self, request):
+        try:
+            return super().handle_request(request)
+        except httpx.TransportError as e:
+            raise DatabaseConnectionError(str(e)) from e
+
+
 class Database:
     def __init__(self, url, key):
         self.url = url
@@ -9,7 +22,7 @@ class Database:
             "Content-Type": "application/json",
             "Prefer": "return=representation"
         }
-        self.client = httpx.Client(base_url=url+"/rest/v1", headers=self.headers)
+        self.client = httpx.Client(base_url=url+"/rest/v1", headers=self.headers, transport=_ConnectionErrorTransport())
 
 
     def create_account(self, email, password):
@@ -180,7 +193,10 @@ class Database:
             return {}
 
         group_id = group["id"]
-        response = self.client.get("/categories", params={"group_id": f"eq.{group_id}"})
+        params = {"group_id": f"eq.{group_id}"}
+        if type is not None:
+            params["type"] = f"eq.{type.value}"
+        response = self.client.get("/categories", params=params)
         data = response.json()
         return [
             {

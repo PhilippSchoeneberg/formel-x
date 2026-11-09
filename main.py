@@ -8,13 +8,17 @@ from src.screens.compound_menu import CompoundMenuScreen
 from src.screens.compound_learning import CompoundLearningScreen
 from src.screens.question_learning import QuestionLearningScreen
 
-from src.database.database import Database
+from src.popups.error_popup_menu import ErrorPopupMenu
+
+from src.database.database import Database, DatabaseConnectionError
 from src.utils.language_manager import LanguageManager
 from src.utils.json_parser import load_state, save_state
 
 import os
 from kivymd.app import MDApp
+from kivy.app import App
 from kivy.lang import Builder
+from kivy.base import ExceptionHandler, ExceptionManager
 from kivy.core.text import LabelBase
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.screenmanager import ScreenManager
@@ -22,6 +26,18 @@ from kivymd.font_definitions import theme_font_styles
 
 
 LabelBase.register(name="RobotoDownloaded", fn_regular="assets/Roboto-VariableFont_wdth,wght.ttf")
+
+
+class DatabaseConnectionErrorHandler(ExceptionHandler):
+    """Shows an error popup instead of crashing when the server can't be reached."""
+    def handle_exception(self, exception):
+        if isinstance(exception, DatabaseConnectionError):
+            App.get_running_app().show_connection_error()
+            return ExceptionManager.PASS
+        return ExceptionManager.RAISE
+
+
+ExceptionManager.add_handler(DatabaseConnectionErrorHandler())
 
 class MainApp(MDApp):
     def __init__(self):
@@ -53,6 +69,7 @@ class MainApp(MDApp):
         self.learning_mode = False
         self.general_dropdown_menu = None
         self.formula_to_name_query_mode = True
+        self.connection_error_popup_open = False
 
         # Instantiate Language Manager
         self.language_manager = LanguageManager(self.language)
@@ -130,12 +147,33 @@ class MainApp(MDApp):
 
     def on_start(self):
         self.set_theme()
-        if self.logged_in_user_id:
-            self.login(self.logged_in_user_id)
-        else:
-            self.logout()
-        if self.logged_in_group:
-            self.modes_menu_screen.set_group(self.logged_in_group)
+        self.load_initial_data()
+
+
+    def load_initial_data(self):
+        # Runs before Kivy's main loop, so the global ExceptionManager handler doesn't apply here
+        try:
+            if self.logged_in_user_id:
+                self.login(self.logged_in_user_id)
+            else:
+                self.logout()
+            if self.logged_in_group:
+                self.modes_menu_screen.set_group(self.logged_in_group)
+        except DatabaseConnectionError:
+            self.show_connection_error(retry_function=self.load_initial_data)
+
+
+    def show_connection_error(self, retry_function=None):
+        if self.connection_error_popup_open:
+            return
+        self.connection_error_popup_open = True
+
+        def on_dismiss():
+            self.connection_error_popup_open = False
+            if retry_function:
+                retry_function()
+
+        ErrorPopupMenu().open(self.language_manager.translate("connection_error"), on_dismiss)
 
 
     def login(self, loggedInUserId):
@@ -143,10 +181,10 @@ class MainApp(MDApp):
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
 
-        self.modes_menu_screen.refresh()
-
         self.root.get_screen("modesMenu").ids.account_button.icon = "logout"
         self.root.get_screen("modesMenu").ids.account_button.on_release = self.logout
+
+        self.modes_menu_screen.refresh()
 
 
     def logout(self):
@@ -154,10 +192,10 @@ class MainApp(MDApp):
         self.state["logged_in_user_id"] = self.logged_in_user_id
         save_state(self.state)
 
-        self.modes_menu_screen.refresh()
-
         self.root.get_screen("modesMenu").ids.account_button.icon = "account"
         self.root.get_screen("modesMenu").ids.account_button.on_release = RegisterOrLoginAccountPopupMenu().open
+
+        self.modes_menu_screen.refresh()
 
 
     def change_screen(self, name):

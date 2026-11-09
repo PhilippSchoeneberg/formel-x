@@ -33,6 +33,7 @@ class ErrorPopupMenu(MDDialog):
 
 
     def dismiss(self, *args, **kwargs):
+        # Close first so an exception raised by the action can't leave the dialog stuck open
+        super().dismiss()
         if self.action_function:
             self.action_function()
-        super().dismiss()

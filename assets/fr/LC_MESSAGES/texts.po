@@ -591,3 +591,6 @@ msgstr "Tennessine"
 
 msgid "oganesson"
 msgstr "Oganesson"
+
+msgid "connection_error"
+msgstr "Impossible de se connecter au serveur. Veuillez vérifier votre connexion internet et réessayer."

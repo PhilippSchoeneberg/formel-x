@@ -28,7 +28,7 @@ source.include_exts = py,png,jpg,kv,atlas,ttf,json,sql,mo
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-#source.exclude_dirs = tests, bin, venv
+source.exclude_dirs = .venv, bin
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -46,7 +46,7 @@ version = 0
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy, asynckivy, asyncgui, polib, passlib, bcrypt, httpx, httpcore, h11, openssl, pillow, materialyoucolor
+requirements = python3, kivy, https://github.com/kivymd/KivyMD/archive/d2f77408999d0298cfbdf75c89d66649880d7492.zip, asynckivy==0.6.4, asyncgui==0.6.3, polib, passlib, bcrypt, httpx, httpcore, h11, openssl, pillow, materialyoucolor
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

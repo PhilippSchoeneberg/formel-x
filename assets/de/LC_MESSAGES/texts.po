@@ -591,3 +591,6 @@ msgstr "Tenness"
 
 msgid "oganesson"
 msgstr "Oganesson"
+
+msgid "connection_error"
+msgstr "Keine Verbindung zum Server. Bitte überprüfe deine Internetverbindung und versuche es erneut."
