@@ -4,7 +4,7 @@
 import { api } from "../api.js";
 import { DIFFICULTIES, categoryDialog, confirmDelete, entryDialog, showError } from "../dialogs.js";
 import { t } from "../i18n.js";
-import { isOwner, savePrefs, state } from "../store.js";
+import { isOwner, savePrefs, staleCheck, state } from "../store.js";
 import { button, h, replaceContent } from "../ui.js";
 import { pageHeader, segmented } from "./common.js";
 
@@ -24,8 +24,10 @@ function learnLink(kind, categoryId) {
 export async function renderMenu(view, kind) {
   const config = KINDS[kind];
   const owner = isOwner();
+  const stale = staleCheck();
   const categories = await api.categories(state.group.id, config.type);
-  const rerender = () => renderMenu(view, kind).catch(showError);
+  if (stale()) return;
+  const rerender = () => { if (!stale()) renderMenu(view, kind).catch(showError); };
 
   const addCategory = async () => {
     if (await categoryDialog(config.type)) rerender();

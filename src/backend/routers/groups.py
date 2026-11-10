@@ -48,9 +48,12 @@ async def update_group(body: GroupIn, group=Depends(get_owned_group), db: Databa
     if existing and existing["id"] != group["id"]:
         raise HTTPException(status.HTTP_409_CONFLICT, "group_exists")
     try:
-        return await db.update_group(group["id"], body.name)
+        updated = await db.update_group(group["id"], body.name)
     except DatabaseConflictError:
         raise HTTPException(status.HTTP_409_CONFLICT, "group_exists")
+    if updated is None:  # deleted in the meantime
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "group_not_found")
+    return updated
 
 
 @router.delete("/{group_id}", status_code=status.HTTP_204_NO_CONTENT)

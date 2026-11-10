@@ -40,7 +40,10 @@ async def update_category(body: CategoryUpdate, category=Depends(get_owned_categ
     category_type = CategoryType.from_db(category["type"])
     if await _name_taken(db, category["group_id"], category_type, body.name, exclude_id=category["id"]):
         raise HTTPException(status.HTTP_409_CONFLICT, "category_exists")
-    return await db.update_category(category["id"], body.name)
+    updated = await db.update_category(category["id"], body.name)
+    if updated is None:  # deleted in the meantime
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "category_not_found")
+    return updated
 
 
 @router.delete("/categories/{category_id}", status_code=status.HTTP_204_NO_CONTENT)

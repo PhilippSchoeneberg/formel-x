@@ -4,7 +4,7 @@ from ..database import Database, DatabaseConflictError
 from ..rate_limit import (
     LOGIN_FAILURES_PER_EMAIL, LOGIN_FAILURES_PER_IP, REGISTRATIONS_PER_IP, RateLimiter, client_ip, get_rate_limiter,
 )
-from ..schemas import MIN_PASSWORD_LENGTH, AccountResponse, Credentials, is_valid_email
+from ..schemas import MIN_PASSWORD_LENGTH, AccountResponse, Credentials, is_valid_email, normalize_email
 from ..security import (
     MAX_PASSWORD_BYTES,
     burn_password_check,
@@ -46,7 +46,7 @@ async def register(credentials: Credentials, request: Request, db: Database = De
     if await db.get_account_by_email(credentials.email):
         raise HTTPException(status.HTTP_409_CONFLICT, "account_exists")
     try:
-        account = await db.create_account(credentials.email, hash_password(credentials.password))
+        account = await db.create_account(normalize_email(credentials.email), hash_password(credentials.password))
     except DatabaseConflictError:
         raise HTTPException(status.HTTP_409_CONFLICT, "account_exists")
 
@@ -59,7 +59,7 @@ async def register(credentials: Credentials, request: Request, db: Database = De
 async def login(credentials: Credentials, request: Request, db: Database = Depends(get_db),
                 limiter: RateLimiter = Depends(get_rate_limiter)):
     ip_key = f"login-ip:{client_ip(request)}"
-    email_key = f"login-email:{credentials.email.lower()}"
+    email_key = f"login-email:{normalize_email(credentials.email)}"
     limiter.check((ip_key, LOGIN_FAILURES_PER_IP), (email_key, LOGIN_FAILURES_PER_EMAIL))
 
     account = await db.get_account_by_email(credentials.email)

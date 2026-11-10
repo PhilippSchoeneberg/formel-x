@@ -284,7 +284,7 @@ export function entryDialog(kind, categories, entry = null, defaults = {}) {
   ], { value: entry?.difficulty ?? defaults.difficulty ?? "" });
 
   const inputs = config.fields.map(([key, labelKey, labelParams, required, isFormula]) => {
-    const label = required ? t(labelKey, labelParams) : `${t(labelKey, labelParams)} ${t("optional")}`;
+    const label = required ? t(labelKey, labelParams) : t("label_optional", { label: t(labelKey, labelParams) });
     const item = field(label, {
       value: entry?.[key] ?? "",
       multiline: key === "question",
@@ -298,6 +298,30 @@ export function entryDialog(kind, categories, entry = null, defaults = {}) {
     return { key, required, item };
   });
 
+  // Two options that look the same would make the quiz unanswerable. Mirrors
+  // has_duplicate_answers() in src/backend/schemas.py.
+  const answerGroups = [
+    { match: /name/, normalize: (value) => value.trim().toLocaleLowerCase() },
+    { match: /formula/, normalize: (value) => value.replace(/[{}\s]/g, "") },
+    { match: /answer/, normalize: (value) => value.trim().toLocaleLowerCase() },
+  ];
+  const markDuplicates = () => {
+    let found = false;
+    for (const group of answerGroups) {
+      const seen = new Set();
+      for (const { key, item } of inputs) {
+        if (!group.match.test(key) || !item.value()) continue;
+        const normalized = group.normalize(item.value());
+        if (seen.has(normalized)) {
+          item.setError(t("duplicate_answer"));
+          found = true;
+        }
+        seen.add(normalized);
+      }
+    }
+    return found;
+  };
+
   return formDialog({
     title: entry ? t(config.editKey) : t(config.newKey),
     wide: true,
@@ -310,13 +334,19 @@ export function entryDialog(kind, categories, entry = null, defaults = {}) {
           valid = false;
         }
       }
-      if (!valid) return undefined;
+      if (!valid || markDuplicates()) return undefined;
 
       const data = { category_id: Number(category.value()), difficulty: difficulty.value() };
       for (const { key, item } of inputs) data[key] = item.value() || null;
-      return entry
-        ? await api.updateEntry(kind, entry.id, data)
-        : await api.createEntry(kind, state.group.id, data);
+      try {
+        return entry
+          ? await api.updateEntry(kind, entry.id, data)
+          : await api.createEntry(kind, state.group.id, data);
+      } catch (error) {
+        if (error.detail !== "duplicate_answers") throw error;
+        markDuplicates();
+        return undefined;
+      }
     },
   });
 }

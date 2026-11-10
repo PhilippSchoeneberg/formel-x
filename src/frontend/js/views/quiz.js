@@ -5,7 +5,7 @@ import { api } from "../api.js";
 import { confirmDelete, entryDialog, showError } from "../dialogs.js";
 import { formulaToUnicode } from "../formula.js";
 import { t } from "../i18n.js";
-import { isOwner, state } from "../store.js";
+import { isOwner, staleCheck, state } from "../store.js";
 import { button, focusElement, h, replaceContent, shuffle } from "../ui.js";
 import { pageHeader } from "./common.js";
 import { KINDS } from "./menu.js";
@@ -57,12 +57,19 @@ async function newRound(kind, params) {
  * `focusPrompt` moves focus to the new question after answering, so keyboard and screen reader
  * users continue right there instead of on a button that no longer exists.
  */
-export async function renderQuiz(view, kind, params, { focusPrompt = false } = {}) {
+export async function renderQuiz(view, kind, params, { focusPrompt = false, fresh = false } = {}) {
   const config = KINDS[kind];
   const owner = isOwner();
   const back = `#/${kind}`;
+  const stale = staleCheck();
 
-  if (!round || round.key !== roundKey(kind, params)) round = await newRound(kind, params);
+  // `fresh`: the user opened the quiz from a link, so start over even if the same round exists
+  // (otherwise a finished round would greet them with "Well done!" right away).
+  if (fresh || !round || round.key !== roundKey(kind, params)) {
+    const next = await newRound(kind, params);
+    if (stale()) return;
+    round = next;
+  }
 
   let title = t(config.titleKey);
   const categoryId = params.get("category");
@@ -71,9 +78,12 @@ export async function renderQuiz(view, kind, params, { focusPrompt = false } = {
     const category = categories.find((item) => String(item.id) === categoryId);
     if (category) title = category.name;
   }
+  if (stale()) return;
 
   const restart = async () => {
-    round = await newRound(kind, params);
+    const next = await newRound(kind, params);
+    if (stale()) return;
+    round = next;
     renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
   };
 
@@ -134,6 +144,7 @@ export async function renderQuiz(view, kind, params, { focusPrompt = false } = {
         feedback.className = "feedback good";
         for (const other of optionButtons) other.setAttribute("aria-disabled", "true");
         setTimeout(() => {
+          if (stale()) return; // the user has moved on
           round.index += 1;
           renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
         }, 900);
@@ -152,7 +163,7 @@ export async function renderQuiz(view, kind, params, { focusPrompt = false } = {
       icon: "edit", variant: "text", iconOnly: true,
       onclick: async () => {
         const updated = await entryDialog(kind, categories, entry);
-        if (!updated) return;
+        if (!updated || stale()) return;
         round.entries[round.index] = updated;
         round.order = null;
         renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
@@ -165,6 +176,7 @@ export async function renderQuiz(view, kind, params, { focusPrompt = false } = {
         if (!(await confirmDelete(config.deleteKey, name))) return;
         try {
           await api.deleteEntry(kind, entry.id);
+          if (stale()) return;
           round.entries.splice(round.index, 1);
           round.order = null;
           renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);

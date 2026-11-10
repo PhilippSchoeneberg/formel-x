@@ -101,9 +101,15 @@ class SameOriginMiddleware:
         if scope["type"] == "http" and scope["method"] in UNSAFE_METHODS and scope["path"].startswith("/api/"):
             origin = _header(scope, b"origin")
             fetch_site = _header(scope, b"sec-fetch-site")
-            host = _header(scope, b"host")
+            # Reverse proxies often rewrite Host (nginx's default is the upstream address) and
+            # pass the original in X-Forwarded-Host. A page on another site can't set that
+            # header (it's not CORS-safelisted), so accepting it doesn't weaken the check.
+            hosts = {_header(scope, b"host")}
+            forwarded = _header(scope, b"x-forwarded-host")
+            if forwarded:
+                hosts.add(forwarded.split(",")[0].strip())
             if origin is not None and origin != "null":
-                if urlsplit(origin).netloc != host:
+                if urlsplit(origin).netloc not in hosts:
                     return await _send_json(send, 403, "cross_origin_request")
             elif origin == "null" or fetch_site in ("cross-site", "same-site"):
                 return await _send_json(send, 403, "cross_origin_request")

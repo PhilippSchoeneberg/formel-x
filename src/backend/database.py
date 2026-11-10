@@ -9,7 +9,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 
-from sqlalchemy import Select, delete, event, insert, select, update
+from sqlalchemy import Select, delete, event, func, insert, select, update
 from sqlalchemy.exc import DBAPIError, IntegrityError, InterfaceError, OperationalError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.pool import StaticPool
@@ -103,7 +103,8 @@ class Database:
 
 
     async def get_account_by_email(self, email):
-        return await self._one(select(accounts).where(accounts.c.email == email))
+        # Case-insensitive, so "Max@example.com" finds the account registered as "max@example.com".
+        return await self._one(select(accounts).where(func.lower(accounts.c.email) == email.strip().lower()))
 
 
     async def create_account(self, email, password_hash):
