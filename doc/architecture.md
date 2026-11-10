@@ -94,7 +94,7 @@ doc/                 This documentation
   styles go through the CSSOM (`element.style`), which CSP permits.
 - **Headers** on every response: CSP, `X-Content-Type-Options`, `X-Frame-Options`/`frame-ancestors`
   (no framing), `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`,
-  `Cross-Origin-Resource-Policy`, and HSTS when `SECURE_COOKIES` is on.
+  `Cross-Origin-Resource-Policy`. HSTS is set by the HTTPS proxy (Caddy), not the app.
 - **Abuse limits:** request bodies over 64 KiB get `413`; group-name lookups are limited to 30 per
   minute per IP; `/groups/lookup` takes at most 100 ids.
 - **SQL injection:** all queries go through SQLAlchemy with bound parameters.

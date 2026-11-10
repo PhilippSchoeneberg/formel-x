@@ -4,6 +4,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .config import FRONTEND_DIR, Settings
 from .database import Database, DatabaseConnectionError, DatabaseError
@@ -53,7 +54,10 @@ def create_app(settings: Settings, db=None):
     # and put the security headers on every response, including errors.
     app.add_middleware(SameOriginMiddleware)
     app.add_middleware(BodySizeLimitMiddleware)
-    app.add_middleware(SecurityHeadersMiddleware, hsts=settings.secure_cookies)
+    app.add_middleware(SecurityHeadersMiddleware)
+    # Outermost: answer only to our own host names (400 otherwise). No www redirect: redirects
+    # belong to the proxy in front.
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_host_list, www_redirect=False)
 
     @app.exception_handler(DatabaseConnectionError)
     async def connection_error(request: Request, exc: DatabaseConnectionError):

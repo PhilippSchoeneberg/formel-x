@@ -61,12 +61,11 @@ def _header(scope, name):
 
 
 class SecurityHeadersMiddleware:
-    def __init__(self, app, hsts=False):
+    def __init__(self, app):
         self.app = app
-        # Only over HTTPS: browsers would otherwise refuse plain http://localhost for a year.
+        # No HSTS here: the TLS-terminating proxy (Caddy) sets it. Sending it from both would
+        # duplicate the header.
         self.headers = dict(SECURITY_HEADERS)
-        if hsts:
-            self.headers["strict-transport-security"] = "max-age=31536000"
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":

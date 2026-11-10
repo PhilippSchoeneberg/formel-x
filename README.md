@@ -20,7 +20,10 @@ uv sync
 cp .env.example .env        # fill in a database password, DATABASE_URL and a session secret
 ```
 ```bash
-docker compose up -d db     # PostgreSQL in Docker
+docker network create web   # once; compose.yaml expects this network
+```
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml up -d db   # PostgreSQL on localhost
 ```
 ```bash
 uv run alembic upgrade head
@@ -29,7 +32,7 @@ uv run alembic upgrade head
 uv run uvicorn src.backend.main:app --reload
 ```
 
-Then open http://127.0.0.1:8000. To run everything (app and database) in Docker instead, use `docker compose up -d --build`.
+Then open http://127.0.0.1:8000. To deploy behind HTTPS on a server, see [doc/deployment.md](doc/deployment.md).
 
 Run the tests with `uv run pytest` (once before: `uv run playwright install chromium` for the browser tests).
 

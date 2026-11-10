@@ -21,7 +21,8 @@ Until November 2026 this was a Kivy/Android app (never published) on Supabase; t
 ```bash
 uv sync                                                                   # install deps (incl. dev group)
 cp .env.example .env                                                      # fill in values
-docker compose up -d db                                                   # PostgreSQL
+docker network create web                                                 # once (compose.yaml expects it)
+docker compose -f compose.yaml -f compose.dev.yaml up -d db               # PostgreSQL on localhost:5432
 uv run alembic upgrade head                                               # create/upgrade tables
 uv run uvicorn src.backend.main:app --reload                              # http://127.0.0.1:8000
 uv run playwright install chromium                                        # once, for browser tests
@@ -31,7 +32,8 @@ uv run pytest                                                             # all 
 - Run uvicorn from the repo root (the import path is `src.backend.main:app`). File paths inside the app are resolved from `config.py`, not the CWD.
 - `.env` needs `POSTGRES_PASSWORD`, `DATABASE_URL` (`postgresql+asyncpg://formelx:<pw>@localhost:5432/formelx`), `SESSION_SECRET`; set `SECURE_COOKIES=false` for local http. Never commit `.env` and never print secrets.
 - Tests (`tests/conftest.py`) run the real app and `Database` on SQLite in memory (tables via `metadata.create_all`); set `TEST_DATABASE_URL` to run them on an empty, wipeable Postgres database. Add tests when changing the API. Keep queries portable between SQLite and Postgres. `tests/e2e/` has Playwright browser tests for the main flows (`-m 'not e2e'` skips them).
-- Full stack: `docker compose up -d --build` (app container runs `alembic upgrade head` on start). `APP_PORT` overrides host port 8000. Never use `docker compose down -v` on real data (deletes the DB volume).
+- Docker: `compose.yaml` is the server setup (containers `formel-x` + `formel-x-db`, external network `web`, **no published ports**: only the Caddy proxy reaches the app, over HTTPS). `compose.dev.yaml` adds localhost ports for development. The app does no TLS, no redirects and no HSTS (Caddy does). Never use `docker compose down -v` on real data (deletes the DB volume). See `doc/deployment.md`.
+- `ALLOWED_HOSTS` (comma-separated, default `*`) feeds Starlette's `TrustedHostMiddleware`; compose sets it from `PUBLIC_HOST`.
 
 ## Layout
 
