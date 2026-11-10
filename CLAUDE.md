@@ -19,17 +19,18 @@ Until November 2026 this was a Kivy/Android app (never published) on Supabase; t
 ## Running
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt   # once
+uv sync                                                                   # install deps (incl. dev group)
 cp .env.example .env                                                      # fill in values
 docker compose up -d db                                                   # PostgreSQL
-.venv/bin/alembic upgrade head                                            # create/upgrade tables
-.venv/bin/uvicorn src.backend.main:app --reload                           # http://127.0.0.1:8000
-.venv/bin/pytest                                                          # tests
+uv run alembic upgrade head                                               # create/upgrade tables
+uv run uvicorn src.backend.main:app --reload                              # http://127.0.0.1:8000
+uv run playwright install chromium                                        # once, for browser tests
+uv run pytest                                                             # all tests (-m 'not e2e' skips the browser)
 ```
 
 - Run uvicorn from the repo root (the import path is `src.backend.main:app`). File paths inside the app are resolved from `config.py`, not the CWD.
 - `.env` needs `POSTGRES_PASSWORD`, `DATABASE_URL` (`postgresql+asyncpg://formelx:<pw>@localhost:5432/formelx`), `SESSION_SECRET`; set `SECURE_COOKIES=false` for local http. Never commit `.env` and never print secrets.
-- Tests (`tests/conftest.py`) run the real app and `Database` on SQLite in memory (tables via `metadata.create_all`); set `TEST_DATABASE_URL` to run them on an empty, wipeable Postgres database. Add tests when changing the API. Keep queries portable between SQLite and Postgres.
+- Tests (`tests/conftest.py`) run the real app and `Database` on SQLite in memory (tables via `metadata.create_all`); set `TEST_DATABASE_URL` to run them on an empty, wipeable Postgres database. Add tests when changing the API. Keep queries portable between SQLite and Postgres. `tests/e2e/` has Playwright browser tests for the main flows (`-m 'not e2e'` skips them).
 - Full stack: `docker compose up -d --build` (app container runs `alembic upgrade head` on start). `APP_PORT` overrides host port 8000. Never use `docker compose down -v` on real data (deletes the DB volume).
 
 ## Layout
@@ -47,6 +48,10 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 
 - All DB access goes through `Database` (`database.py`), one async method per query (each its own transaction), returning plain dicts.
 - `DatabaseConnectionError` → 503 `connection_error`; other DB errors → `DatabaseError` → 502 (logged); unique violations → `DatabaseConflictError`.
+- Every endpoint declares a `response_model` from `schemas.py`; routes return DB dicts and the model filters them. Add the model when adding an endpoint.
+- Login/registration go through `RateLimiter` (`rate_limit.py`, `app.state.rate_limiter`). New passwords need `MIN_PASSWORD_LENGTH` (8) characters; login doesn't check it.
+- Config is `pydantic-settings` (`config.py`): `Settings`, `DatabaseSettings`, `SupabaseSettings`; env vars win over `.env`.
+- Dependencies: `pyproject.toml` + `uv.lock` (uv). Use `uv add`, never pip/requirements files.
 - Errors use short `detail` codes (`group_exists`, `invalid_credentials`, `not_group_owner`, …) that the frontend maps to translated messages. Don't return English sentences.
 - Auth: bcrypt via the `bcrypt` package (old passlib hashes verify fine). Login stores `account_id` in Starlette's signed, HTTP-only session cookie. Use the dependencies in `security.py`: `require_account_id`, `get_group_or_404`, `get_owned_group`, `ensure_owner`.
 - Passwords are stripped before hashing/verifying (the old app did this; keep it for existing accounts). Max 72 bytes.

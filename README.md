@@ -9,11 +9,10 @@ that their owners create and edit; anyone can add a group by its name and learn.
 
 ## Quick start
 
+Needs [uv](https://docs.astral.sh/uv/) (`brew install uv`) and Docker.
+
 ```bash
-python3 -m venv .venv
-```
-```bash
-.venv/bin/pip install -r requirements-dev.txt
+uv sync
 ```
 ```bash
 cp .env.example .env        # fill in a database password, DATABASE_URL and a session secret
@@ -22,15 +21,15 @@ cp .env.example .env        # fill in a database password, DATABASE_URL and a se
 docker compose up -d db     # PostgreSQL in Docker
 ```
 ```bash
-.venv/bin/alembic upgrade head
+uv run alembic upgrade head
 ```
 ```bash
-.venv/bin/uvicorn src.backend.main:app --reload
+uv run uvicorn src.backend.main:app --reload
 ```
 
 Then open http://127.0.0.1:8000. To run everything (app and database) in Docker instead, use `docker compose up -d --build`.
 
-Run the tests with `.venv/bin/pytest`.
+Run the tests with `uv run pytest` (once before: `uv run playwright install chromium` for the browser tests).
 
 ## Documentation
 

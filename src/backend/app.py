@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .config import FRONTEND_DIR, Settings
 from .database import Database, DatabaseConnectionError, DatabaseError
+from .rate_limit import RateLimiter
 from .routers import auth, categories, elements, entries, groups
 
 
@@ -19,6 +20,7 @@ def create_app(settings: Settings, db=None):
     @asynccontextmanager
     async def lifespan(app):
         app.state.db = db or Database(settings.database_url)
+        app.state.rate_limiter = RateLimiter()
         yield
         if db is None:
             await app.state.db.close()

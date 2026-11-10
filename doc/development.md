@@ -2,11 +2,11 @@
 
 ## Setup
 
-Requires Python 3.11 or newer and Docker (for PostgreSQL).
+Requires [uv](https://docs.astral.sh/uv/) (`brew install uv`), Python 3.11 or newer (uv can install it) and Docker (for PostgreSQL).
 
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements-dev.txt
+uv sync                              # creates .venv with all dependencies from uv.lock
+uv run playwright install chromium   # browser for the end-to-end tests
 cp .env.example .env
 ```
 
@@ -23,13 +23,13 @@ Start the database and create the tables (once, and again after pulling new migr
 
 ```bash
 docker compose up -d db
-.venv/bin/alembic upgrade head
+uv run alembic upgrade head
 ```
 
 Then, from the repository root:
 
 ```bash
-.venv/bin/uvicorn src.backend.main:app --reload
+uv run uvicorn src.backend.main:app --reload
 ```
 
 Open http://127.0.0.1:8000. The API docs are at http://127.0.0.1:8000/api/docs.
@@ -37,21 +37,34 @@ Open http://127.0.0.1:8000. The API docs are at http://127.0.0.1:8000/api/docs.
 The frontend has no build step: edit files in `src/frontend` and reload the page.
 
 To run the whole stack in Docker (as on the server) use `docker compose up -d --build`. Set
-`APP_PORT` in `.env` if port 8000 is taken.
+`APP_PORT` or `DB_PORT` in `.env` if port 8000 or 5432 is taken.
+
+## Dependencies
+
+Dependencies are declared in `pyproject.toml` and pinned in `uv.lock` (commit both).
+
+```bash
+uv add <package>              # runtime dependency
+uv add --dev <package>        # test/dev dependency
+uv lock --upgrade             # update everything within the declared ranges
+```
 
 ## Tests
 
 ```bash
-.venv/bin/pytest
+uv run pytest                  # everything
+uv run pytest -m "not e2e"     # skip the browser tests
 ```
 
-The tests run the real FastAPI app and database code against SQLite in memory, so they need
-no running database and no `.env`. To run them against PostgreSQL, point
+- `tests/test_api.py` runs the real FastAPI app and database code against SQLite in memory,
+  so it needs no running database and no `.env`.
+- `tests/e2e/` starts the app on a temporary SQLite database and drives it with Playwright
+  (headless Chromium). Add `--headed` to watch the browser. To run them against PostgreSQL, point
 `TEST_DATABASE_URL` at an **empty** database that may be wiped:
 
 ```bash
 docker compose exec db createdb -U formelx formelx_test
-TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx_test .venv/bin/pytest
+TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx_test uv run pytest tests/test_api.py
 ```
 
 ## Changing the schema
@@ -59,9 +72,9 @@ TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx
 1. Change the tables in `src/backend/tables.py`.
 2. Generate a migration and review it:
    ```bash
-   .venv/bin/alembic revision --autogenerate -m "Add something"
+   uv run alembic revision --autogenerate -m "Add something"
    ```
-3. Apply it with `.venv/bin/alembic upgrade head`. `alembic check` reports whether the tables
+3. Apply it with `uv run alembic upgrade head`. `alembic check` reports whether the tables
    and the migrations still match.
 
 The app container applies migrations itself on every start.

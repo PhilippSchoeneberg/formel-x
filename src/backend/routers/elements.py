@@ -1,20 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..database import Database
+from ..schemas import ElementOut
 from ..security import get_db, get_group_or_404, get_owned_group
 
 
 router = APIRouter(prefix="/api", tags=["elements"])
 
 
-@router.get("/elements")
+@router.get("/elements", response_model=list[ElementOut])
 async def all_elements(response: Response, db: Database = Depends(get_db)):
     # The periodic table doesn't change, so let browsers cache it for a day.
     response.headers["Cache-Control"] = "public, max-age=86400"
     return await db.get_elements()
 
 
-@router.get("/groups/{group_id}/elements")
+@router.get("/groups/{group_id}/elements", response_model=list[str])
 async def group_elements(group=Depends(get_group_or_404), db: Database = Depends(get_db)):
     return await db.get_group_element_symbols(group["id"])
 

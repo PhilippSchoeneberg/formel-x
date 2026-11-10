@@ -9,6 +9,10 @@ import { button, confirmDialog, field, h, messageDialog, openDialog, selectField
 
 export const DIFFICULTIES = ["easy", "medium", "hard"];
 
+// Must match MIN_PASSWORD_LENGTH and EMAIL_PATTERN in src/backend/schemas.py.
+const MIN_PASSWORD_LENGTH = 8;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /** Shows a translated error for failures nobody handled more specifically. */
 export function showError(error) {
   console.error(error);
@@ -105,6 +109,14 @@ export function loginDialog(startInRegisterMode = false) {
         event.preventDefault();
         const required = registerMode ? [email, password, repetition] : [email, password];
         if (!requireFilled(required)) return;
+        if (registerMode && !EMAIL_PATTERN.test(email.value())) {
+          email.setError(t("invalid_email"));
+          return;
+        }
+        if (registerMode && password.value().length < MIN_PASSWORD_LENGTH) {
+          password.setError(t("password_too_short", { count: MIN_PASSWORD_LENGTH }));
+          return;
+        }
         if (registerMode && password.value() !== repetition.value()) {
           repetition.setError(t("passwords_mismatch"));
           return;
@@ -120,6 +132,13 @@ export function loginDialog(startInRegisterMode = false) {
             password.setError(t("login_failed"));
           } else if (error.status === 409) {
             email.setError(t("account_exists"));
+          } else if (error.status === 429) {
+            const minutes = Math.max(1, Math.ceil((error.retryAfter || 60) / 60));
+            password.setError(t("too_many_attempts", { minutes }));
+          } else if (error.detail === "invalid_email") {
+            email.setError(t("invalid_email"));
+          } else if (error.detail === "password_too_short") {
+            password.setError(t("password_too_short", { count: MIN_PASSWORD_LENGTH }));
           } else if (error.detail === "password_too_long") {
             password.setError(t("password_too_long"));
           } else {

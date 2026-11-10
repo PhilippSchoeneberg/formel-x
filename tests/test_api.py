@@ -15,7 +15,10 @@ COMPOUND = {
 }
 
 
-def register(client, email="owner@example.com", password="secret"):
+PASSWORD = "secret-password"
+
+
+def register(client, email="owner@example.com", password=PASSWORD):
     response = client.post("/api/auth/register", json={"email": email, "password": password})
     assert response.status_code == 201, response.text
     return response.json()["account"]
@@ -42,21 +45,21 @@ def test_register_login_logout(client):
     assert client.get("/api/auth/me").json()["account"] == account
     assert "password" not in account
 
-    assert client.post("/api/auth/register", json={"email": "owner@example.com", "password": "other"}).status_code == 409
+    assert client.post("/api/auth/register", json={"email": "owner@example.com", "password": "other-password"}).status_code == 409
 
     assert client.post("/api/auth/logout").status_code == 204
     assert client.get("/api/auth/me").json() == {"account": None}
 
     assert client.post("/api/auth/login", json={"email": "owner@example.com", "password": "wrong"}).status_code == 401
-    assert client.post("/api/auth/login", json={"email": "nobody@example.com", "password": "secret"}).status_code == 401
+    assert client.post("/api/auth/login", json={"email": "nobody@example.com", "password": PASSWORD}).status_code == 401
     # Surrounding whitespace was always stripped from passwords.
-    response = client.post("/api/auth/login", json={"email": "owner@example.com", "password": " secret "})
+    response = client.post("/api/auth/login", json={"email": "owner@example.com", "password": f" {PASSWORD} "})
     assert response.status_code == 200
     assert client.get("/api/auth/me").json()["account"]["id"] == account["id"]
 
 
 def test_session_cookie_is_http_only(client):
-    response = client.post("/api/auth/register", json={"email": "a@example.com", "password": "pw"})
+    response = client.post("/api/auth/register", json={"email": "a@example.com", "password": PASSWORD})
     cookie = response.headers["set-cookie"].lower()
     assert "httponly" in cookie and "samesite=lax" in cookie
 
@@ -87,7 +90,7 @@ def test_group_lifecycle_and_ownership(client):
     assert client.patch(f"/api/groups/{group['id']}", json={"name": "Hacked"}).status_code == 403
     assert client.delete(f"/api/groups/{group['id']}").status_code == 403
 
-    client.post("/api/auth/login", json={"email": "owner@example.com", "password": "secret"})
+    client.post("/api/auth/login", json={"email": "owner@example.com", "password": PASSWORD})
     assert client.patch(f"/api/groups/{group['id']}", json={"name": "Renamed"}).json()["name"] == "Renamed"
     assert client.delete(f"/api/groups/{group['id']}").status_code == 204
     assert client.get("/api/groups/mine").json() == []
@@ -196,3 +199,86 @@ def test_connection_error_returns_503():
         response = client.get("/api/elements")
     assert response.status_code == 503
     assert response.json() == {"detail": "connection_error"}
+
+
+def test_registration_needs_eight_characters(client):
+    response = client.post("/api/auth/register", json={"email": "a@example.com", "password": " short7 "})
+    assert response.status_code == 422
+    assert response.json() == {"detail": "password_too_short"}
+    assert client.post("/api/auth/register", json={"email": "a@example.com", "password": "x" * 73}).json() == {"detail": "password_too_long"}
+    register(client, email="a@example.com", password="12345678")
+
+
+def test_old_short_passwords_can_still_log_in(client):
+    # Accounts imported from the Android app may have shorter passwords.
+    client.portal.call(client.db.create_account, "old@example.com", hash_password("abc"))
+    assert client.post("/api/auth/login", json={"email": "old@example.com", "password": "abc"}).status_code == 200
+
+
+def test_failed_logins_are_rate_limited_per_email(client):
+    register(client)
+    client.post("/api/auth/logout")
+    for _ in range(5):
+        assert client.post("/api/auth/login", json={"email": "owner@example.com", "password": "wrong"}).status_code == 401
+    blocked = client.post("/api/auth/login", json={"email": "owner@example.com", "password": PASSWORD})
+    assert blocked.status_code == 429
+    assert blocked.json() == {"detail": "too_many_attempts"}
+    assert 0 < int(blocked.headers["Retry-After"]) <= 15 * 60
+    # Other accounts aren't affected.
+    register(client, email="other@example.com")
+
+
+def test_successful_login_resets_the_email_counter(client):
+    register(client)
+    for _ in range(4):
+        client.post("/api/auth/login", json={"email": "owner@example.com", "password": "wrong"})
+    assert client.post("/api/auth/login", json={"email": "owner@example.com", "password": PASSWORD}).status_code == 200
+    for _ in range(4):
+        assert client.post("/api/auth/login", json={"email": "owner@example.com", "password": "wrong"}).status_code == 401
+
+
+def test_registrations_are_rate_limited_per_ip(client):
+    for i in range(5):
+        register(client, email=f"user{i}@example.com")
+    response = client.post("/api/auth/register", json={"email": "user5@example.com", "password": PASSWORD})
+    assert response.status_code == 429
+
+
+def test_rate_limiter_window_expires():
+    from src.backend.rate_limit import RateLimiter, Rule
+
+    now = [0.0]
+    limiter = RateLimiter(clock=lambda: now[0])
+    rule = Rule(limit=2, window=60)
+    limiter.hit("k", rule)
+    limiter.hit("k", rule)
+    assert limiter.retry_after("k", rule) == 60
+    now[0] = 30
+    assert limiter.retry_after("k", rule) == 30
+    now[0] = 60
+    assert limiter.retry_after("k", rule) == 0
+
+
+def test_responses_only_contain_declared_fields(client):
+    account = register(client)
+    assert set(account) == {"id", "email"}
+    gid = create_group(client)["id"]
+    category = client.post(f"/api/groups/{gid}/categories", json={"name": "Acids", "type": "compound"}).json()
+    assert set(category) == {"id", "name", "type", "group_id"}
+    compound = client.post(f"/api/groups/{gid}/compounds", json={**COMPOUND, "category_id": category["id"]}).json()
+    assert "date" not in compound
+    schema = client.get("/api/openapi.json").json()["components"]["schemas"]
+    assert {"AccountOut", "GroupOut", "CategoryOut", "CompoundOut", "QuestionOut", "ElementOut"} <= set(schema)
+
+
+@pytest.mark.parametrize("email", ["no-at-sign", "two@@example.com", "a@b", "with space@example.com", "a@example."])
+def test_registration_rejects_invalid_emails(client, email):
+    response = client.post("/api/auth/register", json={"email": email, "password": PASSWORD})
+    assert response.status_code == 422
+    assert response.json() == {"detail": "invalid_email"}
+
+
+def test_login_does_not_check_the_email_format(client):
+    # Imported accounts may have addresses the new check would reject.
+    client.portal.call(client.db.create_account, "legacy-user", hash_password(PASSWORD))
+    assert client.post("/api/auth/login", json={"email": "legacy-user", "password": PASSWORD}).status_code == 200
