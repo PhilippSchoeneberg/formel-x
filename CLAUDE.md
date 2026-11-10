@@ -4,7 +4,7 @@ Guidance for Claude Code when working in this repository.
 
 ## What this is
 
-**FormelX** is a chemistry learning web app. The frontend is plain HTML/CSS/JS (ES modules, no build step, no framework); the backend is Python **FastAPI**, which also serves the frontend. Data lives in **Supabase** (Postgres), reached only from the backend over PostgREST with `httpx`.
+**FormelX** is a chemistry learning web app. The frontend is plain HTML/CSS/JS (ES modules, no build step, no framework); the backend is Python **FastAPI**, which also serves the frontend. Data lives in the app's own **PostgreSQL** database (Docker), accessed with SQLAlchemy Core + asyncpg; the schema is managed with Alembic.
 
 Learning modes:
 
@@ -14,28 +14,30 @@ Learning modes:
 
 Content is organised into **groups** (courses). A logged-in account *owns* groups and edits their content. Visitors without an account add existing groups by exact name (saved in `localStorage`) and only learn.
 
-Until November 2026 this was a Kivy/Android app; that code is gone from the tree but lives in git history and on `main` (Android version 4).
+Until November 2026 this was a Kivy/Android app (never published) on Supabase; that code is gone from the tree but lives in git history. `src/backend/import_supabase.py` copies the old Supabase data over once.
 
 ## Running
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt   # once
 cp .env.example .env                                                      # fill in values
+docker compose up -d db                                                   # PostgreSQL
+.venv/bin/alembic upgrade head                                            # create/upgrade tables
 .venv/bin/uvicorn src.backend.main:app --reload                           # http://127.0.0.1:8000
 .venv/bin/pytest                                                          # tests
 ```
 
 - Run uvicorn from the repo root (the import path is `src.backend.main:app`). File paths inside the app are resolved from `config.py`, not the CWD.
-- `.env` needs `SUPABASE_URL`, `SUPABASE_KEY` (service_role key, server-only), `SESSION_SECRET`; set `SECURE_COOKIES=false` for local http. Never commit `.env` and never print secrets.
-- Tests use `tests/fake_db.py` (in-memory `Database` stand-in) via `create_app(settings, db=FakeDatabase())`; they need no network or `.env`. Add tests there when changing the API.
-- Docker: `docker build -t formelx . && docker run -p 8000:8000 --env-file .env formelx`.
+- `.env` needs `POSTGRES_PASSWORD`, `DATABASE_URL` (`postgresql+asyncpg://formelx:<pw>@localhost:5432/formelx`), `SESSION_SECRET`; set `SECURE_COOKIES=false` for local http. Never commit `.env` and never print secrets.
+- Tests (`tests/conftest.py`) run the real app and `Database` on SQLite in memory (tables via `metadata.create_all`); set `TEST_DATABASE_URL` to run them on an empty, wipeable Postgres database. Add tests when changing the API. Keep queries portable between SQLite and Postgres.
+- Full stack: `docker compose up -d --build` (app container runs `alembic upgrade head` on start). `APP_PORT` overrides host port 8000. Never use `docker compose down -v` on real data (deletes the DB volume).
 
 ## Layout
 
 ```
-src/backend/    main.py (entry), app.py (create_app), config.py, database.py, security.py, schemas.py, routers/, sql/
+src/backend/    main.py (entry), app.py (create_app), config.py, database.py, tables.py, elements_data.py, security.py, schemas.py, routers/, migrations/, import_supabase.py
 src/frontend/   index.html, css/style.css, js/{main,api,store,i18n,ui,dialogs,formula}.js, js/views/, locales/, assets/
-tests/          pytest + fake_db.py
+tests/          pytest (conftest.py, test_api.py)
 doc/            architecture.md, api.md, development.md, deployment.md
 ```
 
@@ -43,8 +45,8 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 
 ## Backend conventions
 
-- All DB access goes through `Database` (`database.py`), one async method per query, returning plain dicts. Keep `tests/fake_db.py` in sync when adding methods.
-- `DatabaseConnectionError` → 503 `connection_error`; other PostgREST errors → `DatabaseError` → 502 (logged); HTTP 409 → `DatabaseConflictError` (unique violations).
+- All DB access goes through `Database` (`database.py`), one async method per query (each its own transaction), returning plain dicts.
+- `DatabaseConnectionError` → 503 `connection_error`; other DB errors → `DatabaseError` → 502 (logged); unique violations → `DatabaseConflictError`.
 - Errors use short `detail` codes (`group_exists`, `invalid_credentials`, `not_group_owner`, …) that the frontend maps to translated messages. Don't return English sentences.
 - Auth: bcrypt via the `bcrypt` package (old passlib hashes verify fine). Login stores `account_id` in Starlette's signed, HTTP-only session cookie. Use the dependencies in `security.py`: `require_account_id`, `get_group_or_404`, `get_owned_group`, `ensure_owner`.
 - Passwords are stripped before hashing/verifying (the old app did this; keep it for existing accounts). Max 72 bytes.
@@ -70,14 +72,15 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 
 ## Database
 
-- Tables: `accounts`, `groups`, `elements`, `elements_to_groups`, `categories`, `compounds`, `questions` (`src/backend/sql/setup.sql`). Content tables are scoped by `group_id`.
-- The live Supabase project is shared with the released Android app, which uses the public anon key directly. `sql/lockdown.sql` (RLS on, no policies) secures it but breaks that app — don't run it without the user's go-ahead. Don't change the schema without asking either.
+- Tables: `accounts`, `groups`, `elements`, `elements_to_groups`, `categories`, `compounds`, `questions`, defined in `src/backend/tables.py`. Content tables are scoped by `group_id`. Column names match the old Supabase schema.
+- Schema changes: edit `tables.py`, then `alembic revision --autogenerate -m "..."`, review the file in `src/backend/migrations/versions/`, and check `alembic check` is clean. Never edit an applied migration. The first migration seeds the elements from `elements_data.py`.
+- Ids are `BigInteger` with a SQLite `Integer` variant (`Id` in `tables.py`) so tests autoincrement.
 - The DB stores lanthanides/actinides as group 3; the frontend lays out the f-block from hard-coded symbol lists in `js/views/elements.js`.
 
 ## Known gotchas
 
-- `.idea/` is partly tracked (IDE config); avoid committing unrelated changes there.
-- The old Supabase anon key is in git history (from the Android app). Treat it as public.
+- `.idea/` (IDE config) is ignored by git.
+- The old Supabase anon key is in git history (from the Android app). Treat it as public; the Supabase project should be deleted after the import.
 
 ## Git
 
