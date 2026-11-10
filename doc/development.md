@@ -67,6 +67,23 @@ docker compose exec db createdb -U formelx formelx_test
 TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx_test uv run pytest tests/test_api.py
 ```
 
+## Continuous integration
+
+`.github/workflows/tests.yml` runs on every pull request into `development` or `main`, again
+after merging, and on demand (Actions tab → CI → Run workflow). It has two jobs:
+
+- **tests** – installs the locked dependencies with uv, checks that `uv.lock` is up to date,
+  applies the migrations to a PostgreSQL 17 service and runs `alembic check`, then runs the API
+  tests on Postgres and the Playwright browser tests in headless Chromium.
+- **docker-build** – builds the production image, so a broken Dockerfile is caught early.
+
+Both branches have a ruleset that requires these two checks to pass before a pull request can
+be merged, so nothing that fails the tests reaches `development` or `main`. A new push to a pull
+request cancels the run that's still going and starts a fresh one.
+
+If a check fails, open it from the pull request's "Checks" tab to see which step failed and run
+the same command locally (e.g. `uv run pytest -m e2e`).
+
 ## Changing the schema
 
 1. Change the tables in `src/backend/tables.py`.
