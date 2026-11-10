@@ -30,12 +30,27 @@ Create `.env` next to `docker-compose.yml` (see `.env.example`):
 docker compose up -d --build
 ```
 
-Put a reverse proxy that terminates HTTPS in front of port 8000 (e.g. Caddy or nginx).
+The app's port is bound to `127.0.0.1` only. Put a reverse proxy that terminates HTTPS in front of it
+(e.g. Caddy or nginx); never expose port 8000 directly, or passwords and the login cookie would
+travel unencrypted. With `SECURE_COOKIES=true` (the default) the app also sends HSTS, so browsers
+only ever use HTTPS for the site.
 Uvicorn runs with `--proxy-headers`, but only trusts `X-Forwarded-For` from the addresses in
 `FORWARDED_ALLOW_IPS` (default `127.0.0.1`). If the proxy reaches the container from another
 address (e.g. the Docker bridge), add `FORWARDED_ALLOW_IPS=<proxy address>` to the app's
 environment. Otherwise every visitor looks like the proxy, and the login rate limit is shared
 by everyone.
+
+## Security checklist
+
+- `SESSION_SECRET`: long random value (the app refuses anything under 32 characters), different
+  from any other environment. Changing it logs everyone out.
+- `SECURE_COOKIES=true` and HTTPS only.
+- `FORWARDED_ALLOW_IPS` set to the proxy's address if it isn't `127.0.0.1` (otherwise rate limits
+  see every visitor as the proxy).
+- Delete the old Supabase project after the import; its public key is in this repository's history.
+- Merge Dependabot's pull requests regularly and keep the server's OS and Docker up to date.
+- Turn on **Private vulnerability reporting** in the repository settings (Security → Advanced
+  Security) so the link in `SECURITY.md` works.
 
 ## Login protection
 

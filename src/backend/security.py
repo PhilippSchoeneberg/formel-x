@@ -21,6 +21,21 @@ def verify_password(password, password_hash):
         return False
 
 
+_dummy_hash = None
+
+
+def burn_password_check(password):
+    """Spends the same time as a real check, for logins with an unknown email address.
+
+    Without it, "no such account" answers faster than "wrong password", and the response time
+    reveals which email addresses have an account.
+    """
+    global _dummy_hash
+    if _dummy_hash is None:
+        _dummy_hash = hash_password("formelx-timing-equalizer")
+    verify_password(password, _dummy_hash)
+
+
 def get_db(request: Request) -> Database:
     return request.app.state.db
 

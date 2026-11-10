@@ -64,7 +64,7 @@ def base_url(tmp_path_factory):
     """Starts the app in a background thread and returns its URL (also used by pytest-playwright)."""
     url = f"sqlite+aiosqlite:///{tmp_path_factory.mktemp('e2e') / 'formelx.db'}"
     db = Database(url)
-    app = create_app(Settings(database_url=url, session_secret="e2e-secret", secure_cookies=False), db=db)
+    app = create_app(Settings(database_url=url, session_secret="e2e-secret-at-least-32-characters-long", secure_cookies=False), db=db)
     port = _free_port()
     server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
 

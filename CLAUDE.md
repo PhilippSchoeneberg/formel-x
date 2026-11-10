@@ -68,6 +68,10 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 - Formulas use LaTeX-like notation, rendered with `formulaToUnicode` (`H_2O` → `H₂O`, `SO_4^{2-}` → `SO₄²⁻`).
 - Styling: one `css/style.css` with CSS custom properties; light/dark via `prefers-color-scheme` and `data-theme` on `<html>`. Correct/wrong answers use `--good`/`--bad` tokens.
 - Keep it dependency-free: no npm, no bundler, no CDN scripts.
+- Security rules (strict CSP in `src/backend/middleware.py`, tests in `tests/test_security.py`):
+  - No inline `<script>`/`<style>`, no `style="…"` attributes, no event-handler attributes, no third-party URLs. Pass `style` to `h()` (it uses `element.style.cssText`).
+  - Insert user content only as text (`h()`/`textContent`), never via `innerHTML`.
+  - New endpoints get rate limits if they can be used to guess or brute-force something (`rate_limit.py`).
 - Accessibility rules (covered by `tests/e2e/test_accessibility.py`):
   - Every view has exactly one `<h1>`; the router focuses it after navigation and sets `document.title` from it.
   - Re-rendering must not drop focus: restore it (see `renderHeader`, `renderElements(view, { focus })`, `renderQuiz(…, { focusPrompt })`). Don't `disable` a button the user just pressed; use `aria-disabled`.

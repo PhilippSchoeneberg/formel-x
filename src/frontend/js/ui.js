@@ -9,8 +9,9 @@ export function h(tag, attrs = {}, ...children) {
     if (value === null || value === undefined || value === false) continue;
     if (key.startsWith("on") && typeof value === "function") {
       element.addEventListener(key.slice(2), value);
-    } else if (key === "html") {
-      element.innerHTML = value;
+    } else if (key === "style") {
+      // Through the CSSOM: the Content-Security-Policy blocks style *attributes*, not this.
+      element.style.cssText = value;
     } else if (value === true) {
       element.setAttribute(key, "");
     } else {
