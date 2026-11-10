@@ -1,28 +1,13 @@
-import os
-from dataclasses import dataclass
+"""Configuration from environment variables, with `.env` in the repository root as fallback."""
+
 from pathlib import Path
 
-from dotenv import load_dotenv
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 FRONTEND_DIR = ROOT_DIR / "src" / "frontend"
-
-load_dotenv(ROOT_DIR / ".env")
-
-
-@dataclass(frozen=True)
-class Settings:
-    database_url: str
-    session_secret: str
-    secure_cookies: bool = True
-
-
-def _require(name):
-    value = os.environ.get(name, "").strip()
-    if not value:
-        raise RuntimeError(f"Environment variable {name} is not set. Copy .env.example to .env and fill it in.")
-    return value
 
 
 def normalize_database_url(url):
@@ -33,13 +18,39 @@ def normalize_database_url(url):
     return url
 
 
+class _Base(BaseSettings):
+    # Real environment variables win over .env; unrelated .env entries are ignored.
+    model_config = SettingsConfigDict(env_file=ROOT_DIR / ".env", extra="ignore")
+
+
+class DatabaseSettings(_Base):
+    """What Alembic and the import script need."""
+
+    database_url: str
+
+    @field_validator("database_url")
+    @classmethod
+    def _normalize(cls, value):
+        return normalize_database_url(value.strip())
+
+
+class Settings(DatabaseSettings):
+    """Everything the web app needs."""
+
+    session_secret: str
+    secure_cookies: bool = True
+
+
+class SupabaseSettings(_Base):
+    """Only for the one-time import from the old Supabase project."""
+
+    supabase_url: str
+    supabase_key: str
+
+
 def database_url():
-    return normalize_database_url(_require("DATABASE_URL"))
+    return DatabaseSettings().database_url
 
 
 def load_settings():
-    return Settings(
-        database_url=database_url(),
-        session_secret=_require("SESSION_SECRET"),
-        secure_cookies=os.environ.get("SECURE_COOKIES", "true").strip().lower() not in ("0", "false", "no"),
-    )
+    return Settings()

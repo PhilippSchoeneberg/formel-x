@@ -2,16 +2,16 @@
 
 Usage (from the repository root, after `alembic upgrade head`):
 
-    SUPABASE_URL=https://<ref>.supabase.co SUPABASE_KEY=<key> python -m src.backend.import_supabase
+    uv run python -m src.backend.import_supabase
 
-DATABASE_URL (from the environment or .env) is the target. The import keeps all ids, dates and
+SUPABASE_URL and SUPABASE_KEY (the source) and DATABASE_URL (the target) come from the
+environment or .env. The import keeps all ids, dates and
 password hashes, so existing accounts can log in as before. It refuses to run when the target
 already has accounts or groups, and runs in a single transaction: either everything is
 imported or nothing.
 """
 
 import asyncio
-import os
 import sys
 from datetime import datetime
 
@@ -19,7 +19,7 @@ import httpx
 from sqlalchemy import func, insert, select, text
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from .config import database_url
+from .config import SupabaseSettings, database_url
 from .tables import accounts, categories, compounds, elements, elements_to_groups, groups, questions
 
 
@@ -35,13 +35,6 @@ TABLES = [
     (elements, "symbol"),
     (elements_to_groups, "group_id"),
 ]
-
-
-def _require(name):
-    value = os.environ.get(name, "").strip()
-    if not value:
-        sys.exit(f"Set {name} (see the docstring of this script).")
-    return value
 
 
 async def fetch_table(client, table, order):
@@ -106,9 +99,13 @@ def prepare(source):
 
 
 async def main():
-    supabase_url = _require("SUPABASE_URL").rstrip("/")
-    supabase_key = _require("SUPABASE_KEY")
-    target_url = database_url()
+    try:
+        source_settings = SupabaseSettings()
+        target_url = database_url()
+    except ValueError as e:
+        sys.exit(f"Missing configuration (see the docstring of this script):\n{e}")
+    supabase_url = source_settings.supabase_url.strip().rstrip("/")
+    supabase_key = source_settings.supabase_key.strip()
 
     headers = {"apikey": supabase_key, "Authorization": f"Bearer {supabase_key}"}
     async with httpx.AsyncClient(base_url=f"{supabase_url}/rest/v1", headers=headers, timeout=30) as client:

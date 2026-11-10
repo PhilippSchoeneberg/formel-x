@@ -2,10 +2,11 @@
 // backend's `detail` code (e.g. "group_exists"), which the UI maps to translated messages.
 
 export class ApiError extends Error {
-  constructor(status, detail) {
+  constructor(status, detail, retryAfter = null) {
     super(typeof detail === "string" ? detail : `HTTP ${status}`);
     this.status = status;
     this.detail = detail;
+    this.retryAfter = retryAfter; // seconds, set for 429 responses
   }
 
   get isConnectionError() {
@@ -29,7 +30,10 @@ async function request(method, path, body) {
 
   if (response.status === 204) return null;
   const data = await response.json().catch(() => null);
-  if (!response.ok) throw new ApiError(response.status, data?.detail);
+  if (!response.ok) {
+    const retryAfter = Number(response.headers.get("Retry-After")) || null;
+    throw new ApiError(response.status, data?.detail, retryAfter);
+  }
   return data;
 }
 

@@ -158,16 +158,14 @@ export async function renderElements(view) {
       type: "button",
       class: "element",
       style,
-      title: name,
-      "aria-label": session.mode === "learning" ? name : `${element.symbol}, ${name}`,
+      // In practice mode neither the tooltip nor the accessible name may reveal the answer.
+      title: session.mode === "learning" ? null : name,
+      "aria-label": session.mode === "learning" ? "?" : `${element.symbol}, ${name}`,
+      "data-symbol": element.symbol,
     }, h("span", { class: "symbol" }, element.symbol));
     cell.addEventListener("click", () => onCellClick(element, cell));
     buttons.set(element.symbol, cell);
     table.append(cell);
-  }
-  // Learning mode must not reveal the answer through the accessible name either.
-  if (session.mode === "learning") {
-    for (const cell of buttons.values()) cell.setAttribute("aria-label", "?");
   }
 
   const modeToggle = segmented(

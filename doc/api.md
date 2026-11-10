@@ -11,11 +11,12 @@ of validation errors for `422`).
 | Method | Path | Body | Result |
 | --- | --- | --- | --- |
 | GET | `/auth/me` | | `{"account": {id, email} \| null}` |
-| POST | `/auth/register` | `{email, password}` | `201 {"account"}`, `409 account_exists`, `422 password_too_long` |
-| POST | `/auth/login` | `{email, password}` | `{"account"}`, `401 invalid_credentials` |
+| POST | `/auth/register` | `{email, password}` | `201 {"account"}`, `409 account_exists`, `422 password_too_short` (under 8 characters) / `password_too_long`, `429 too_many_attempts` |
+| POST | `/auth/login` | `{email, password}` | `{"account"}`, `401 invalid_credentials`, `429 too_many_attempts` |
 | POST | `/auth/logout` | | `204` |
 
-Register and login set the session cookie.
+Register and login set the session cookie. `429` responses carry a `Retry-After` header in
+seconds; see [deployment.md](deployment.md#login-protection) for the limits.
 
 ## Groups
 

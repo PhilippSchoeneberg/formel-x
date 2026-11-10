@@ -20,14 +20,15 @@ src/
   backend/
     main.py          Entry point for uvicorn: builds the app from environment settings
     app.py           create_app(): middleware, error handlers, routers, static frontend
-    config.py        Settings from environment variables / .env
+    config.py        Settings (pydantic-settings) from environment variables / .env
     database.py      Async data access (SQLAlchemy Core), one method per query
     tables.py        Table definitions (the schema)
     elements_data.py The 118 elements, seeded by the first migration
     migrations/      Alembic migrations (alembic.ini is in the repository root)
     import_supabase.py  One-time import from the old Supabase project
     security.py      bcrypt hashing, session login, owner checks (FastAPI dependencies)
-    schemas.py       Pydantic request bodies and validation
+    rate_limit.py    In-memory rate limits for login and registration
+    schemas.py       Pydantic request and response models
     routers/         auth, groups, elements, categories, entries (compounds + questions)
   frontend/
     index.html       App shell
@@ -42,7 +43,8 @@ src/
     js/views/        home, elements (periodic table), menu (categories), quiz
     locales/         de/en/es/fr/nl JSON translations
     assets/          Logo and the Roboto font
-tests/               pytest tests (SQLite in memory, or Postgres via TEST_DATABASE_URL)
+tests/               pytest API tests (SQLite in memory, or Postgres via TEST_DATABASE_URL)
+  e2e/               Playwright browser tests
 doc/                 This documentation
 ```
 
@@ -62,6 +64,10 @@ doc/                 This documentation
 - After login the server sets a signed, HTTP-only session cookie (`formelx_session`,
   `SameSite=Lax`, 30 days). It only holds the account id. JavaScript never sees a token.
 - Write endpoints check that the logged-in account owns the group (`403` otherwise).
+- New passwords need at least 8 characters; login doesn't check this, so older accounts keep working.
+- Failed logins and registrations are rate-limited (`429` with `Retry-After`).
+- Every endpoint declares a Pydantic `response_model`, so responses only ever contain the
+  listed fields (never password hashes) and `/api/docs` shows exact types.
 
 ## Frontend
 

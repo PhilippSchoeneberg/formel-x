@@ -1,5 +1,10 @@
-"""Request bodies. Text fields are stripped; empty optional fields become None."""
+"""Request and response models.
 
+Request bodies strip text; empty optional fields become None. Response models list exactly the
+fields the API returns: anything else in a database row (password hashes, dates) is dropped.
+"""
+
+import re
 from enum import Enum
 from typing import Annotated, Literal
 
@@ -30,6 +35,19 @@ def _empty_to_none(value):
         value = value.strip()
         return value or None
     return value
+
+
+# Registration needs at least this many characters (after stripping). Login doesn't check it,
+# so older accounts with shorter passwords can still log in.
+MIN_PASSWORD_LENGTH = 8
+
+# A deliberately simple check for new accounts: one @, no spaces, and a dot in the domain.
+# Must match EMAIL_PATTERN in src/frontend/js/dialogs.js.
+EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
+def is_valid_email(email):
+    return bool(EMAIL_PATTERN.fullmatch(email))
 
 
 class Credentials(BaseModel):
@@ -83,3 +101,70 @@ class QuestionIn(BaseModel):
     category_id: int
 
     _optional = field_validator("wrong_answer3", "wrong_answer4", mode="before")(_empty_to_none)
+
+
+# Responses -------------------------------------------------------------------
+
+
+class AccountOut(BaseModel):
+    id: int
+    email: str
+
+
+class AccountResponse(BaseModel):
+    account: AccountOut | None
+
+
+class GroupOut(BaseModel):
+    id: int
+    name: str
+    owner_id: int
+
+
+class ElementOut(BaseModel):
+    symbol: str
+    name: str
+    system_group: int
+    system_period: int
+
+
+class CategoryOut(BaseModel):
+    id: int
+    name: str
+    type: CategoryType
+    group_id: int
+
+    @field_validator("type", mode="before")
+    @classmethod
+    def _from_db(cls, value):
+        return CategoryType.from_db(value) if isinstance(value, int) else value
+
+
+class CompoundOut(BaseModel):
+    id: int
+    correct_name: str
+    wrong_name1: str
+    wrong_name2: str
+    wrong_name3: str | None
+    wrong_name4: str | None
+    correct_formula: str
+    wrong_formula1: str
+    wrong_formula2: str
+    wrong_formula3: str | None
+    wrong_formula4: str | None
+    difficulty: Difficulty
+    category_id: int
+    group_id: int
+
+
+class QuestionOut(BaseModel):
+    id: int
+    question: str
+    correct_answer: str
+    wrong_answer1: str
+    wrong_answer2: str
+    wrong_answer3: str | None
+    wrong_answer4: str | None
+    difficulty: Difficulty
+    category_id: int
+    group_id: int

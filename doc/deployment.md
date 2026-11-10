@@ -19,6 +19,7 @@ Create `.env` next to `docker-compose.yml` (see `.env.example`):
 | `SESSION_SECRET` | Long random string that signs the login cookie. Changing it logs everyone out. |
 | `SECURE_COOKIES` | `true` (default) in production, so the cookie is only sent over HTTPS. |
 | `APP_PORT` | Optional host port for the app (default 8000). |
+| `DB_PORT` | Optional host port for PostgreSQL on `127.0.0.1` (default 5432). |
 
 `DATABASE_URL` is set by `docker-compose.yml` for the app container; you only need it in
 `.env` for local development and for the import script.
@@ -30,7 +31,18 @@ docker compose up -d --build
 ```
 
 Put a reverse proxy that terminates HTTPS in front of port 8000 (e.g. Caddy or nginx).
-Uvicorn runs with `--proxy-headers`.
+Uvicorn runs with `--proxy-headers`, but only trusts `X-Forwarded-For` from the addresses in
+`FORWARDED_ALLOW_IPS` (default `127.0.0.1`). If the proxy reaches the container from another
+address (e.g. the Docker bridge), add `FORWARDED_ALLOW_IPS=<proxy address>` to the app's
+environment. Otherwise every visitor looks like the proxy, and the login rate limit is shared
+by everyone.
+
+## Login protection
+
+Failed logins are limited to 5 per email address and 20 per IP address within 15 minutes,
+and registrations to 5 per IP address per hour (`src/backend/rate_limit.py`). Further attempts
+get `429 Too Many Requests` with a `Retry-After` header. The counters live in the app process,
+so they reset on restart and don't work across several app instances (that would need Redis).
 
 To update: pull the new code and run `docker compose up -d --build` again.
 
@@ -41,11 +53,11 @@ The old data lives in the Supabase project. To move it over:
 1. Start only the database and create the tables:
    ```bash
    docker compose up -d db
-   DATABASE_URL=postgresql+asyncpg://formelx:<POSTGRES_PASSWORD>@localhost:5432/formelx .venv/bin/alembic upgrade head
+   uv run alembic upgrade head
    ```
 2. Put `SUPABASE_URL` and `SUPABASE_KEY` in `.env` and run the import:
    ```bash
-   DATABASE_URL=postgresql+asyncpg://formelx:<POSTGRES_PASSWORD>@localhost:5432/formelx .venv/bin/python -m src.backend.import_supabase
+   uv run python -m src.backend.import_supabase
    ```
    It copies accounts (with their password hashes, so logins keep working), groups,
    categories, compounds, questions and element lists, keeps all ids, and refuses to run if
