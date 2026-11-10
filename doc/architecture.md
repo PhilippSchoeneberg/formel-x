@@ -5,10 +5,10 @@ FormelX is a single FastAPI server that does two things:
 - it serves the static frontend (`src/frontend`) at `/`, and
 - it offers a JSON API under `/api` that the frontend calls.
 
-Only the backend talks to the database. The browser never sees a Supabase key.
+Only the backend talks to the database. The browser never sees database credentials.
 
 ```
-Browser (HTML/CSS/JS)  ──fetch /api/...──▶  FastAPI (src/backend)  ──PostgREST/HTTPS──▶  Supabase Postgres
+Browser (HTML/CSS/JS)  ──fetch /api/...──▶  FastAPI (src/backend)  ──SQLAlchemy/asyncpg──▶  PostgreSQL
         ▲                                         │
         └──────────── static files ◀──────────────┘
 ```
@@ -21,11 +21,14 @@ src/
     main.py          Entry point for uvicorn: builds the app from environment settings
     app.py           create_app(): middleware, error handlers, routers, static frontend
     config.py        Settings from environment variables / .env
-    database.py      Async Supabase (PostgREST) client, one method per query
+    database.py      Async data access (SQLAlchemy Core), one method per query
+    tables.py        Table definitions (the schema)
+    elements_data.py The 118 elements, seeded by the first migration
+    migrations/      Alembic migrations (alembic.ini is in the repository root)
+    import_supabase.py  One-time import from the old Supabase project
     security.py      bcrypt hashing, session login, owner checks (FastAPI dependencies)
     schemas.py       Pydantic request bodies and validation
     routers/         auth, groups, elements, categories, entries (compounds + questions)
-    sql/             setup.sql (schema), insert_elements.sql (seed), lockdown.sql (RLS)
   frontend/
     index.html       App shell
     css/style.css    All styles, themed with CSS custom properties (light/dark)
@@ -39,7 +42,7 @@ src/
     js/views/        home, elements (periodic table), menu (categories), quiz
     locales/         de/en/es/fr/nl JSON translations
     assets/          Logo and the Roboto font
-tests/               pytest tests with an in-memory fake database
+tests/               pytest tests (SQLite in memory, or Postgres via TEST_DATABASE_URL)
 doc/                 This documentation
 ```
 

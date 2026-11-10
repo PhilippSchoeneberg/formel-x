@@ -1,15 +1,11 @@
-import httpx
 import pytest
 from fastapi.testclient import TestClient
 
 from src.backend.app import create_app
 from src.backend.config import Settings
-from src.backend.database import Database
+from src.backend.database import Database, DatabaseConflictError
 from src.backend.security import hash_password, verify_password
-from tests.fake_db import FakeDatabase
 
-
-SETTINGS = Settings(supabase_url="http://unused", supabase_key="unused", session_secret="test-secret", secure_cookies=False)
 
 COMPOUND = {
     "correct_name": "Water", "wrong_name1": "Hydrogen peroxide", "wrong_name2": "Oxygen",
@@ -17,17 +13,6 @@ COMPOUND = {
     "correct_formula": "H_2O", "wrong_formula1": "H_2O_2", "wrong_formula2": "O_2",
     "difficulty": "easy",
 }
-
-
-@pytest.fixture
-def db():
-    return FakeDatabase()
-
-
-@pytest.fixture
-def client(db):
-    with TestClient(create_app(SETTINGS, db=db)) as client:
-        yield client
 
 
 def register(client, email="owner@example.com", password="secret"):
@@ -111,7 +96,7 @@ def test_group_lifecycle_and_ownership(client):
 def test_elements(client):
     register(client)
     group = create_group(client)
-    assert len(client.get("/api/elements").json()) == 6
+    assert len(client.get("/api/elements").json()) == 118
     url = f"/api/groups/{group['id']}/elements"
     assert client.put(f"{url}/H").status_code == 204
     assert client.put(f"{url}/H").status_code == 204
@@ -178,12 +163,36 @@ def test_frontend_is_served(client):
     assert "<title>FormelX</title>" in response.text
 
 
-def test_connection_error_returns_503():
-    def fail(request):
-        raise httpx.ConnectError("offline")
+def test_deleting_a_group_deletes_its_content(client):
+    register(client)
+    gid = create_group(client)["id"]
+    client.put(f"/api/groups/{gid}/elements/O")
+    category = client.post(f"/api/groups/{gid}/categories", json={"name": "Acids", "type": "compound"}).json()
+    client.post(f"/api/groups/{gid}/compounds", json={**COMPOUND, "category_id": category["id"]})
 
-    db = Database("http://supabase.invalid", "key", transport=httpx.MockTransport(fail))
-    with TestClient(create_app(SETTINGS, db=db)) as client:
+    assert client.delete(f"/api/groups/{gid}").status_code == 204
+    assert client.get(f"/api/groups/{gid}/compounds").status_code == 404
+    db = client.db
+    assert client.portal.call(db.get_entries, "compounds", gid) == []
+    assert client.portal.call(db.get_categories, gid) == []
+    assert client.portal.call(db.get_group_element_symbols, gid) == []
+
+
+def test_unique_violations_become_conflicts(client):
+    db = client.db
+    account = client.portal.call(db.create_account, "a@example.com", "hash")
+    client.portal.call(db.create_group, "Same", account["id"])
+    with pytest.raises(DatabaseConflictError):
+        client.portal.call(db.create_group, "Same", account["id"])
+    with pytest.raises(DatabaseConflictError):
+        client.portal.call(db.create_account, "a@example.com", "hash")
+
+
+def test_connection_error_returns_503():
+    # Nothing listens on port 1, so connecting fails right away.
+    url = "postgresql+asyncpg://formelx:formelx@127.0.0.1:1/formelx"
+    settings = Settings(database_url=url, session_secret="test-secret", secure_cookies=False)
+    with TestClient(create_app(settings, db=Database(url))) as client:
         response = client.get("/api/elements")
     assert response.status_code == 503
     assert response.json() == {"detail": "connection_error"}

@@ -13,8 +13,7 @@ load_dotenv(ROOT_DIR / ".env")
 
 @dataclass(frozen=True)
 class Settings:
-    supabase_url: str
-    supabase_key: str
+    database_url: str
     session_secret: str
     secure_cookies: bool = True
 
@@ -26,10 +25,21 @@ def _require(name):
     return value
 
 
+def normalize_database_url(url):
+    """Accepts plain postgres:// URLs and selects the async asyncpg driver for them."""
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+asyncpg://" + url[len(prefix):]
+    return url
+
+
+def database_url():
+    return normalize_database_url(_require("DATABASE_URL"))
+
+
 def load_settings():
     return Settings(
-        supabase_url=_require("SUPABASE_URL").rstrip("/"),
-        supabase_key=_require("SUPABASE_KEY"),
+        database_url=database_url(),
         session_secret=_require("SESSION_SECRET"),
         secure_cookies=os.environ.get("SECURE_COOKIES", "true").strip().lower() not in ("0", "false", "no"),
     )

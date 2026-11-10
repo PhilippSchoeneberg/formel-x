@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 .env
 .DS_Store
+.idea/
 
 # Android release keystore (kept out of the repo)
 *.keystore

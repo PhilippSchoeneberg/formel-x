@@ -14,11 +14,11 @@ SESSION_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
 
 
 def create_app(settings: Settings, db=None):
-    """Builds the app. Tests pass their own `db`; otherwise Supabase is used."""
+    """Builds the app. Tests pass their own `db`; otherwise settings.database_url is used."""
 
     @asynccontextmanager
     async def lifespan(app):
-        app.state.db = db or Database(settings.supabase_url, settings.supabase_key)
+        app.state.db = db or Database(settings.database_url)
         yield
         if db is None:
             await app.state.db.close()
