@@ -8,7 +8,7 @@ import re
 from enum import Enum
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, StringConstraints, field_validator
+from pydantic import BaseModel, Field, StringConstraints, field_validator
 
 
 ShortText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
@@ -53,7 +53,7 @@ def is_valid_email(email):
 class Credentials(BaseModel):
     email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=254)]
     # Passwords were always stripped by the app, so keep doing it for existing accounts.
-    password: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+    password: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1024)]
 
 
 class GroupIn(BaseModel):
@@ -61,7 +61,7 @@ class GroupIn(BaseModel):
 
 
 class GroupIds(BaseModel):
-    ids: list[int]
+    ids: list[int] = Field(max_length=100)
 
 
 class CategoryIn(BaseModel):

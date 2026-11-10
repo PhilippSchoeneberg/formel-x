@@ -2,6 +2,9 @@
 
 All endpoints are under `/api` and use JSON. Interactive docs are served at `/api/docs`.
 
+For every endpoint: writes (`POST`/`PUT`/`PATCH`/`DELETE`) from another site's page get
+`403 cross_origin_request`, and request bodies over 64 KiB get `413 request_too_large`.
+
 "Owner" means the logged-in account must own the group (`401` when not logged in, `403`
 when logged in as someone else). Errors return `{"detail": "<code>"}` (or FastAPI's list
 of validation errors for `422`).
@@ -23,7 +26,7 @@ seconds; see [deployment.md](deployment.md#login-protection) for the limits.
 | Method | Path | Access | Notes |
 | --- | --- | --- | --- |
 | GET | `/groups/mine` | logged in | Groups owned by the account, sorted by name |
-| GET | `/groups/by-name?name=` | public | `404 group_not_found` |
+| GET | `/groups/by-name?name=` | public | `404 group_not_found`; `429 too_many_attempts` after 30 lookups per minute |
 | POST | `/groups/lookup` | public | Body `{ids: [..]}` → the groups that still exist |
 | POST | `/groups` | logged in | Body `{name}`; `409 group_exists` |
 | PATCH | `/groups/{id}` | owner | Body `{name}`; `409 group_exists` |

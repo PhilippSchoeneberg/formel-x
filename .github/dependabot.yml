@@ -1,0 +1,23 @@
+# Opens pull requests for outdated or vulnerable dependencies. CI tests each one before merging.
+version: 2
+updates:
+  - package-ecosystem: uv
+    directory: /
+    target-branch: development
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: development
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: docker
+    directory: /
+    target-branch: development
+    schedule:
+      interval: monthly

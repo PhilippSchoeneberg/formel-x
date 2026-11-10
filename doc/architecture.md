@@ -79,6 +79,30 @@ doc/                 This documentation
 - Translations are keyed by snake_case ids. Each value is a full sentence with named
   placeholders (`t("where_is", { element })`), so every language can use its own grammar.
 
+## Security
+
+- **Passwords:** bcrypt; at least 8 characters for new accounts; login and registration are
+  rate-limited; a login with an unknown email runs a dummy bcrypt check so response times don't
+  reveal which addresses have an account.
+- **Session:** signed, HTTP-only cookie (`SameSite=Lax`, `Secure` in production). The signing
+  secret must be at least 32 characters.
+- **CSRF:** besides `SameSite=Lax`, `SameOriginMiddleware` rejects API writes whose `Origin` or
+  `Sec-Fetch-Site` shows another site (`403 cross_origin_request`). There's no CORS, so other
+  sites can't read API responses either.
+- **XSS:** the frontend only inserts user content as text (`h()` has no raw-HTML option). A strict
+  Content-Security-Policy allows only the site's own scripts, styles, fonts and requests; dynamic
+  styles go through the CSSOM (`element.style`), which CSP permits.
+- **Headers** on every response: CSP, `X-Content-Type-Options`, `X-Frame-Options`/`frame-ancestors`
+  (no framing), `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`,
+  `Cross-Origin-Resource-Policy`, and HSTS when `SECURE_COOKIES` is on.
+- **Abuse limits:** request bodies over 64 KiB get `413`; group-name lookups are limited to 30 per
+  minute per IP; `/groups/lookup` takes at most 100 ids.
+- **SQL injection:** all queries go through SQLAlchemy with bound parameters.
+- **Dependencies:** pinned in `uv.lock`; Dependabot opens update PRs, and CI tests them.
+
+Known limits: group content is readable by anyone who knows a group's id or name (groups are
+shared by name on purpose), and sessions can't be revoked server-side before they expire.
+
 ## Accessibility
 
 Target: WCAG 2.2 AA. axe reports no violations on any screen in either theme.

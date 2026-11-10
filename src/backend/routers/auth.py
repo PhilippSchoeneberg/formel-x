@@ -7,6 +7,7 @@ from ..rate_limit import (
 from ..schemas import MIN_PASSWORD_LENGTH, AccountResponse, Credentials, is_valid_email
 from ..security import (
     MAX_PASSWORD_BYTES,
+    burn_password_check,
     get_db,
     hash_password,
     login_session,
@@ -62,6 +63,8 @@ async def login(credentials: Credentials, request: Request, db: Database = Depen
     limiter.check((ip_key, LOGIN_FAILURES_PER_IP), (email_key, LOGIN_FAILURES_PER_EMAIL))
 
     account = await db.get_account_by_email(credentials.email)
+    if not account:
+        burn_password_check(credentials.password)
     if not account or not verify_password(credentials.password, account["password"]):
         limiter.hit(ip_key, LOGIN_FAILURES_PER_IP)
         limiter.hit(email_key, LOGIN_FAILURES_PER_EMAIL)

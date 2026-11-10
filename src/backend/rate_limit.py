@@ -22,6 +22,8 @@ class Rule:
 LOGIN_FAILURES_PER_IP = Rule(limit=20, window=15 * 60)
 LOGIN_FAILURES_PER_EMAIL = Rule(limit=5, window=15 * 60)
 REGISTRATIONS_PER_IP = Rule(limit=5, window=60 * 60)
+# Group names work like join codes, so slow down guessing them.
+GROUP_LOOKUPS_PER_IP = Rule(limit=30, window=60)
 
 _MAX_KEYS = 50_000
 

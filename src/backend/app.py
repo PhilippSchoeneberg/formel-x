@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from .config import FRONTEND_DIR, Settings
 from .database import Database, DatabaseConnectionError, DatabaseError
+from .middleware import BodySizeLimitMiddleware, SameOriginMiddleware, SecurityHeadersMiddleware
 from .rate_limit import RateLimiter
 from .routers import auth, categories, elements, entries, groups
 
@@ -48,6 +49,11 @@ def create_app(settings: Settings, db=None):
         same_site="lax",
         https_only=settings.secure_cookies,
     )
+    # Added last = runs first: reject oversized and cross-site requests before anything else,
+    # and put the security headers on every response, including errors.
+    app.add_middleware(SameOriginMiddleware)
+    app.add_middleware(BodySizeLimitMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware, hsts=settings.secure_cookies)
 
     @app.exception_handler(DatabaseConnectionError)
     async def connection_error(request: Request, exc: DatabaseConnectionError):

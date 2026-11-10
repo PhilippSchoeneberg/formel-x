@@ -20,7 +20,7 @@ from src.backend.tables import elements, metadata
 
 TEST_DATABASE_URL = normalize_database_url(os.environ.get("TEST_DATABASE_URL", "sqlite+aiosqlite://"))
 
-SETTINGS = Settings(database_url=TEST_DATABASE_URL, session_secret="test-secret", secure_cookies=False)
+SETTINGS = Settings(database_url=TEST_DATABASE_URL, session_secret="test-secret-at-least-32-characters-long", secure_cookies=False)
 
 
 async def _reset(db):

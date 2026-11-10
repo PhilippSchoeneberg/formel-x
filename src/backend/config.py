@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,7 +37,9 @@ class DatabaseSettings(_Base):
 class Settings(DatabaseSettings):
     """Everything the web app needs."""
 
-    session_secret: str
+    # Signs the login cookie: anyone who knows it can log in as any account. Generate it with
+    # python -c "import secrets; print(secrets.token_urlsafe(32))"
+    session_secret: str = Field(min_length=32)
     secure_cookies: bool = True
 
 

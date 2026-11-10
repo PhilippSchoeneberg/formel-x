@@ -34,8 +34,10 @@ services:
       DATABASE_URL: postgresql+asyncpg://formelx:${POSTGRES_PASSWORD}@db:5432/formelx
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
       SECURE_COOKIES: ${SECURE_COOKIES:-true}
+    # Only reachable from this machine: put a reverse proxy with HTTPS in front (see doc/deployment.md).
+    # Plain HTTP on a public port would send passwords and the login cookie unencrypted.
     ports:
-      - "${APP_PORT:-8000}:8000"
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/elements')"]
       interval: 10s

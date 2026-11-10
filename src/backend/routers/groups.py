@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from ..database import Database, DatabaseConflictError
+from ..rate_limit import GROUP_LOOKUPS_PER_IP, RateLimiter, client_ip, get_rate_limiter
 from ..schemas import GroupIds, GroupIn, GroupOut
 from ..security import get_db, get_owned_group, require_account_id
 
@@ -14,8 +15,12 @@ async def my_groups(account_id=Depends(require_account_id), db: Database = Depen
 
 
 @router.get("/by-name", response_model=GroupOut)
-async def group_by_name(name: str, db: Database = Depends(get_db)):
-    group = await db.get_group_by_name(name.strip())
+async def group_by_name(name: str, request: Request, db: Database = Depends(get_db),
+                        limiter: RateLimiter = Depends(get_rate_limiter)):
+    key = f"group-lookup:{client_ip(request)}"
+    limiter.check((key, GROUP_LOOKUPS_PER_IP))
+    limiter.hit(key, GROUP_LOOKUPS_PER_IP)
+    group = await db.get_group_by_name(name.strip()[:200])
     if not group:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "group_not_found")
     return group
@@ -24,7 +29,7 @@ async def group_by_name(name: str, db: Database = Depends(get_db)):
 @router.post("/lookup", response_model=list[GroupOut])
 async def lookup_groups(body: GroupIds, db: Database = Depends(get_db)):
     """Returns the groups that still exist out of the given ids (used for groups saved in the browser)."""
-    return await db.get_groups_by_ids(body.ids[:100])
+    return await db.get_groups_by_ids(body.ids)
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=GroupOut)

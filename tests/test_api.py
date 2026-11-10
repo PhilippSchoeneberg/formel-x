@@ -196,7 +196,7 @@ def test_unique_violations_become_conflicts(client):
 def test_connection_error_returns_503():
     # Nothing listens on port 1, so connecting fails right away.
     url = "postgresql+asyncpg://formelx:formelx@127.0.0.1:1/formelx"
-    settings = Settings(database_url=url, session_secret="test-secret", secure_cookies=False)
+    settings = Settings(database_url=url, session_secret="test-secret-at-least-32-characters-long", secure_cookies=False)
     with TestClient(create_app(settings, db=Database(url))) as client:
         response = client.get("/api/elements")
     assert response.status_code == 503
