@@ -102,5 +102,6 @@ Feature-branch workflow:
   git push -u origin feature/<short-name>
   gh pr create --base development
   ```
+- CI (`.github/workflows/tests.yml`) runs the `tests` and `docker-build` jobs on every PR into `development`/`main`; the branch rulesets require both to pass before merging. Run `uv run pytest` locally before pushing. Keep the job names stable: they're the required check names.
 - Urgent fixes to a release: branch `hotfix/<name>` from `main`, PR into `main`, then merge `main` back into `development`.
 - Commit messages are short imperative English sentences (e.g. "Fix the refreshing of categories after creation.").

@@ -1,5 +1,7 @@
 # FormelX
 
+[![CI](https://github.com/PhilippSchoeneberg/formel-x/actions/workflows/tests.yml/badge.svg?branch=development)](https://github.com/PhilippSchoeneberg/formel-x/actions/workflows/tests.yml)
+
 A web app for learning chemistry: find elements in the periodic table, match compound names
 and formulas, and answer multiple-choice questions. Content is organised in groups (courses)
 that their owners create and edit; anyone can add a group by its name and learn.

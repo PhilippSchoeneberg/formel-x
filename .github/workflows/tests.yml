@@ -1,0 +1,88 @@
+# Runs on every pull request into development or main, and again after merging.
+# Branch rules require the "tests" and "docker-build" checks to pass before a PR can be merged.
+name: CI
+
+on:
+  pull_request:
+    branches: [development, main]
+  push:
+    branches: [development, main]
+  workflow_dispatch:
+
+# A new push to the same PR cancels the run that is still going.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: formelx
+          POSTGRES_PASSWORD: formelx
+          POSTGRES_DB: formelx
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U formelx -d formelx"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://formelx:formelx@localhost:5432/formelx
+      # API tests run on the same Postgres; they drop and recreate the tables.
+      TEST_DATABASE_URL: postgresql+asyncpg://formelx:formelx@localhost:5432/formelx
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.7"
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lock file is up to date
+        run: uv lock --check
+
+      - name: Migrations apply and match the tables
+        run: |
+          uv run alembic upgrade head
+          uv run alembic check
+
+      - name: API tests (PostgreSQL)
+        run: uv run pytest -m "not e2e"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+
+      - name: Install Chromium
+        run: uv run playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: uv run pytest -m e2e
+
+  docker-build:
+    name: docker-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build --tag formelx:ci .
