@@ -79,6 +79,23 @@ doc/                 This documentation
 - Translations are keyed by snake_case ids. Each value is a full sentence with named
   placeholders (`t("where_is", { element })`), so every language can use its own grammar.
 
+## Accessibility
+
+Target: WCAG 2.2 AA. axe reports no violations on any screen in either theme.
+
+- Each page has one `<h1>`; after navigation focus moves to it and the browser tab title
+  follows it ("Compounds – FormelX").
+- Everything works with the keyboard. The periodic table is a single Tab stop; the arrow keys,
+  Home and End move between elements. In practice mode the cells are announced by position
+  ("Period 4, group 8"), so screen reader users can play too.
+- Right/wrong and "in the practice list" are shown with color **and** a ✓/✗ mark or a dot, plus
+  text for screen readers. Windows high-contrast mode gets outlines instead of backgrounds.
+- Answer feedback and the current question are announced through live regions; focus moves to
+  the next question after a correct answer and stays on a wrong one.
+- Form errors are linked to their fields (`aria-describedby`, `aria-invalid`) and focus jumps to
+  the first invalid field.
+- Animations are turned off for `prefers-reduced-motion`.
+
 ## Errors
 
 - Database unreachable → API answers `503 {"detail": "connection_error"}`; the frontend shows

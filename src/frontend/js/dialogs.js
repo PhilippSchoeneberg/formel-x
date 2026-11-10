@@ -5,7 +5,7 @@ import { api } from "./api.js";
 import { formulaToUnicode } from "./formula.js";
 import { t } from "./i18n.js";
 import { state } from "./store.js";
-import { button, confirmDialog, field, h, messageDialog, openDialog, selectField } from "./ui.js";
+import { button, confirmDialog, field, focusFirstInvalid, h, messageDialog, openDialog, selectField } from "./ui.js";
 
 export const DIFFICULTIES = ["easy", "medium", "hard"];
 
@@ -43,6 +43,7 @@ function formDialog({ title, fields, submit, submitLabel = t("save"), wide = fal
         try {
           const result = await submit();
           if (result !== undefined) close(result);
+          else focusFirstInvalid(form);
         } catch (error) {
           showError(error);
         } finally {
@@ -76,8 +77,8 @@ export function loginDialog(startInRegisterMode = false) {
 
   return openDialog({
     title: registerMode ? t("create_account") : t("log_in"),
-    build: (close) => {
-      const title = () => document.getElementById("dialog-title");
+    build: (close, ids) => {
+      const title = () => document.getElementById(ids.title);
       const submitButton = button("", { variant: "filled", type: "submit" });
       const toggle = button("", { variant: "text" });
 
@@ -108,18 +109,19 @@ export function loginDialog(startInRegisterMode = false) {
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const required = registerMode ? [email, password, repetition] : [email, password];
-        if (!requireFilled(required)) return;
+        const invalid = () => focusFirstInvalid(form);
+        if (!requireFilled(required)) return invalid();
         if (registerMode && !EMAIL_PATTERN.test(email.value())) {
           email.setError(t("invalid_email"));
-          return;
+          return invalid();
         }
         if (registerMode && password.value().length < MIN_PASSWORD_LENGTH) {
           password.setError(t("password_too_short", { count: MIN_PASSWORD_LENGTH }));
-          return;
+          return invalid();
         }
         if (registerMode && password.value() !== repetition.value()) {
           repetition.setError(t("passwords_mismatch"));
-          return;
+          return invalid();
         }
         submitButton.disabled = true;
         try {
@@ -147,6 +149,7 @@ export function loginDialog(startInRegisterMode = false) {
         } finally {
           submitButton.disabled = false;
         }
+        focusFirstInvalid(form);
       });
 
       queueMicrotask(render);

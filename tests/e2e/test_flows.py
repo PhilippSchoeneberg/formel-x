@@ -57,7 +57,7 @@ def test_visitor_groups_are_remembered(page: Page):
 def test_periodic_table_practice(page: Page):
     add_demo_group(page)
     page.get_by_role("link", name="Periodic table").click()
-    page.get_by_role("button", name="Practice").click()
+    page.get_by_role("button", name="Practice", exact=True).click()
 
     for round_number in range(1, 4):
         expect(page.get_by_text(f"{round_number} of 3")).to_be_visible()

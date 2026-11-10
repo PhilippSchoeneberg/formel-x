@@ -6,7 +6,7 @@ import { confirmDelete, entryDialog, showError } from "../dialogs.js";
 import { formulaToUnicode } from "../formula.js";
 import { t } from "../i18n.js";
 import { isOwner, state } from "../store.js";
-import { button, h, shuffle } from "../ui.js";
+import { button, focusElement, h, replaceContent, shuffle } from "../ui.js";
 import { pageHeader } from "./common.js";
 import { KINDS } from "./menu.js";
 
@@ -53,7 +53,11 @@ async function newRound(kind, params) {
   };
 }
 
-export async function renderQuiz(view, kind, params) {
+/**
+ * `focusPrompt` moves focus to the new question after answering, so keyboard and screen reader
+ * users continue right there instead of on a button that no longer exists.
+ */
+export async function renderQuiz(view, kind, params, { focusPrompt = false } = {}) {
   const config = KINDS[kind];
   const owner = isOwner();
   const back = `#/${kind}`;
@@ -70,11 +74,11 @@ export async function renderQuiz(view, kind, params) {
 
   const restart = async () => {
     round = await newRound(kind, params);
-    renderQuiz(view, kind, params).catch(showError);
+    renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
   };
 
   if (!round.entries.length) {
-    view.replaceChildren(
+    replaceContent(view, 
       pageHeader(title, { back }),
       h("div", { class: "empty-state" },
         h("p", {}, t("no_entries")),
@@ -85,10 +89,10 @@ export async function renderQuiz(view, kind, params) {
   }
 
   if (round.index >= round.entries.length) {
-    view.replaceChildren(
+    replaceContent(view, 
       pageHeader(title, { back }),
       h("div", { class: "empty-state done" },
-        h("p", { class: "done-title" }, t("well_done")),
+        h("h2", { class: "done-title" }, t("well_done")),
         h("p", {}, t("round_complete")),
         h("div", { class: "row center" },
           button(t("play_again"), { icon: "play", variant: "filled", onclick: () => restart().catch(showError) }),
@@ -96,6 +100,7 @@ export async function renderQuiz(view, kind, params) {
         ),
       ),
     );
+    if (focusPrompt) focusElement(view.querySelector(".done-title"));
     return;
   }
 
@@ -110,23 +115,31 @@ export async function renderQuiz(view, kind, params) {
   const feedback = h("p", { class: "feedback", "aria-live": "polite" });
   let answered = false;
 
+  // Answered options get aria-disabled instead of disabled: a disabled button would drop the
+  // keyboard focus. The result is shown by color, a ✓/✗ mark and screen-reader-only text.
+  const mark = (optionButton, key) => {
+    optionButton.setAttribute("aria-disabled", "true");
+    optionButton.append(h("span", { class: "sr-only" }, ` ${t(key)}`));
+  };
   const optionButtons = options.map((option) => {
-    const optionButton = h("button", { type: "button", class: question.formula ? "option formula" : "option" }, option.text);
+    const optionButton = h("button", { type: "button", class: question.formula ? "option formula" : "option" },
+      h("span", {}, option.text));
     optionButton.addEventListener("click", () => {
-      if (answered) return;
+      if (answered || optionButton.getAttribute("aria-disabled") === "true") return;
       if (option.correct) {
         answered = true;
         optionButton.classList.add("correct");
+        mark(optionButton, "marked_correct");
         feedback.textContent = t("correct");
         feedback.className = "feedback good";
-        for (const other of optionButtons) other.disabled = other !== optionButton;
+        for (const other of optionButtons) other.setAttribute("aria-disabled", "true");
         setTimeout(() => {
           round.index += 1;
-          renderQuiz(view, kind, params).catch(showError);
+          renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
         }, 900);
       } else {
         optionButton.classList.add("wrong");
-        optionButton.disabled = true;
+        mark(optionButton, "marked_wrong");
         feedback.textContent = t("wrong");
         feedback.className = "feedback bad";
       }
@@ -142,7 +155,7 @@ export async function renderQuiz(view, kind, params) {
         if (!updated) return;
         round.entries[round.index] = updated;
         round.order = null;
-        renderQuiz(view, kind, params).catch(showError);
+        renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
       },
     }),
     button(t(config.deleteKey), {
@@ -154,7 +167,7 @@ export async function renderQuiz(view, kind, params) {
           await api.deleteEntry(kind, entry.id);
           round.entries.splice(round.index, 1);
           round.order = null;
-          renderQuiz(view, kind, params).catch(showError);
+          renderQuiz(view, kind, params, { focusPrompt: true }).catch(showError);
         } catch (error) {
           showError(error);
         }
@@ -164,15 +177,17 @@ export async function renderQuiz(view, kind, params) {
 
   const progress = (round.index / round.entries.length) * 100;
 
-  view.replaceChildren(
+  replaceContent(view, 
     pageHeader(title, { back, actions: ownerActions }),
-    h("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(round.entries.length), "aria-valuenow": String(round.index) },
+    // Decorative: the "1 of 3" text below says the same for everyone.
+    h("div", { class: "progress", "aria-hidden": "true" },
       h("div", { class: "progress-bar", style: `width:${progress}%` })),
     h("p", { class: "progress-text" }, t("progress", { current: round.index + 1, total: round.entries.length })),
     h("section", { class: "card quiz-card" },
       h("h2", { class: "quiz-prompt" }, question.prompt),
-      h("div", { class: "options" }, optionButtons),
+      h("div", { class: "options", role: "group", "aria-label": t("answers") }, optionButtons),
       feedback,
     ),
   );
+  if (focusPrompt) focusElement(view.querySelector(".quiz-prompt"));
 }

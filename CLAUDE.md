@@ -68,6 +68,13 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 - Formulas use LaTeX-like notation, rendered with `formulaToUnicode` (`H_2O` → `H₂O`, `SO_4^{2-}` → `SO₄²⁻`).
 - Styling: one `css/style.css` with CSS custom properties; light/dark via `prefers-color-scheme` and `data-theme` on `<html>`. Correct/wrong answers use `--good`/`--bad` tokens.
 - Keep it dependency-free: no npm, no bundler, no CDN scripts.
+- Accessibility rules (covered by `tests/e2e/test_accessibility.py`):
+  - Every view has exactly one `<h1>`; the router focuses it after navigation and sets `document.title` from it.
+  - Re-rendering must not drop focus: restore it (see `renderHeader`, `renderElements(view, { focus })`, `renderQuiz(…, { focusPrompt })`). Don't `disable` a button the user just pressed; use `aria-disabled`.
+  - Never show state by color alone: add a mark (✓/✗, dot) and text for screen readers (`.sr-only`, accessible names).
+  - Form errors: `field()`/`selectField()` link hint and error via `aria-describedby`; call `focusFirstInvalid(form)` after validation fails (`formDialog` does it).
+  - The periodic table is one Tab stop with arrow-key navigation (roving tabindex); in practice mode cells are named by position, never by element.
+  - Use `uid()` for ids, never fixed ids (dialogs can stack).
 
 ## Internationalisation
 

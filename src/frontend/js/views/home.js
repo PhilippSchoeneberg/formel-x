@@ -7,7 +7,7 @@ import { t } from "../i18n.js";
 import {
   isOwner, notify, refreshGroups, removeVisitorGroup, saveVisitorGroup, setGroup, state,
 } from "../store.js";
-import { button, h } from "../ui.js";
+import { button, h, replaceContent } from "../ui.js";
 
 const MODES = [
   { route: "#/elements", key: "mode_elements", glyph: "Fe", accent: "accent-1" },
@@ -118,7 +118,7 @@ function emptyState() {
 
 export function renderHome(view) {
   if (!state.group) {
-    view.replaceChildren(
+    replaceContent(view, 
       h("section", { class: "hero" },
         h("img", { class: "hero-logo", src: "assets/logo.png", alt: "" }),
         h("h1", {}, "FormelX"),
@@ -128,7 +128,9 @@ export function renderHome(view) {
     return;
   }
 
-  view.replaceChildren(
+  replaceContent(view, 
+    // Every page needs a main heading; here it's only for screen readers.
+    h("h1", { class: "sr-only" }, "FormelX"),
     h("section", { class: "card group-card" },
       groupPicker(),
       h("div", { class: "row wrap" }, groupActions()),

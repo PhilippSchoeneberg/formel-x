@@ -112,6 +112,22 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 [hidden] { display: none !important; }
 
+/* Visible to screen readers only. */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Headings that receive focus after navigation shouldn't show a focus ring. */
+h1[tabindex="-1"]:focus, h2[tabindex="-1"]:focus { outline: none; }
+
 .skip-link {
   position: absolute;
   left: 8px;
@@ -164,7 +180,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 @media (max-width: 480px) {
   .brand span { display: none; }
-  .account-button span { display: none; }
+  /* Hide the label visually but keep it as the button's accessible name. */
+  .account-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .account-button { padding: 8px; }
 }
 
@@ -452,13 +476,54 @@ button, input, select, textarea { font: inherit; color: inherit; }
   background: var(--surface-2);
   border-style: dashed;
 }
+.element { position: relative; }
 .element.in-group { background: var(--good-soft); border-color: var(--good); color: var(--text); }
+/* A dot marks elements in the practice list, so it doesn't depend on color alone. */
+.element.in-group::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--good);
+}
+.legend { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.9rem; }
+.legend-swatch {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--good);
+  background: var(--good-soft);
+}
+.legend-swatch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--good);
+}
 .periodic-table.learning .element .symbol { visibility: hidden; }
 .periodic-table.learning .element:not(.placeholder) { background: var(--surface-2); }
 .element.correct, .periodic-table.learning .element.correct { background: var(--good-soft); border-color: var(--good); }
 .element.wrong, .periodic-table.learning .element.wrong { background: var(--bad-soft); border-color: var(--bad); }
 .periodic-table.learning .element.correct .symbol,
 .periodic-table.learning .element.wrong .symbol { visibility: visible; }
+/* ✓ and ✗ next to color, for people who can't tell red from green. */
+.element.correct::after, .element.wrong::after {
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.element.correct::after { content: "✓"; color: var(--good); }
+.element.wrong::after { content: "✗"; color: var(--bad); }
 
 /* Quiz ------------------------------------------------------------------------------------ */
 
@@ -481,14 +546,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
   overflow-wrap: anywhere;
   transition: background-color 0.15s, border-color 0.15s;
 }
-.option:hover:not(:disabled) { border-color: var(--primary); }
 .option.formula { font-size: 1.2rem; text-align: center; }
 .option.correct { background: var(--good-soft); border-color: var(--good); }
 .option.wrong { background: var(--bad-soft); border-color: var(--bad); }
-.option:disabled { cursor: default; }
-.option:disabled:not(.correct):not(.wrong) { opacity: 0.6; }
+.option.correct::before, .option.wrong::before { font-weight: 700; margin-right: 8px; }
+.option.correct::before { content: "✓"; color: var(--good); }
+.option.wrong::before { content: "✗"; color: var(--bad); }
+.option[aria-disabled="true"] { cursor: default; }
+.option[aria-disabled="true"]:not(.correct):not(.wrong) { opacity: 0.6; }
+.option:hover:not([aria-disabled="true"]) { border-color: var(--primary); }
 
 .feedback { min-height: 1.5em; font-weight: 600; }
+/* Next to the periodic table the (live) feedback line only takes space while it says something. */
+.prompt + .feedback:empty { min-height: 0; }
 .feedback.good { color: var(--good); }
 .feedback.bad { color: var(--bad); }
 
@@ -497,6 +567,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .toasts { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; z-index: 20; }
 .toast { background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: var(--radius-sm); box-shadow: var(--shadow); transition: opacity 0.3s; }
 .toast.leaving { opacity: 0; }
+
+/* Windows high contrast: backgrounds are replaced, so use outlines for the states. */
+@media (forced-colors: active) {
+  .element.in-group, .option.correct, .element.correct { outline: 3px solid Highlight; outline-offset: -3px; }
+  .option.wrong, .element.wrong { outline: 3px dashed CanvasText; outline-offset: -3px; }
+  .segmented button.selected { outline: 2px solid Highlight; }
+  .progress-bar { background: Highlight; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }

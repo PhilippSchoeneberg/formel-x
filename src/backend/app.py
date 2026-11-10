@@ -14,6 +14,19 @@ from .routers import auth, categories, elements, entries, groups
 SESSION_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
 
 
+class FrontendFiles(StaticFiles):
+    """Static files that browsers re-validate on every load (cheap 304s thanks to the ETag).
+
+    Without a Cache-Control header, browsers guess how long to cache and can keep running old
+    JavaScript modules after a deploy, mixed with new ones.
+    """
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 def create_app(settings: Settings, db=None):
     """Builds the app. Tests pass their own `db`; otherwise settings.database_url is used."""
 
@@ -49,6 +62,6 @@ def create_app(settings: Settings, db=None):
         app.include_router(router)
 
     # Everything that isn't an API route is the static frontend.
-    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+    app.mount("/", FrontendFiles(directory=FRONTEND_DIR, html=True), name="frontend")
 
     return app
