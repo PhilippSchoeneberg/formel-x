@@ -56,7 +56,8 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 - Auth: bcrypt via the `bcrypt` package (old passlib hashes verify fine). Login stores `account_id` in Starlette's signed, HTTP-only session cookie. Use the dependencies in `security.py`: `require_account_id`, `get_group_or_404`, `get_owned_group`, `ensure_owner`.
 - Passwords are stripped before hashing/verifying (the old app did this; keep it for existing accounts). Max 72 bytes.
 - Categories store `type` as int in the DB (compound=0, question=1) but the API uses `"compound"`/`"question"` (`CategoryType` in `schemas.py`). Difficulty is `"easy"|"medium"|"hard"` (also translation keys).
-- Compounds and questions share one router factory (`routers/entries.py`): one correct + 2 required + 2 optional wrong answers; the category must belong to the same group and type.
+- Compounds and questions share one router factory (`routers/entries.py`): one correct + 2 required + 2 optional wrong answers; the category must belong to the same group and type; no two options may look the same (`has_duplicate_answers`, mirrored in `entryDialog`).
+- Email addresses are case-insensitive: lookups use `lower(email)`, new accounts are stored lowercased (`normalize_email`).
 - Never return `accounts.password` from an endpoint.
 
 ## Frontend conventions
@@ -64,6 +65,7 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 - Hash router in `js/main.js`: `#/`, `#/elements`, `#/compounds`, `#/questions`, `#/<kind>/learn?category=&difficulty=`. Views are `render*(view, …)` functions in `js/views/` that rebuild `<main>`.
 - Build DOM with `h(tag, attrs, ...children)` from `js/ui.js` (never `innerHTML` with user content). Dialogs: `openDialog`, `messageDialog`, `confirmDialog`, and the forms in `js/dialogs.js`.
 - Global state is `state` in `js/store.js`; after a change that affects the page, call `notify()` (re-renders header + current view). Preferences persist in `localStorage` key `formelx`.
+- Views must not draw after the user has moved on: call `const stale = staleCheck()` (store.js) at the start of a render and `if (stale()) return;` after every `await`, in timers and in dialog callbacks before re-rendering.
 - API calls go through `api` in `js/api.js`, which throws `ApiError` (`status`, `detail`, `isConnectionError`). Use `showError(error)` for unexpected failures.
 - Formulas use LaTeX-like notation, rendered with `formulaToUnicode` (`H_2O` → `H₂O`, `SO_4^{2-}` → `SO₄²⁻`).
 - Styling: one `css/style.css` with CSS custom properties; light/dark via `prefers-color-scheme` and `data-theme` on `<html>`. Correct/wrong answers use `--good`/`--bad` tokens.

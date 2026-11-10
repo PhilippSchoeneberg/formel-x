@@ -40,6 +40,10 @@ address (e.g. the Docker bridge), add `FORWARDED_ALLOW_IPS=<proxy address>` to t
 environment. Otherwise every visitor looks like the proxy, and the login rate limit is shared
 by everyone.
 
+The proxy must pass the public host name, either as `Host` (Caddy does this by default; in nginx
+use `proxy_set_header Host $host;`) or as `X-Forwarded-Host`. Otherwise the cross-site check
+rejects every form submission with `403 cross_origin_request`.
+
 ## Security checklist
 
 - `SESSION_SECRET`: long random value (the app refuses anything under 32 characters), different

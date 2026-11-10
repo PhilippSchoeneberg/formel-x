@@ -14,11 +14,11 @@ of validation errors for `422`).
 | Method | Path | Body | Result |
 | --- | --- | --- | --- |
 | GET | `/auth/me` | | `{"account": {id, email} \| null}` |
-| POST | `/auth/register` | `{email, password}` | `201 {"account"}`, `409 account_exists`, `422 password_too_short` (under 8 characters) / `password_too_long`, `429 too_many_attempts` |
+| POST | `/auth/register` | `{email, password}` (email is stored lowercased) | `201 {"account"}`, `409 account_exists`, `422 password_too_short` (under 8 characters) / `password_too_long`, `429 too_many_attempts` |
 | POST | `/auth/login` | `{email, password}` | `{"account"}`, `401 invalid_credentials`, `429 too_many_attempts` |
 | POST | `/auth/logout` | | `204` |
 
-Register and login set the session cookie. `429` responses carry a `Retry-After` header in
+Register and login set the session cookie. Email addresses are matched case-insensitively. `429` responses carry a `Retry-After` header in
 seconds; see [deployment.md](deployment.md#login-protection) for the limits.
 
 ## Groups
@@ -84,5 +84,6 @@ Question body:
 }
 ```
 
-Text is trimmed; empty optional answers become `null`. Formulas use the notation `H_2O`,
+Text is trimmed; empty optional answers become `null`. Two options that would look the same
+(names/answers ignoring case, formulas ignoring `{}`) give `422 duplicate_answers`. Formulas use the notation `H_2O`,
 `SO_4^{2-}` and are rendered by the frontend.

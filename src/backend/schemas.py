@@ -50,6 +50,39 @@ def is_valid_email(email):
     return bool(EMAIL_PATTERN.fullmatch(email))
 
 
+def normalize_email(email):
+    """Email addresses are compared case-insensitively ("Max@…" and "max@…" are one account)."""
+    return email.strip().lower()
+
+
+def _has_duplicates(values, key):
+    seen = set()
+    for value in values:
+        if value is None:
+            continue
+        normalized = key(value)
+        if normalized in seen:
+            return True
+        seen.add(normalized)
+    return False
+
+
+def has_duplicate_answers(body):
+    """True when two answer options of a compound/question would look the same in the quiz.
+
+    Names and answers are compared ignoring case and surrounding spaces; formulas are compared
+    case-sensitively (CO and Co are different) but ignoring {} grouping (H_{2}O equals H_2O).
+    """
+    data = body.model_dump()
+    if "question" in data:
+        answers = [data["correct_answer"], *(data[f"wrong_answer{i}"] for i in range(1, 5))]
+        return _has_duplicates(answers, lambda value: value.strip().casefold())
+    names = [data["correct_name"], *(data[f"wrong_name{i}"] for i in range(1, 5))]
+    formulas = [data["correct_formula"], *(data[f"wrong_formula{i}"] for i in range(1, 5))]
+    return (_has_duplicates(names, lambda value: value.strip().casefold())
+            or _has_duplicates(formulas, lambda value: value.replace("{", "").replace("}", "").replace(" ", "")))
+
+
 class Credentials(BaseModel):
     email: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=254)]
     # Passwords were always stripped by the app, so keep doing it for existing accounts.

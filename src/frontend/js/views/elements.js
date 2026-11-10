@@ -8,7 +8,7 @@
 import { api } from "../api.js";
 import { showError } from "../dialogs.js";
 import { getLanguage, t } from "../i18n.js";
-import { isOwner, state } from "../store.js";
+import { isOwner, staleCheck, state } from "../store.js";
 import { focusElement, h, messageDialog, replaceContent, shuffle, uid } from "../ui.js";
 import { pageHeader, segmented } from "./common.js";
 
@@ -97,7 +97,9 @@ function neighbour(cells, from, key) {
 }
 
 export async function renderElements(view, { focus = null } = {}) {
+  const stale = staleCheck();
   const [elements, symbols] = await Promise.all([loadElements(), api.groupElements(state.group.id)]);
+  if (stale()) return;
   if (session.groupId !== state.group.id) {
     session.groupId = state.group.id;
     session.mode = "remembering";
@@ -177,12 +179,14 @@ export async function renderElements(view, { focus = null } = {}) {
         feedback.className = "feedback good";
         paint();
         setTimeout(async () => {
+          if (stale()) return; // the user has moved on
           session.index += 1;
           session.wrong = new Set();
           session.solved = null;
           if (session.index >= session.queue.length) {
             session.mode = "remembering";
             await renderElements(view).catch(showError);
+            if (stale()) return;
             await messageDialog(t("round_complete"), t("well_done"));
             focusElement(view.querySelector("h1"));
             return;

@@ -3,12 +3,16 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from ..database import Database
-from ..schemas import CategoryType, CompoundIn, CompoundOut, Difficulty, QuestionIn, QuestionOut
+from ..schemas import CategoryType, CompoundIn, CompoundOut, Difficulty, QuestionIn, QuestionOut, has_duplicate_answers
 from ..security import ensure_owner, get_db, get_group_or_404, get_owned_group, require_account_id
 
 
 def make_router(table, category_type, body_model, response_model):
     router = APIRouter(prefix="/api", tags=[table])
+
+    def check_answers(body):
+        if has_duplicate_answers(body):
+            raise HTTPException(422, "duplicate_answers")
 
     async def check_category(db, group_id, category_id):
         category = await db.get_category(category_id)
@@ -29,13 +33,18 @@ def make_router(table, category_type, body_model, response_model):
 
     @router.post(f"/groups/{{group_id}}/{table}", status_code=status.HTTP_201_CREATED, response_model=response_model)
     async def create_entry(body: body_model, group=Depends(get_owned_group), db: Database = Depends(get_db)):
+        check_answers(body)
         await check_category(db, group["id"], body.category_id)
         return await db.create_entry(table, {**body.model_dump(), "group_id": group["id"]})
 
     @router.patch(f"/{table}/{{entry_id}}", response_model=response_model)
     async def update_entry(body: body_model, entry=Depends(get_owned_entry), db: Database = Depends(get_db)):
+        check_answers(body)
         await check_category(db, entry["group_id"], body.category_id)
-        return await db.update_entry(table, entry["id"], body.model_dump())
+        updated = await db.update_entry(table, entry["id"], body.model_dump())
+        if updated is None:  # deleted in the meantime
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "entry_not_found")
+        return updated
 
     @router.delete(f"/{table}/{{entry_id}}", status_code=status.HTTP_204_NO_CONTENT)
     async def delete_entry(entry=Depends(get_owned_entry), db: Database = Depends(get_db)):

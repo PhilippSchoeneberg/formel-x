@@ -3,7 +3,7 @@
 import { api } from "./api.js";
 import { loginDialog, showError } from "./dialogs.js";
 import { LANGUAGES, detectLanguage, setLanguage, t } from "./i18n.js";
-import { loadAccount, notify, onChange, refreshGroups, savePrefs, state } from "./store.js";
+import { loadAccount, nextGeneration, notify, onChange, refreshGroups, savePrefs, staleCheck, state } from "./store.js";
 import { button, focusElement, h, messageDialog } from "./ui.js";
 import { renderElements } from "./views/elements.js";
 import { renderHome } from "./views/home.js";
@@ -18,15 +18,14 @@ const ROUTES = [
   { pattern: /^\/$/, render: () => renderHome(view) },
   { pattern: /^\/elements$/, render: () => renderElements(view), needsGroup: true },
   { pattern: /^\/(compounds|questions)$/, render: ([kind]) => renderMenu(view, kind), needsGroup: true },
-  { pattern: /^\/(compounds|questions)\/learn$/, render: ([kind], params) => renderQuiz(view, kind, params), needsGroup: true },
+  // Arriving from a link starts a new round; re-renders (e.g. a language switch) keep the round going.
+  { pattern: /^\/(compounds|questions)\/learn$/, render: ([kind], params, { navigated }) => renderQuiz(view, kind, params, { fresh: navigated }), needsGroup: true },
 ];
 
 function parseHash() {
   const [path, search = ""] = (location.hash.slice(1) || "/").split("?");
   return { path: path || "/", params: new URLSearchParams(search) };
 }
-
-let renderToken = 0;
 
 /** Names the browser tab after the page's main heading, so screen readers announce where you are. */
 function updateDocumentTitle() {
@@ -39,7 +38,8 @@ function updateDocumentTitle() {
  * users start at the new page's heading instead of somewhere in the old, now removed, content.
  */
 async function render({ moveFocus = false } = {}) {
-  const token = ++renderToken;
+  nextGeneration();
+  const stale = staleCheck();
   const { path, params } = parseHash();
   const route = ROUTES.find((item) => item.pattern.test(path));
   if (!route || (route.needsGroup && !state.group)) {
@@ -50,12 +50,12 @@ async function render({ moveFocus = false } = {}) {
   }
   const match = path.match(route.pattern).slice(1);
   try {
-    await route.render(match, params, () => token === renderToken);
-    if (token !== renderToken) return;
+    await route.render(match, params, { navigated: moveFocus });
+    if (stale()) return;
     updateDocumentTitle();
     if (moveFocus) focusElement(view.querySelector("h1") || view);
   } catch (error) {
-    if (token === renderToken) showError(error);
+    if (!stale()) showError(error);
   }
 }
 

@@ -27,6 +27,22 @@ export const state = {
   },
 };
 
+// Every navigation or full re-render gets a new number. Views remember the number they were
+// started with and stop when it's outdated: a slow request or a timer must never draw an old
+// page over the one the user has moved on to.
+let generation = 0;
+
+export function nextGeneration() {
+  generation += 1;
+  return generation;
+}
+
+/** Returns a function that tells whether the current view has been replaced since this call. */
+export function staleCheck() {
+  const started = generation;
+  return () => started !== generation;
+}
+
 const listeners = new Set();
 
 export function onChange(listener) {
