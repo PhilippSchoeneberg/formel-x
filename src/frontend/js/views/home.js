@@ -3,16 +3,16 @@
 
 import { api } from "../api.js";
 import { addGroupDialog, confirmDelete, groupDialog, loginDialog, showError } from "../dialogs.js";
-import { t, tj } from "../i18n.js";
+import { t } from "../i18n.js";
 import {
   isOwner, notify, refreshGroups, removeVisitorGroup, saveVisitorGroup, setGroup, state,
 } from "../store.js";
 import { button, h } from "../ui.js";
 
 const MODES = [
-  { route: "#/elements", key: "elements", glyph: "Fe", accent: "accent-1" },
-  { route: "#/compounds", key: "compounds", glyph: "H₂O", accent: "accent-2" },
-  { route: "#/questions", key: "questions", glyph: "?", accent: "accent-3" },
+  { route: "#/elements", key: "mode_elements", glyph: "Fe", accent: "accent-1" },
+  { route: "#/compounds", key: "mode_compounds", glyph: "H₂O", accent: "accent-2" },
+  { route: "#/questions", key: "mode_questions", glyph: "?", accent: "accent-3" },
 ];
 
 async function run(action) {
@@ -45,8 +45,8 @@ async function addGroup() {
 function groupActions() {
   if (state.account) {
     return [
-      button(tj("create", "group"), { icon: "plus", variant: "tonal", onclick: createGroup }),
-      isOwner() && button(tj("edit", "group"), {
+      button(t("new_group"), { icon: "plus", variant: "tonal", onclick: createGroup }),
+      isOwner() && button(t("rename_group"), {
         icon: "edit", variant: "text",
         onclick: async () => {
           const updated = await groupDialog(state.group);
@@ -57,10 +57,10 @@ function groupActions() {
           });
         },
       }),
-      isOwner() && button(tj("delete", "group"), {
+      isOwner() && button(t("delete_group"), {
         icon: "delete", variant: "text-danger",
         onclick: async () => {
-          if (!(await confirmDelete("group", state.group.name))) return;
+          if (!(await confirmDelete("delete_group", state.group.name))) return;
           await run(async () => {
             await api.deleteGroup(state.group.id);
             await refreshGroups();
@@ -72,7 +72,7 @@ function groupActions() {
   }
   return [
     button(t("add_group"), { icon: "plus", variant: "tonal", onclick: addGroup }),
-    state.group && button(tj("leave", "group"), {
+    state.group && button(t("leave_group"), {
       icon: "leave", variant: "text",
       onclick: async () => {
         removeVisitorGroup(state.group);
@@ -97,12 +97,12 @@ function groupPicker() {
 
 function emptyState() {
   return h("div", { class: "empty-state" },
-    h("p", {}, t("no_groups_yet_error")),
+    h("p", {}, state.account ? t("no_groups_owner") : t("no_groups_visitor")),
     state.account
-      ? button(tj("create", "group"), { icon: "plus", variant: "filled", onclick: createGroup })
+      ? button(t("new_group"), { icon: "plus", variant: "filled", onclick: createGroup })
       : h("div", { class: "row center" },
           button(t("add_group"), { icon: "plus", variant: "filled", onclick: addGroup }),
-          button(t("login"), {
+          button(t("log_in"), {
             icon: "account", variant: "text",
             onclick: async () => {
               const account = await loginDialog();
@@ -134,7 +134,7 @@ export function renderHome(view) {
       h("div", { class: "row wrap" }, groupActions()),
     ),
     h("section", { "aria-labelledby": "modes-title" },
-      h("h2", { id: "modes-title", class: "section-title" }, tj("select", "mode")),
+      h("h2", { id: "modes-title", class: "section-title" }, t("choose_mode")),
       h("div", { class: "mode-grid" },
         MODES.map((mode) =>
           h("a", { class: `mode-card ${mode.accent}`, href: mode.route },

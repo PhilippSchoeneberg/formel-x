@@ -66,9 +66,10 @@ See `doc/architecture.md` for the full picture and `doc/api.md` for every endpoi
 
 ## Internationalisation
 
-- All visible strings go through `t("key")` / `tj("key1", "key2", …)` (`js/i18n.js`). Keys are snake_case ids, not English.
-- Strings are built by concatenation, so many values have intentional leading/trailing spaces (`"Wähle "`, `" darf nicht leer sein."`). Preserve them; `tj` collapses double spaces.
-- When adding a key, add it to **all five** `src/frontend/locales/{de,en,es,fr,nl}.json`. Element names from the DB (`hydrogen`, …) are keys too.
+- All visible strings go through `t("key", params)` (`js/i18n.js`). Keys are snake_case ids, not English, and each value is a **complete** phrase or sentence with named placeholders: `"where_is": "Where is {element}?"` → `t("where_is", { element })`.
+- Never build a sentence by joining several keys or by concatenating text around a translation: word order, articles and gender differ per language. Add a new key with placeholders instead.
+- Tone: informal (du / tú / tu / je), short labels, sentence case in en. Quote marks per language: “…” en, „…“ de, «…» es, « … » fr, ‘…’ nl.
+- When adding a key, add it to **all five** `src/frontend/locales/{de,en,es,fr,nl}.json`. Element names from the DB (`hydrogen`, …) are keys too; inside sentences they're lowercased except in German (see `views/elements.js`).
 
 ## Database
 

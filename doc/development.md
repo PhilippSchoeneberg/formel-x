@@ -70,11 +70,14 @@ The app container applies migrations itself on every start.
 
 Translations are JSON files in `src/frontend/locales/` (`de`, `en`, `es`, `fr`, `nl`).
 
-- Keys are snake_case ids (`"add_category"`), not English text.
+- Keys are snake_case ids (`"new_category"`), not English text.
+- Every value is a complete phrase or sentence. Variable parts are named placeholders:
+  `"where_is": "Wo befindet sich {element}?"`, used as `t("where_is", { element })`.
+- Don't build sentences from several keys: word order and grammar differ between languages.
 - When you add a key, add it to **all five** files. Missing keys fall back to English, then
   to the key itself.
-- Many values have intentional leading/trailing spaces because strings are concatenated,
-  e.g. `tj("select", "category")` → `"Wähle Kategorie"`. Keep them.
+- Tone is informal (du / tú / tu / je). Use the quote marks of each language:
+  “…” (en), „…“ (de), «…» (es), « … » (fr), ‘…’ (nl).
 - Element names from the database (`hydrogen`, …) are translation keys too.
 
 To add a language, add `<code>.json` and register it in `LANGUAGES` in
@@ -86,6 +89,6 @@ To add a language, add `<code>.json` and register it in `LANGUAGES` in
   `Database` in `database.py`; schema in `tables.py` plus an Alembic migration; request
   validation in `schemas.py`; ownership checks via the dependencies in `security.py`.
 - Frontend: views in `js/views` render into `<main>` with the `h()` helper from `js/ui.js`.
-  All user-visible text goes through `t()`/`tj()`. State changes that affect the whole page
+  All user-visible text goes through `t()`. State changes that affect the whole page
   call `notify()` from `store.js`, which re-renders the header and the current view.
 - Commit messages are short imperative English sentences.

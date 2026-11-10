@@ -4,7 +4,7 @@
 import { api } from "../api.js";
 import { confirmDelete, entryDialog, showError } from "../dialogs.js";
 import { formulaToUnicode } from "../formula.js";
-import { t, tj } from "../i18n.js";
+import { t } from "../i18n.js";
 import { isOwner, state } from "../store.js";
 import { button, h, shuffle } from "../ui.js";
 import { pageHeader } from "./common.js";
@@ -29,14 +29,14 @@ function buildQuestion(kind, entry) {
   if ((state.prefs.compoundMode || "formula") === "formula") {
     const keys = ["correct_formula", "wrong_formula1", "wrong_formula2", "wrong_formula3", "wrong_formula4"];
     return {
-      prompt: `${t("compound_learning_mode_list_formula_text")}${entry.correct_name}?`,
+      prompt: t("ask_formula", { name: entry.correct_name }),
       options: keys.filter((key) => entry[key]).map((key) => ({ text: formulaToUnicode(entry[key]), correct: key === "correct_formula" })),
       formula: true,
     };
   }
   const keys = ["correct_name", "wrong_name1", "wrong_name2", "wrong_name3", "wrong_name4"];
   return {
-    prompt: `${t("compound_learning_mode_list_name_text")}${formulaToUnicode(entry.correct_formula)}?`,
+    prompt: t("ask_name", { formula: formulaToUnicode(entry.correct_formula) }),
     options: keys.filter((key) => entry[key]).map((key) => ({ text: entry[key], correct: key === "correct_name" })),
   };
 }
@@ -77,7 +77,7 @@ export async function renderQuiz(view, kind, params) {
     view.replaceChildren(
       pageHeader(title, { back }),
       h("div", { class: "empty-state" },
-        h("p", {}, t("no_entries_yet_error")),
+        h("p", {}, t("no_entries")),
         button(t("back"), { icon: "back", variant: "filled", onclick: () => { location.hash = back; } }),
       ),
     );
@@ -88,10 +88,10 @@ export async function renderQuiz(view, kind, params) {
     view.replaceChildren(
       pageHeader(title, { back }),
       h("div", { class: "empty-state done" },
-        h("p", { class: "done-title" }, t("correct_feedback")),
+        h("p", { class: "done-title" }, t("well_done")),
         h("p", {}, t("round_complete")),
         h("div", { class: "row center" },
-          button(t("restart"), { icon: "play", variant: "filled", onclick: () => restart().catch(showError) }),
+          button(t("play_again"), { icon: "play", variant: "filled", onclick: () => restart().catch(showError) }),
           button(t("back"), { icon: "back", variant: "text", onclick: () => { location.hash = back; } }),
         ),
       ),
@@ -117,7 +117,7 @@ export async function renderQuiz(view, kind, params) {
       if (option.correct) {
         answered = true;
         optionButton.classList.add("correct");
-        feedback.textContent = t("correct_feedback");
+        feedback.textContent = t("correct");
         feedback.className = "feedback good";
         for (const other of optionButtons) other.disabled = other !== optionButton;
         setTimeout(() => {
@@ -127,7 +127,7 @@ export async function renderQuiz(view, kind, params) {
       } else {
         optionButton.classList.add("wrong");
         optionButton.disabled = true;
-        feedback.textContent = t("wrong_feedback");
+        feedback.textContent = t("wrong");
         feedback.className = "feedback bad";
       }
     });
@@ -135,7 +135,7 @@ export async function renderQuiz(view, kind, params) {
   });
 
   const ownerActions = owner ? [
-    button(tj("edit", config.titleKey === "compounds" ? "compound" : "question"), {
+    button(t(config.editKey), {
       icon: "edit", variant: "text", iconOnly: true,
       onclick: async () => {
         const updated = await entryDialog(kind, categories, entry);
@@ -145,11 +145,11 @@ export async function renderQuiz(view, kind, params) {
         renderQuiz(view, kind, params).catch(showError);
       },
     }),
-    button(tj("delete", config.titleKey === "compounds" ? "compound" : "question"), {
+    button(t(config.deleteKey), {
       icon: "delete", variant: "text-danger", iconOnly: true,
       onclick: async () => {
         const name = kind === "compounds" ? entry.correct_name : entry.question;
-        if (!(await confirmDelete(kind === "compounds" ? "compound" : "question", name))) return;
+        if (!(await confirmDelete(config.deleteKey, name))) return;
         try {
           await api.deleteEntry(kind, entry.id);
           round.entries.splice(round.index, 1);
@@ -168,7 +168,7 @@ export async function renderQuiz(view, kind, params) {
     pageHeader(title, { back, actions: ownerActions }),
     h("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(round.entries.length), "aria-valuenow": String(round.index) },
       h("div", { class: "progress-bar", style: `width:${progress}%` })),
-    h("p", { class: "progress-text" }, `${round.index + 1} / ${round.entries.length}`),
+    h("p", { class: "progress-text" }, t("progress", { current: round.index + 1, total: round.entries.length })),
     h("section", { class: "card quiz-card" },
       h("h2", { class: "quiz-prompt" }, question.prompt),
       h("div", { class: "options" }, optionButtons),

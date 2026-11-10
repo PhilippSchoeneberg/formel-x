@@ -35,7 +35,7 @@ src/
     js/main.js       Boot, header, hash router
     js/api.js        fetch wrapper for /api
     js/store.js      App state + localStorage preferences
-    js/i18n.js       Translation loading and t()/tj()
+    js/i18n.js       Translation loading and t() with {placeholders}
     js/ui.js         DOM helper h(), icons, dialogs, form fields
     js/dialogs.js    Login, group, category, compound/question dialogs
     js/formula.js    H_2O → H₂O notation
@@ -70,8 +70,8 @@ doc/                 This documentation
   `#/compounds/learn?category=<id>&difficulty=<d>` and the same for questions.
 - Preferences (theme, language, selected group, difficulty, compound quiz direction, the
   visitor's saved groups) live in `localStorage` under the key `formelx`.
-- Translations are keyed by snake_case ids. Many values carry leading/trailing spaces
-  because UI strings are built by concatenation (`tj("select", "category")`).
+- Translations are keyed by snake_case ids. Each value is a full sentence with named
+  placeholders (`t("where_is", { element })`), so every language can use its own grammar.
 
 ## Errors
 

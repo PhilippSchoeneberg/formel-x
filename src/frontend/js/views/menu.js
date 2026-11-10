@@ -3,14 +3,14 @@
 
 import { api } from "../api.js";
 import { DIFFICULTIES, categoryDialog, confirmDelete, entryDialog, showError } from "../dialogs.js";
-import { t, tj } from "../i18n.js";
+import { t } from "../i18n.js";
 import { isOwner, savePrefs, state } from "../store.js";
 import { button, h } from "../ui.js";
 import { pageHeader, segmented } from "./common.js";
 
 export const KINDS = {
-  compounds: { type: "compound", titleKey: "compounds", addKey: "add_compound" },
-  questions: { type: "question", titleKey: "questions", addKey: "add_question" },
+  compounds: { type: "compound", titleKey: "mode_compounds", addKey: "new_compound", editKey: "edit_compound", deleteKey: "delete_compound" },
+  questions: { type: "question", titleKey: "mode_questions", addKey: "new_question", editKey: "edit_question", deleteKey: "delete_question" },
 };
 
 function learnLink(kind, categoryId) {
@@ -33,12 +33,12 @@ export async function renderMenu(view, kind) {
   const addEntry = () => entryDialog(kind, categories);
 
   const actions = owner ? [
-    button(t("add_category"), { icon: "plus", variant: "tonal", onclick: addCategory }),
+    button(t("new_category"), { icon: "plus", variant: "tonal", onclick: addCategory }),
     categories.length ? button(t(config.addKey), { icon: "plus", variant: "filled", onclick: addEntry }) : null,
   ] : [];
 
   const difficulty = h("select", { id: "difficulty-select" },
-    h("option", { value: "" }, t("all")),
+    h("option", { value: "" }, t("all_difficulties")),
     DIFFICULTIES.map((value) => h("option", { value }, t(value))),
   );
   difficulty.value = state.prefs.difficulty || "";
@@ -52,15 +52,15 @@ export async function renderMenu(view, kind) {
     kind === "compounds"
       ? segmented(
           [
-            { value: "formula", label: t("formula_to_name") },
-            { value: "name", label: t("name_to_formula") },
+            { value: "formula", label: t("find_formula") },
+            { value: "name", label: t("find_name") },
           ],
           state.prefs.compoundMode || "formula",
           (mode) => {
             savePrefs({ compoundMode: mode });
             rerender();
           },
-          t("mode"),
+          t("quiz_direction"),
         )
       : null,
   );
@@ -69,28 +69,28 @@ export async function renderMenu(view, kind) {
   if (!categories.length) {
     content = h("div", { class: "empty-state" },
       owner
-        ? button(tj("create", "category"), { icon: "plus", variant: "filled", onclick: addCategory })
-        : h("p", {}, t("no_categories_yet_error")),
+        ? h("div", { class: "empty-state-inner" }, h("p", {}, t("no_categories")), button(t("create_first_category"), { icon: "plus", variant: "filled", onclick: addCategory }))
+        : h("p", {}, t("no_categories")),
     );
   } else {
     const rows = [];
     if (categories.length >= 2) {
       rows.push(h("li", {}, h("a", { class: "list-link", href: learnLink(kind, null) },
-        h("span", {}, t("all")), h("span", { class: "list-chevron", "aria-hidden": "true" }, "›"))));
+        h("span", {}, t("all_categories")), h("span", { class: "list-chevron", "aria-hidden": "true" }, "›"))));
     }
     for (const category of categories) {
       rows.push(h("li", {},
         h("a", { class: "list-link", href: learnLink(kind, category.id) },
           h("span", {}, category.name), h("span", { class: "list-chevron", "aria-hidden": "true" }, "›")),
         owner ? h("div", { class: "row list-actions" },
-          button(tj("edit", "category"), {
+          button(t("rename_category"), {
             icon: "edit", variant: "text", iconOnly: true,
             onclick: async () => { if (await categoryDialog(config.type, category)) rerender(); },
           }),
-          button(tj("delete", "category"), {
+          button(t("delete_category"), {
             icon: "delete", variant: "text-danger", iconOnly: true,
             onclick: async () => {
-              if (!(await confirmDelete("category", category.name))) return;
+              if (!(await confirmDelete("delete_category", category.name))) return;
               try {
                 await api.deleteCategory(category.id);
                 rerender();
@@ -103,7 +103,7 @@ export async function renderMenu(view, kind) {
       ));
     }
     content = h("section", { class: "card list-card", "aria-labelledby": "category-title" },
-      h("h2", { id: "category-title", class: "section-title" }, `${tj("select", "category")}:`),
+      h("h2", { id: "category-title", class: "section-title" }, t("choose_category")),
       h("ul", { class: "list" }, rows),
     );
   }

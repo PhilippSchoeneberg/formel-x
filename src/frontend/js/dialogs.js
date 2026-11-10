@@ -3,7 +3,7 @@
 
 import { api } from "./api.js";
 import { formulaToUnicode } from "./formula.js";
-import { t, tj } from "./i18n.js";
+import { t } from "./i18n.js";
 import { state } from "./store.js";
 import { button, confirmDialog, field, h, messageDialog, openDialog, selectField } from "./ui.js";
 
@@ -13,14 +13,14 @@ export const DIFFICULTIES = ["easy", "medium", "hard"];
 export function showError(error) {
   console.error(error);
   const key = error?.isConnectionError ? "connection_error" : "unknown_error";
-  return messageDialog(t(key));
+  return messageDialog(t(key), t("error_title"));
 }
 
 /**
  * Builds a dialog form. `fields` are field() objects, `submit()` throws or returns the result.
  * Returning undefined from submit keeps the dialog open (validation failed).
  */
-function formDialog({ title, fields, submit, submitLabel = t("submit"), extra = null, wide = false }) {
+function formDialog({ title, fields, submit, submitLabel = t("save"), wide = false }) {
   return openDialog({
     title,
     wide,
@@ -28,7 +28,6 @@ function formDialog({ title, fields, submit, submitLabel = t("submit"), extra = 
       const submitButton = button(submitLabel, { variant: "filled", type: "submit" });
       const form = h("form", { class: "form", novalidate: true },
         h("div", { class: wide ? "form-grid" : "form-stack" }, fields.map((item) => item.element)),
-        extra ? extra(close) : null,
         h("div", { class: "dialog-actions" },
           button(t("cancel"), { variant: "text", onclick: () => close(null) }),
           submitButton,
@@ -52,11 +51,11 @@ function formDialog({ title, fields, submit, submitLabel = t("submit"), extra = 
 }
 
 /** Marks every empty required field; returns true when all are filled. */
-function requireFilled(entries) {
+function requireFilled(items) {
   let valid = true;
-  for (const [item, labelKey] of entries) {
+  for (const item of items) {
     if (!item.value()) {
-      item.setError(tj(labelKey, "empty_error"));
+      item.setError(t("required"));
       valid = false;
     }
   }
@@ -67,12 +66,12 @@ function requireFilled(entries) {
 
 export function loginDialog(startInRegisterMode = false) {
   let registerMode = startInRegisterMode;
-  const email = field(t("email_address"), { type: "email", autocomplete: "email", maxlength: 254 });
+  const email = field(t("email"), { type: "email", autocomplete: "email", maxlength: 254 });
   const password = field(t("password"), { type: "password", autocomplete: "current-password" });
-  const repetition = field(t("password_repetition"), { type: "password", autocomplete: "new-password" });
+  const repetition = field(t("password_repeat"), { type: "password", autocomplete: "new-password" });
 
   return openDialog({
-    title: registerMode ? t("registration") : t("login"),
+    title: registerMode ? t("create_account") : t("log_in"),
     build: (close) => {
       const title = () => document.getElementById("dialog-title");
       const submitButton = button("", { variant: "filled", type: "submit" });
@@ -81,9 +80,9 @@ export function loginDialog(startInRegisterMode = false) {
       const render = () => {
         repetition.element.hidden = !registerMode;
         password.input.autocomplete = registerMode ? "new-password" : "current-password";
-        submitButton.querySelector("span").textContent = registerMode ? t("register") : t("login");
-        toggle.querySelector("span").textContent = registerMode ? t("go_to_login") : t("go_to_registration");
-        if (title()) title().textContent = registerMode ? t("registration") : t("login");
+        submitButton.querySelector("span").textContent = registerMode ? t("create_account") : t("log_in");
+        toggle.querySelector("span").textContent = registerMode ? t("to_login") : t("to_register");
+        if (title()) title().textContent = registerMode ? t("create_account") : t("log_in");
         for (const item of [email, password, repetition]) item.setError(null);
       };
       toggle.addEventListener("click", () => {
@@ -104,13 +103,10 @@ export function loginDialog(startInRegisterMode = false) {
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const required = [[email, "email_address"], [password, "password"]];
-        if (registerMode) required.push([repetition, "password_repetition"]);
+        const required = registerMode ? [email, password, repetition] : [email, password];
         if (!requireFilled(required)) return;
         if (registerMode && password.value() !== repetition.value()) {
-          const message = tj("password", "and", "password_repetition", "do_not_match_error");
-          password.setError(message);
-          repetition.setError(message);
+          repetition.setError(t("passwords_mismatch"));
           return;
         }
         submitButton.disabled = true;
@@ -121,11 +117,9 @@ export function loginDialog(startInRegisterMode = false) {
           close(result.account);
         } catch (error) {
           if (error.status === 401) {
-            const message = tj("email_address", "or", "password", "incorrect_error");
-            email.setError(message);
-            password.setError(message);
+            password.setError(t("login_failed"));
           } else if (error.status === 409) {
-            email.setError(tj("account", "already_exists_error"));
+            email.setError(t("account_exists"));
           } else if (error.detail === "password_too_long") {
             password.setError(t("password_too_long"));
           } else {
@@ -147,15 +141,15 @@ export function loginDialog(startInRegisterMode = false) {
 export function groupDialog(group = null) {
   const name = field(t("group_name"), { value: group?.name, maxlength: 200 });
   return formDialog({
-    title: group ? tj("edit", "group") : tj("create", "group"),
+    title: group ? t("rename_group") : t("new_group"),
     fields: [name],
     submit: async () => {
-      if (!requireFilled([[name, "group_name"]])) return undefined;
+      if (!requireFilled([name])) return undefined;
       try {
         return group ? await api.updateGroup(group.id, name.value()) : await api.createGroup(name.value());
       } catch (error) {
         if (error.status !== 409) throw error;
-        name.setError(tj("group_name", "already_exists_error"));
+        name.setError(t("group_exists"));
         return undefined;
       }
     },
@@ -167,30 +161,32 @@ export function addGroupDialog() {
   const name = field(t("group_name"), { maxlength: 200 });
   return formDialog({
     title: t("add_group"),
+    submitLabel: t("add_group"),
     fields: [name],
     submit: async () => {
-      if (!requireFilled([[name, "group_name"]])) return undefined;
+      if (!requireFilled([name])) return undefined;
       try {
         const group = await api.groupByName(name.value());
         if (state.groups.some((item) => item.id === group.id)) {
-          name.setError(tj("group", "already_added_error"));
+          name.setError(t("group_already_added"));
           return undefined;
         }
         return group;
       } catch (error) {
         if (error.status !== 404) throw error;
-        name.setError(tj("group", "does_not_exist_error"));
+        name.setError(t("group_not_found"));
         return undefined;
       }
     },
   });
 }
 
-export function confirmDelete(typeKey, itemName) {
+/** Asks before deleting. `titleKey` is the action, e.g. "delete_group". */
+export function confirmDelete(titleKey, itemName) {
   return confirmDialog({
-    title: `${tj("delete", typeKey)}?`,
-    message: `${t("delete_text")}"${itemName}"?`,
-    confirmLabel: t("delete").trim(),
+    title: t(titleKey),
+    message: t("confirm_delete", { name: itemName }),
+    confirmLabel: t("delete"),
     danger: true,
   });
 }
@@ -200,17 +196,17 @@ export function confirmDelete(typeKey, itemName) {
 export function categoryDialog(type, category = null) {
   const name = field(t("category_name"), { value: category?.name, maxlength: 200 });
   return formDialog({
-    title: category ? tj("edit", "category") : t("add_category"),
+    title: category ? t("rename_category") : t("new_category"),
     fields: [name],
     submit: async () => {
-      if (!requireFilled([[name, "category_name"]])) return undefined;
+      if (!requireFilled([name])) return undefined;
       try {
         return category
           ? await api.updateCategory(category.id, name.value())
           : await api.createCategory(state.group.id, name.value(), type);
       } catch (error) {
         if (error.status !== 409) throw error;
-        name.setError(tj("category", "already_exists_error"));
+        name.setError(t("category_exists"));
         return undefined;
       }
     },
@@ -221,31 +217,32 @@ export function categoryDialog(type, category = null) {
 
 const ENTRY_FORMS = {
   compounds: {
-    titleKey: "compound",
-    addKey: "add_compound",
+    newKey: "new_compound",
+    editKey: "edit_compound",
+    // [field, label key, label params, required, is formula]
     fields: [
-      ["correct_name", "correct_formula_name", true],
-      ["correct_formula", "correct_formula", true, true],
-      ["wrong_name1", "first_wrong_formula_name", true],
-      ["wrong_formula1", "first_wrong_formula", true, true],
-      ["wrong_name2", "second_wrong_formula_name", true],
-      ["wrong_formula2", "second_wrong_formula", true, true],
-      ["wrong_name3", "third_wrong_formula_name", false],
-      ["wrong_formula3", "third_wrong_formula", false, true],
-      ["wrong_name4", "fourth_wrong_formula_name", false],
-      ["wrong_formula4", "fourth_wrong_formula", false, true],
+      ["correct_name", "correct_name", {}, true],
+      ["correct_formula", "correct_formula", {}, true, true],
+      ["wrong_name1", "wrong_name", { n: 1 }, true],
+      ["wrong_formula1", "wrong_formula", { n: 1 }, true, true],
+      ["wrong_name2", "wrong_name", { n: 2 }, true],
+      ["wrong_formula2", "wrong_formula", { n: 2 }, true, true],
+      ["wrong_name3", "wrong_name", { n: 3 }, false],
+      ["wrong_formula3", "wrong_formula", { n: 3 }, false, true],
+      ["wrong_name4", "wrong_name", { n: 4 }, false],
+      ["wrong_formula4", "wrong_formula", { n: 4 }, false, true],
     ],
   },
   questions: {
-    titleKey: "question",
-    addKey: "add_question",
+    newKey: "new_question",
+    editKey: "edit_question",
     fields: [
-      ["question", "question", true],
-      ["correct_answer", "correct_answer", true],
-      ["wrong_answer1", "first_wrong_answer", true],
-      ["wrong_answer2", "second_wrong_answer", true],
-      ["wrong_answer3", "third_wrong_answer", false],
-      ["wrong_answer4", "fourth_wrong_answer", false],
+      ["question", "question", {}, true],
+      ["correct_answer", "correct_answer", {}, true],
+      ["wrong_answer1", "wrong_answer", { n: 1 }, true],
+      ["wrong_answer2", "wrong_answer", { n: 2 }, true],
+      ["wrong_answer3", "wrong_answer", { n: 3 }, false],
+      ["wrong_answer4", "wrong_answer", { n: 4 }, false],
     ],
   },
 };
@@ -255,17 +252,17 @@ export function entryDialog(kind, categories, entry = null, defaults = {}) {
   const config = ENTRY_FORMS[kind];
 
   const category = selectField(t("category"), [
-    { value: "", label: tj("select", "category") },
+    { value: "", label: t("choose_category") },
     ...categories.map((item) => ({ value: String(item.id), label: item.name })),
   ], { value: String(entry?.category_id ?? defaults.categoryId ?? "") });
 
   const difficulty = selectField(t("difficulty"), [
-    { value: "", label: tj("select", "difficulty") },
+    { value: "", label: t("choose_difficulty") },
     ...DIFFICULTIES.map((value) => ({ value, label: t(value) })),
   ], { value: entry?.difficulty ?? defaults.difficulty ?? "" });
 
-  const inputs = config.fields.map(([key, labelKey, required, isFormula]) => {
-    const label = required ? t(labelKey) : `${t(labelKey)} ${t("optional")}`;
+  const inputs = config.fields.map(([key, labelKey, labelParams, required, isFormula]) => {
+    const label = required ? t(labelKey, labelParams) : `${t(labelKey, labelParams)} ${t("optional")}`;
     const item = field(label, {
       value: entry?.[key] ?? "",
       multiline: key === "question",
@@ -276,22 +273,20 @@ export function entryDialog(kind, categories, entry = null, defaults = {}) {
       autocomplete: "off",
     });
     if (key === "question") item.element.classList.add("span-2");
-    return { key, labelKey, required, item };
+    return { key, required, item };
   });
 
   return formDialog({
-    title: entry ? tj("edit", config.titleKey) : t(config.addKey),
+    title: entry ? t(config.editKey) : t(config.newKey),
     wide: true,
     fields: [category, difficulty, ...inputs.map((input) => input.item)],
     submit: async () => {
-      let valid = requireFilled(inputs.filter((input) => input.required).map((input) => [input.item, input.labelKey]));
-      if (!category.value()) {
-        category.setError(tj("category", "empty_error"));
-        valid = false;
-      }
-      if (!difficulty.value()) {
-        difficulty.setError(tj("difficulty", "empty_error"));
-        valid = false;
+      let valid = requireFilled(inputs.filter((input) => input.required).map((input) => input.item));
+      for (const select of [category, difficulty]) {
+        if (!select.value()) {
+          select.setError(t("select_required"));
+          valid = false;
+        }
       }
       if (!valid) return undefined;
 
