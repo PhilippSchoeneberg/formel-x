@@ -3,7 +3,7 @@
 
 import { api } from "../api.js";
 import { showError } from "../dialogs.js";
-import { t, tj } from "../i18n.js";
+import { getLanguage, t } from "../i18n.js";
 import { isOwner, state } from "../store.js";
 import { h, messageDialog, shuffle } from "../ui.js";
 import { pageHeader, segmented } from "./common.js";
@@ -54,7 +54,7 @@ function layout(elements) {
 function startLearning() {
   const queue = (allElements || []).filter((element) => session.symbols.has(element.symbol));
   if (!queue.length) {
-    messageDialog(t("no_elements_yet_error"));
+    messageDialog(t("no_elements"));
     return false;
   }
   session.queue = shuffle(queue);
@@ -95,10 +95,12 @@ export async function renderElements(view) {
     }
     if (learning) {
       const element = current();
-      prompt.textContent = `${t("element_learning_mode_list_text")}${t(element.name)}?`;
-      progress.textContent = `${session.index + 1} / ${session.queue.length}`;
+      // Element names are capitalized as labels; inside a sentence only German keeps the capital.
+      const name = getLanguage() === "de" ? t(element.name) : t(element.name).toLocaleLowerCase(getLanguage());
+      prompt.textContent = t("where_is", { element: name });
+      progress.textContent = t("progress", { current: session.index + 1, total: session.queue.length });
     } else {
-      prompt.textContent = owner ? t("add_element_to_learning_mode_hint") : t("element_remembering_mode_list_text");
+      prompt.textContent = owner ? t("elements_owner_hint") : t("elements_study_hint");
       progress.textContent = "";
     }
   }
@@ -116,7 +118,7 @@ export async function renderElements(view) {
           if (session.index >= session.queue.length) {
             session.mode = "remembering";
             renderElements(view).catch(showError);
-            messageDialog(t("round_complete"), t("correct_feedback"));
+            messageDialog(t("round_complete"), t("well_done"));
             return;
           }
           paint();
@@ -170,8 +172,8 @@ export async function renderElements(view) {
 
   const modeToggle = segmented(
     [
-      { value: "remembering", label: t("remembering_mode") },
-      { value: "learning", label: t("learning_mode") },
+      { value: "remembering", label: t("study_mode") },
+      { value: "learning", label: t("practice_mode") },
     ],
     session.mode,
     (mode) => {
@@ -179,11 +181,11 @@ export async function renderElements(view) {
       session.mode = mode;
       renderElements(view).catch(showError);
     },
-    tj("select", "mode"),
+    t("mode"),
   );
 
   view.replaceChildren(
-    pageHeader(t("elements")),
+    pageHeader(t("mode_elements")),
     h("div", { class: "toolbar" }, modeToggle, progress),
     prompt,
     h("div", { class: "table-scroll" }, table),

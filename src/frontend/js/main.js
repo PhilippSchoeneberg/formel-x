@@ -61,8 +61,9 @@ function currentTheme() {
 
 function renderHeader() {
   const actions = document.getElementById("header-actions");
+  document.querySelector(".skip-link").textContent = t("skip_to_content");
 
-  const language = h("select", { class: "language-select", "aria-label": t("language").trim() },
+  const language = h("select", { class: "language-select", "aria-label": t("language") },
     Object.entries(LANGUAGES).map(([code, name]) => h("option", { value: code }, name)));
   language.value = state.prefs.language;
   language.addEventListener("change", async () => {
@@ -72,7 +73,7 @@ function renderHeader() {
   });
 
   const dark = currentTheme() === "dark";
-  const theme = button(t("theme").trim(), {
+  const theme = button(dark ? t("theme_light") : t("theme_dark"), {
     icon: dark ? "sun" : "moon",
     variant: "text",
     iconOnly: true,
@@ -84,7 +85,7 @@ function renderHeader() {
   });
 
   const account = state.account
-    ? button(t("logout"), {
+    ? button(t("log_out"), {
         icon: "logout",
         variant: "text",
         class: "account-button",
@@ -100,7 +101,7 @@ function renderHeader() {
           }
         },
       })
-    : button(t("login"), {
+    : button(t("log_in"), {
         icon: "account",
         variant: "tonal",
         class: "account-button",
@@ -139,7 +140,7 @@ async function start() {
       await loadSession();
       break;
     } catch (error) {
-      await messageDialog(t(error?.isConnectionError ? "connection_error" : "unknown_error"));
+      await messageDialog(t(error?.isConnectionError ? "connection_error" : "unknown_error"), t("error_title"));
     }
   }
 

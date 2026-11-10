@@ -1,6 +1,7 @@
-// Translations live in /locales/<code>.json. Keys are snake_case ids, and many values carry
-// intentional leading/trailing spaces because strings are built by concatenation,
-// e.g. t("select") + t("category") -> "Wähle Kategorie".
+// Translations live in /locales/<code>.json. Every key is a complete phrase or sentence;
+// variable parts use named placeholders, e.g. "where_is": "Where is {element}?" with
+// t("where_is", { element: "Iron" }). Never build sentences by joining several keys:
+// word order and grammar differ between languages.
 
 export const LANGUAGES = {
   de: "Deutsch",
@@ -45,11 +46,8 @@ export function getLanguage() {
   return currentCode;
 }
 
-export function t(key) {
-  return current[key] ?? fallback[key] ?? key;
-}
-
-/** Joins translated parts and tidies the doubled/trailing spaces that concatenation leaves. */
-export function tj(...keys) {
-  return keys.map((key) => t(key)).join("").replace(/\s{2,}/g, " ").trim();
+/** Translates `key` and fills in `{placeholders}` from `params`. Unknown placeholders stay as they are. */
+export function t(key, params = {}) {
+  const text = current[key] ?? fallback[key] ?? key;
+  return text.replace(/\{(\w+)\}/g, (match, name) => (name in params ? String(params[name]) : match));
 }

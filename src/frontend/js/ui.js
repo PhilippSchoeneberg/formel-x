@@ -88,18 +88,18 @@ export function openDialog({ title, build, wide = false }) {
   });
 }
 
-export function messageDialog(message, title = t("sorry")) {
+export function messageDialog(message, title = t("notice")) {
   return openDialog({
     title,
     build: (close) =>
       h("div", {},
         h("p", { class: "dialog-text" }, message),
-        h("div", { class: "dialog-actions" }, button(t("okay"), { variant: "filled", onclick: () => close(true) })),
+        h("div", { class: "dialog-actions" }, button(t("ok"), { variant: "filled", onclick: () => close(true) })),
       ),
   });
 }
 
-export function confirmDialog({ title, message, confirmLabel = t("submit"), danger = false }) {
+export function confirmDialog({ title, message, confirmLabel = t("ok"), danger = false }) {
   return openDialog({
     title,
     build: (close) =>
