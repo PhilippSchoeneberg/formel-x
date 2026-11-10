@@ -1,0 +1,127 @@
+# Development
+
+## Setup
+
+Requires [uv](https://docs.astral.sh/uv/) (`brew install uv`), Python 3.11 or newer (uv can install it) and Docker (for PostgreSQL).
+
+```bash
+uv sync                              # creates .venv with all dependencies from uv.lock
+uv run playwright install chromium   # browser for the end-to-end tests
+cp .env.example .env
+```
+
+In `.env`, set:
+
+- `POSTGRES_PASSWORD` – any password for the local database
+- `DATABASE_URL=postgresql+asyncpg://formelx:<POSTGRES_PASSWORD>@localhost:5432/formelx`
+- `SESSION_SECRET` – any random string
+- `SECURE_COOKIES=false`, otherwise the browser won't send the login cookie over plain `http://`
+
+## Run
+
+Start the database and create the tables (once, and again after pulling new migrations):
+
+```bash
+docker network create web          # once; compose.yaml expects this network
+docker compose -f compose.yaml -f compose.dev.yaml up -d db
+uv run alembic upgrade head
+```
+
+Then, from the repository root:
+
+```bash
+uv run uvicorn src.backend.main:app --reload
+```
+
+Open http://127.0.0.1:8000. The API docs are at http://127.0.0.1:8000/api/docs.
+
+The frontend has no build step: edit files in `src/frontend` and reload the page.
+
+To run the whole stack in Docker on http://127.0.0.1:8000 use
+`docker compose -f compose.yaml -f compose.dev.yaml up -d --build` (set `PUBLIC_HOST=localhost` in
+`.env`). Set `APP_PORT` or `DB_PORT` in `.env` if port 8000 or 5432 is taken. The server uses
+`compose.yaml` alone, without published ports (see deployment.md).
+
+## Dependencies
+
+Dependencies are declared in `pyproject.toml` and pinned in `uv.lock` (commit both).
+
+```bash
+uv add <package>              # runtime dependency
+uv add --dev <package>        # test/dev dependency
+uv lock --upgrade             # update everything within the declared ranges
+```
+
+## Tests
+
+```bash
+uv run pytest                  # everything
+uv run pytest -m "not e2e"     # skip the browser tests
+```
+
+- `tests/test_api.py` runs the real FastAPI app and database code against SQLite in memory,
+  so it needs no running database and no `.env`.
+- `tests/e2e/` starts the app on a temporary SQLite database and drives it with Playwright
+  (headless Chromium). Add `--headed` to watch the browser. To run them against PostgreSQL, point
+`TEST_DATABASE_URL` at an **empty** database that may be wiped:
+
+```bash
+docker exec formel-x-db createdb -U formelx formelx_test
+TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx_test uv run pytest tests/test_api.py
+```
+
+## Continuous integration
+
+`.github/workflows/tests.yml` runs on every pull request into `development` or `main`, again
+after merging, and on demand (Actions tab → CI → Run workflow). It has two jobs:
+
+- **tests** – installs the locked dependencies with uv, checks that `uv.lock` is up to date,
+  applies the migrations to a PostgreSQL 17 service and runs `alembic check`, then runs the API
+  tests on Postgres and the Playwright browser tests in headless Chromium.
+- **docker-build** – builds the production image, so a broken Dockerfile is caught early.
+
+Both branches have a ruleset that requires these two checks to pass before a pull request can
+be merged, so nothing that fails the tests reaches `development` or `main`. A new push to a pull
+request cancels the run that's still going and starts a fresh one.
+
+If a check fails, open it from the pull request's "Checks" tab to see which step failed and run
+the same command locally (e.g. `uv run pytest -m e2e`).
+
+## Changing the schema
+
+1. Change the tables in `src/backend/tables.py`.
+2. Generate a migration and review it:
+   ```bash
+   uv run alembic revision --autogenerate -m "Add something"
+   ```
+3. Apply it with `uv run alembic upgrade head`. `alembic check` reports whether the tables
+   and the migrations still match.
+
+The app container applies migrations itself on every start.
+
+## Translations
+
+Translations are JSON files in `src/frontend/locales/` (`de`, `en`, `es`, `fr`, `nl`).
+
+- Keys are snake_case ids (`"new_category"`), not English text.
+- Every value is a complete phrase or sentence. Variable parts are named placeholders:
+  `"where_is": "Wo befindet sich {element}?"`, used as `t("where_is", { element })`.
+- Don't build sentences from several keys: word order and grammar differ between languages.
+- When you add a key, add it to **all five** files. Missing keys fall back to English, then
+  to the key itself.
+- Tone is informal (du / tú / tu / je). Use the quote marks of each language:
+  “…” (en), „…“ (de), «…» (es), « … » (fr), ‘…’ (nl).
+- Element names from the database (`hydrogen`, …) are translation keys too.
+
+To add a language, add `<code>.json` and register it in `LANGUAGES` in
+`src/frontend/js/i18n.js`.
+
+## Conventions
+
+- Backend: one router per resource in `src/backend/routers`; database access only through
+  `Database` in `database.py`; schema in `tables.py` plus an Alembic migration; request
+  validation in `schemas.py`; ownership checks via the dependencies in `security.py`.
+- Frontend: views in `js/views` render into `<main>` with the `h()` helper from `js/ui.js`.
+  All user-visible text goes through `t()`. State changes that affect the whole page
+  call `notify()` from `store.js`, which re-renders the header and the current view.
+- Commit messages are short imperative English sentences.

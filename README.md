@@ -1,16 +1,46 @@
-# FormulaX
-The source code of the mobile application "FormelX"
+# FormelX
 
-## Installation
-- To install the project, first clone it via `git clone https://github.com/PhilippSchoeneberg/FormelX.git`
-- Then create a virtual environment using at least python version 3.11
-- Finally, install the necessary libraries using `pip install -r requirements.txt`
+[![CI](https://github.com/PhilippSchoeneberg/formel-x/actions/workflows/tests.yml/badge.svg?branch=development)](https://github.com/PhilippSchoeneberg/formel-x/actions/workflows/tests.yml)
 
-## Publication
-### Android
-- Increase numeric version number in the "buildozer.spec" file by 1
-- Create Android App Bundle (.aab) using `buildozer android release`
-- Rename the file to `formelx-release.aab`
-- Sign the file using `jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore my-release-key.keystore bin/formelx-release.aab my-key-alias`
-- Verify the signature using `jarsigner -verify -verbose -certs bin/formelx-release.aab`
-- Zipalign the file using `zipalign -v -p 4 bin/formelx-release.aab bin/formelx-release-aligned.aab`
+A web app for learning chemistry: find elements in the periodic table, match compound names
+and formulas, and answer multiple-choice questions. Content is organised in groups (courses)
+that their owners create and edit; anyone can add a group by its name and learn.
+
+- Frontend: plain HTML, CSS and JavaScript (`src/frontend`)
+- Backend: Python with FastAPI (`src/backend`), data in PostgreSQL
+
+## Quick start
+
+Needs [uv](https://docs.astral.sh/uv/) (`brew install uv`) and Docker.
+
+```bash
+uv sync
+```
+```bash
+cp .env.example .env        # fill in a database password, DATABASE_URL and a session secret
+```
+```bash
+docker network create web   # once; compose.yaml expects this network
+```
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml up -d db   # PostgreSQL on localhost
+```
+```bash
+uv run alembic upgrade head
+```
+```bash
+uv run uvicorn src.backend.main:app --reload
+```
+
+Then open http://127.0.0.1:8000. To deploy behind HTTPS on a server, see [doc/deployment.md](doc/deployment.md).
+
+Run the tests with `uv run pytest` (once before: `uv run playwright install chromium` for the browser tests).
+
+## Documentation
+
+- [Architecture](doc/architecture.md)
+- [API](doc/api.md)
+- [Development](doc/development.md)
+- [Deployment](doc/deployment.md)
+
+The earlier, unpublished Android app (Kivy) is available in the git history.

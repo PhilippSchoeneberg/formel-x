@@ -1,0 +1,69 @@
+# FormelX on a server behind the shared Caddy proxy (see doc/deployment.md).
+#
+#   docker compose up -d --build     # start or update (migrations run automatically)
+#
+# No `ports:` on purpose: the only way in is Caddy, over HTTPS, via the external Docker network
+# "web". Secrets come from .env (copy .env.example). For local development with published
+# localhost ports, add compose.dev.yaml (see that file).
+
+services:
+  app:
+    build: .
+    image: formel-x:latest
+    container_name: formel-x
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # The database is addressed by its unique container name: other projects on "web" may
+      # have a service called "db" too.
+      DATABASE_URL: postgresql+asyncpg://formelx:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@formel-x-db:5432/formelx
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      # Login cookie only over HTTPS. Caddy always serves HTTPS, so keep this true on the server.
+      SECURE_COOKIES: ${SECURE_COOKIES:-true}
+      # Host names the app answers to (the Host header); everything else gets 400.
+      # localhost/127.0.0.1 are for the health check inside the container.
+      ALLOWED_HOSTS: ${PUBLIC_HOST:?Set PUBLIC_HOST in .env},localhost,127.0.0.1
+      # Whose X-Forwarded-* headers uvicorn trusts. The container has no published port, so only
+      # containers on the "web" network (Caddy) can reach it. See doc/deployment.md to narrow it.
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-*}
+    networks:
+      - web
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/elements')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  db:
+    image: postgres:17-alpine
+    container_name: formel-x-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: formelx
+      POSTGRES_USER: formelx
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      # All accounts, groups and learning content. Back this up (doc/deployment.md).
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U formelx -d formelx"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+networks:
+  # Shared with Caddy and the other projects; created once on the server.
+  web:
+    external: true
+  # Only the app and its database; no internet access for the database.
+  internal:
+    internal: true
+
+volumes:
+  db-data:
