@@ -1,27 +1,46 @@
-FROM python:3.13-slim
+# syntax=docker/dockerfile:1
+#
+# FormelX web app (FastAPI + static frontend). Multi-stage build:
+#   1. "builder" installs the locked Python dependencies with uv into /app/.venv
+#   2. the final image copies only that environment and the source code (no uv, no caches)
+# Both base images are multi-arch, so this builds natively on arm64 (Oracle Ampere) and amd64.
+
+ARG PYTHON_IMAGE=python:3.13-slim
+
+FROM ${PYTHON_IMAGE} AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /bin/uv
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    UV_COMPILE_BYTECODE=1 \
+ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    PATH="/app/.venv/bin:$PATH"
+    UV_PYTHON_DOWNLOADS=never
 
 WORKDIR /app
-
-# Install the locked dependencies first so this layer is cached between code changes.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
 
-COPY alembic.ini .
+
+FROM ${PYTHON_IMAGE}
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH"
+
+# Unprivileged user: the app never needs root inside the container.
+RUN useradd --create-home --uid 10001 formelx
+
+WORKDIR /app
+COPY --from=builder /app/.venv /app/.venv
+COPY alembic.ini ./
 COPY src ./src
 
-RUN useradd --create-home formelx
 USER formelx
 
+# Plain HTTP inside the Docker network; the Caddy proxy in front terminates TLS (HTTPS).
 EXPOSE 8000
 
-# Configuration comes from environment variables (see .env.example).
-# Migrations run on every start; they are a no-op when the schema is current.
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn src.backend.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
+# Migrations run on every start; they're a no-op when the schema is current.
+# --proxy-headers: take the client address and the original scheme (https) from the
+# X-Forwarded-For / X-Forwarded-Proto headers of the proxies listed in FORWARDED_ALLOW_IPS.
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn src.backend.main:app --host 0.0.0.0 --port 8000 --proxy-headers --no-server-header"]

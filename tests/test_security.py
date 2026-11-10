@@ -20,7 +20,7 @@ def test_security_headers_on_pages_api_and_errors(client):
         assert headers["x-content-type-options"] == "nosniff"
         assert headers["x-frame-options"] == "DENY"
         assert headers["referrer-policy"] == "same-origin"
-    # HSTS only when the app runs behind HTTPS (secure cookies); the test settings don't.
+    # HSTS belongs to the HTTPS proxy (Caddy), not the app.
     assert "strict-transport-security" not in client.get("/").headers
 
 
@@ -98,3 +98,21 @@ def test_passwords_have_an_upper_bound(client):
     register(client)
     response = client.post("/api/auth/login", json={"email": "owner@example.com", "password": "x" * 1025})
     assert response.status_code == 422
+
+
+def test_only_allowed_hosts_are_answered():
+    from fastapi.testclient import TestClient
+
+    from src.backend.app import create_app
+    from src.backend.database import Database
+    from tests.conftest import TEST_DATABASE_URL
+
+    settings = Settings(database_url=TEST_DATABASE_URL, session_secret="test-secret-at-least-32-characters-long",
+                        secure_cookies=False, allowed_hosts="formelx.example, localhost")
+    with TestClient(create_app(settings, db=Database(TEST_DATABASE_URL))) as client:
+        assert client.get("/", headers={"Host": "formelx.example"}).status_code == 200
+        assert client.get("/", headers={"Host": "localhost:8000"}).status_code == 200
+        response = client.get("/", headers={"Host": "attacker.example"})
+        assert response.status_code == 400
+        # No redirect of any kind from the app: redirects are the proxy's job.
+        assert "location" not in response.headers

@@ -41,6 +41,13 @@ class Settings(DatabaseSettings):
     # python -c "import secrets; print(secrets.token_urlsafe(32))"
     session_secret: str = Field(min_length=32)
     secure_cookies: bool = True
+    # Comma-separated host names the app answers to, e.g. "formel-x.duckdns.org,localhost".
+    # "*" (the default, for development) accepts any Host header.
+    allowed_hosts: str = "*"
+
+    @property
+    def allowed_host_list(self):
+        return [host.strip() for host in self.allowed_hosts.split(",") if host.strip()] or ["*"]
 
 
 class SupabaseSettings(_Base):

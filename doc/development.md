@@ -22,7 +22,8 @@ In `.env`, set:
 Start the database and create the tables (once, and again after pulling new migrations):
 
 ```bash
-docker compose up -d db
+docker network create web          # once; compose.yaml expects this network
+docker compose -f compose.yaml -f compose.dev.yaml up -d db
 uv run alembic upgrade head
 ```
 
@@ -36,8 +37,10 @@ Open http://127.0.0.1:8000. The API docs are at http://127.0.0.1:8000/api/docs.
 
 The frontend has no build step: edit files in `src/frontend` and reload the page.
 
-To run the whole stack in Docker (as on the server) use `docker compose up -d --build`. Set
-`APP_PORT` or `DB_PORT` in `.env` if port 8000 or 5432 is taken.
+To run the whole stack in Docker on http://127.0.0.1:8000 use
+`docker compose -f compose.yaml -f compose.dev.yaml up -d --build` (set `PUBLIC_HOST=localhost` in
+`.env`). Set `APP_PORT` or `DB_PORT` in `.env` if port 8000 or 5432 is taken. The server uses
+`compose.yaml` alone, without published ports (see deployment.md).
 
 ## Dependencies
 
@@ -63,7 +66,7 @@ uv run pytest -m "not e2e"     # skip the browser tests
 `TEST_DATABASE_URL` at an **empty** database that may be wiped:
 
 ```bash
-docker compose exec db createdb -U formelx formelx_test
+docker exec formel-x-db createdb -U formelx formelx_test
 TEST_DATABASE_URL=postgresql+asyncpg://formelx:<password>@localhost:5432/formelx_test uv run pytest tests/test_api.py
 ```
 
