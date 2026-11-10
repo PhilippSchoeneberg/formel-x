@@ -5,7 +5,7 @@ import { api } from "../api.js";
 import { DIFFICULTIES, categoryDialog, confirmDelete, entryDialog, showError } from "../dialogs.js";
 import { t } from "../i18n.js";
 import { isOwner, savePrefs, state } from "../store.js";
-import { button, h } from "../ui.js";
+import { button, h, replaceContent } from "../ui.js";
 import { pageHeader, segmented } from "./common.js";
 
 export const KINDS = {
@@ -108,5 +108,5 @@ export async function renderMenu(view, kind) {
     );
   }
 
-  view.replaceChildren(pageHeader(t(config.titleKey), { actions }), filters, content);
+  replaceContent(view, pageHeader(t(config.titleKey), { actions }), filters, content);
 }

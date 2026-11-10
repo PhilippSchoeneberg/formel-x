@@ -4,7 +4,7 @@ import { api } from "./api.js";
 import { loginDialog, showError } from "./dialogs.js";
 import { LANGUAGES, detectLanguage, setLanguage, t } from "./i18n.js";
 import { loadAccount, notify, onChange, refreshGroups, savePrefs, state } from "./store.js";
-import { button, h, messageDialog } from "./ui.js";
+import { button, focusElement, h, messageDialog } from "./ui.js";
 import { renderElements } from "./views/elements.js";
 import { renderHome } from "./views/home.js";
 import { renderMenu } from "./views/menu.js";
@@ -28,7 +28,17 @@ function parseHash() {
 
 let renderToken = 0;
 
-async function render() {
+/** Names the browser tab after the page's main heading, so screen readers announce where you are. */
+function updateDocumentTitle() {
+  const heading = view.querySelector("h1")?.textContent?.trim();
+  document.title = heading && heading !== "FormelX" ? `${heading} – FormelX` : "FormelX";
+}
+
+/**
+ * Renders the current route. `moveFocus` is set after navigating, so keyboard and screen reader
+ * users start at the new page's heading instead of somewhere in the old, now removed, content.
+ */
+async function render({ moveFocus = false } = {}) {
   const token = ++renderToken;
   const { path, params } = parseHash();
   const route = ROUTES.find((item) => item.pattern.test(path));
@@ -41,6 +51,9 @@ async function render() {
   const match = path.match(route.pattern).slice(1);
   try {
     await route.render(match, params, () => token === renderToken);
+    if (token !== renderToken) return;
+    updateDocumentTitle();
+    if (moveFocus) focusElement(view.querySelector("h1") || view);
   } catch (error) {
     if (token === renderToken) showError(error);
   }
@@ -62,9 +75,12 @@ function currentTheme() {
 function renderHeader() {
   const actions = document.getElementById("header-actions");
   document.querySelector(".skip-link").textContent = t("skip_to_content");
+  // The header is rebuilt on every change; put focus back on the control that had it.
+  const focused = actions.contains(document.activeElement) ? document.activeElement.dataset.control : null;
 
-  const language = h("select", { class: "language-select", "aria-label": t("language") },
-    Object.entries(LANGUAGES).map(([code, name]) => h("option", { value: code }, name)));
+  // Each language name is announced in its own language.
+  const language = h("select", { class: "language-select", "aria-label": t("language"), "data-control": "language" },
+    Object.entries(LANGUAGES).map(([code, name]) => h("option", { value: code, lang: code }, name)));
   language.value = state.prefs.language;
   language.addEventListener("change", async () => {
     savePrefs({ language: language.value });
@@ -77,6 +93,7 @@ function renderHeader() {
     icon: dark ? "sun" : "moon",
     variant: "text",
     iconOnly: true,
+    "data-control": "theme",
     onclick: () => {
       savePrefs({ theme: currentTheme() === "dark" ? "light" : "dark" });
       applyTheme();
@@ -90,6 +107,7 @@ function renderHeader() {
         variant: "text",
         class: "account-button",
         title: state.account.email,
+        "data-control": "account",
         onclick: async () => {
           try {
             await api.logout();
@@ -105,6 +123,7 @@ function renderHeader() {
         icon: "account",
         variant: "tonal",
         class: "account-button",
+        "data-control": "account",
         onclick: async () => {
           const account = await loginDialog();
           if (!account) return;
@@ -119,6 +138,7 @@ function renderHeader() {
       });
 
   actions.replaceChildren(language, theme, account);
+  if (focused) actions.querySelector(`[data-control="${focused}"]`)?.focus();
 }
 
 // Start -------------------------------------------------------------------------
@@ -148,7 +168,7 @@ async function start() {
     renderHeader();
     render();
   });
-  window.addEventListener("hashchange", render);
+  window.addEventListener("hashchange", () => render({ moveFocus: true }));
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderHeader);
   renderHeader();
   render();

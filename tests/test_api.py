@@ -164,6 +164,8 @@ def test_frontend_is_served(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "<title>FormelX</title>" in response.text
+    # Browsers must re-validate the frontend so a deploy never mixes old and new modules.
+    assert client.get("/js/main.js").headers["cache-control"] == "no-cache"
 
 
 def test_deleting_a_group_deletes_its_content(client):
